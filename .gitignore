@@ -1,3 +1,4 @@
+*.pyc
 rq_tools/settings.py
 sql.sql
 enemygen.json
