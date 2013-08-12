@@ -1,0 +1,242 @@
+/*
+--------------Default Styles--------------
+#tableid -> .table-default
+#tableid thead tr th -> .head-default
+#tableid tbody tr td -> .body-default
+#tableid caption -> .caption-default
+--------------Default Styles--------------
+*/
+.table-default
+{
+	width: 300px;
+	margin: 1em auto;
+	border-collapse: collapse;
+	font: 12px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+	border-right: 1px solid #A2A2A2;
+}
+.head-default
+{
+	font-weight: normal;
+	color: #FEFEFE;
+	text-align: center;
+	border-left: 1px solid #A3A3A3;
+	padding: 0.4em 1em 0.3em;
+	background: #010101 url(images/bg-default.png) repeat-x;
+}
+.body-default
+{
+	color: #8E8E8E;
+	padding: 9px;
+	border-right: 1px solid #A3A3A3;
+	text-align: center;
+	background-color: #DDDDDD;
+	border-bottom: 1px solid #FFFFFF;
+}
+.caption-default
+{
+	color: #646464;
+	font-size: 0.94em;
+	letter-spacing: 0.1em;
+	margin: 1em 0 0;
+	padding: 0;
+	caption-side: top;
+	text-align: center;
+}
+/*
+--------------Default Styles--------------
+
+
+--------------Hover and Stripped Styles--------------
+-- Hover Head --
+#tableid thead tr th -> .hoverhead-default
+#tableid tbody tr td -> .hoverheadtd-default
+-- Hover Body --
+#tableid tbody tr -> .hoverbody-default
+-- Stripped --
+#tableid tbody tr -> .odd-default
+--------------Hover and Stripped Styles--------------
+*/
+.odd-default
+{
+	color: #3A3A3A;
+	background-color: #B5B4B4;
+}
+.hoverhead-default
+{
+	color: #FFFFFF;
+	cursor: default;
+	background-color: #B2B2B2;
+	text-decoration: underline;
+	border-left: 0px solid #B2B2B2;
+}
+.hoverheadtd-default
+{
+	color: #020202;
+	background-color: #DADBDB;
+}
+.hoverbody-default
+{
+	color: #BFBFBF;
+	background-color: #262626;
+	cursor: default;
+}
+/*
+--------------Hover and Stripped Styles--------------
+
+
+--------------Numeration Styles--------------
+#tableid tbody tr-> .num-default
+extend: .num-default:hover
+--------------Numeration Styles--------------
+
+*/
+.num-default
+{
+	color: #827272;
+	cursor: pointer;
+	background-color: #DBDBDB;
+	padding: 9px;
+	text-align: center;
+	border: 1px solid #FFFFFF;
+}
+.num-default:hover
+{
+	background-color: #5B5B5B;
+	color: #FFFFFF;
+}
+/*
+--------------Numeration Styles--------------
+
+--------------Sorting Styles--------------
+*/
+.clickable-default
+{
+	cursor: pointer;
+}
+.sorted-default
+{
+	color: #FFFFFF;
+	background-color: #3C3C3C;
+}
+.onclick-default
+{
+	font-weight: bold;
+}
+.sort-img
+{
+	float: right;
+	height: 13px;
+}
+/*
+--------------Sorting Styles--------------
+
+--------------Pagination Styles--------------
+*/
+.pagination
+{
+	width: 300px;
+	margin: -0.3em auto 1em;
+	font: 12px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+}
+.page-list
+{
+	display: inline;
+}
+.page-item
+{
+	display: inline;
+	padding: 0px 5px;
+	margin: 0px 2px;
+	border: 1px solid #7C7C7C;
+	color: #020202;
+	cursor: pointer;
+}
+.page-item:hover
+{
+	background-color: #191919;
+	color: #FFFFFF;
+}
+.selected-page-item
+{
+	background-color: #121212;
+	color: #FFFFFF;
+}
+#pag-info
+{
+	float: left;
+	margin-left: 15px;
+}
+#pag-btn
+{
+	float: right;
+}
+/*
+--------------Pagination Styles--------------
+
+--------------Highlight Style--------------
+*/
+.highlight-default
+{
+	color: #DE0E01;
+}
+.clicklight-default
+{
+	color: #DE0E01;
+}
+/*
+--------------Highlight Style--------------
+
+--------------Edit Box Style--------------
+*/
+.editcell
+{
+	color: #020202;
+	background-color: #FFFFFF;
+	height: 25px;
+	text-align: center;
+	padding: 8px 0 0;
+	font-family: Tahoma;
+}
+.editcell:hover
+{
+}
+UL.btn
+{
+	border: 0px solid #000000;
+	width: 146px;
+	margin: 10px 0 0;
+}
+UL.btn LI
+{
+	display: inline;
+	margin: 1px;
+	border: 1px solid #AAAAAA;
+	padding: 3px;
+}
+UL.btn LI:hover
+{
+	background-color: #020202;
+}
+UL.btn LI A
+{
+	color: #FFFFFF;
+	text-decoration: none;
+}
+UL.btn LI A:hover
+{
+	text-decoration: underline;
+	cursor: pointer;
+}
+/*
+--------------Edit Box Style--------------
+
+
+--------------Highlight Word--------------
+*/
+.hlight
+{
+	font-weight: bold;
+}
+/*
+--------------Highlight Word--------------
+*/

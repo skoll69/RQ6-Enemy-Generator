@@ -1,0 +1,1 @@
+http://localdev/rq_tools/accounts/activate/{{ activation_key }}/

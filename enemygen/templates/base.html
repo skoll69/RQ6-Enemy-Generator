@@ -1,0 +1,43 @@
+{% load url from future %}
+{% load dajaxice_templatetags %}
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>{% block title %}D100 Encounter Generator{% endblock %}</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script src="/rq_static/js/enemygen.js"></script>
+    <script src="/rq_static/js/tquery/core.js"></script>
+    <link rel="stylesheet" type="text/css" href="/rq_static/base.css">
+    {% dajaxice_js_import %}
+</head>
+
+<body><div id="main_container">
+
+<div id="header">D100 Encounter Generator</div>
+
+{% include 'menu.html' %}
+
+{% if setting %}
+<div id="ruleset_setting">
+    Setting: 
+    <form action="{% url 'select_setting_ruleset' %}" method="post" style="display: inline-block;">
+    {% csrf_token %}
+    <select name="setting_id" onchange="this.form.submit()">
+        {% for sett in settings %}
+            <option value="{{ sett.id }}" {% if sett.name = setting %}selected="selected"{% endif %}>{{ sett.name }}</option>
+        {% endfor %}
+    </select>
+    </form>
+</div>
+{% endif %}
+
+<div id="main_content">
+    {% block content %}{% endblock %}
+</div>
+
+<div id="footer">{% if generated %}{{ generated }} foes generated | {% endif %}<a id="email" href="mailto:erkki.lepre@iki.fi">erkki.lepre@iki.fi</a></div>
+
+</div></body>
+</html>

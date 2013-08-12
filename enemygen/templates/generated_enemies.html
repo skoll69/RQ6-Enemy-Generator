@@ -1,0 +1,151 @@
+<html>
+<head>
+<style type="text/css">
+body{
+    font-size: 12px;
+}
+
+div#table_container{
+    width:720px;
+}
+
+.template_name{
+    font-weight: bold;
+}
+
+div.enemy_container{
+    margin-top: 15px;
+    margin-right: 10px;
+    float: left;
+    width: 340px;
+}
+
+.enemy_table{
+    background: white;
+    font-family: Serif;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.enemy_table td, th{
+    font-size: 12px;
+}
+
+.inner_enemy_table{
+    border-collapse: collapse;
+}
+
+.inner_enemy_table td{
+    padding: 2px;
+}
+
+.toprow{
+    background: #555;
+    color: white;
+}
+.evenrow{
+}
+
+.oddrow{
+    background: #CCC;
+}
+
+.title{
+    font-weight: bold;
+}
+
+.item_list{
+    font-style: italic;
+}
+
+table#weapon_table tr td{
+    font-size: 12px;
+}
+</style>
+</head>
+<body>
+
+<div id="table_container">
+{% for enemy in enemies %}
+<div class="enemy_container">
+<table class="enemy_table">
+    <tr><td colspan="3"><span class="template_name">{{ enemy.name }}</span></td></tr>
+    <tr><td valign="top">
+        <table class="inner_enemy_table" id="characteristics">
+            <tr class="toprow"><th>Chars</th></tr>
+            {% for stat in enemy.get_stats %}
+                <tr><td class="{% if forloop.counter|divisibleby:2 %}evenrow{% else %}oddrow{% endif %}">
+                    {{ stat.name }}: {{ stat.value }}
+                </td></tr>
+            {% endfor %}
+        </table>
+    </td><td valign="top">
+        <table class="inner_enemy_table" id="attributes">
+            <tr class="toprow"> <th colspan="2">Attributes</th></tr>
+            <tr class="oddrow"> <td>Action Points</td>  <td>{{ enemy.attributes.action_points }}</td></tr>
+            <tr class="evenrow"><td>Damage Modifier</td><td>{{ enemy.attributes.damage_modifier }}</td></tr>
+            <tr class="oddrow"> <td>Magic Points</td>   <td>{{ enemy.attributes.magic_points }}</td></tr>
+            <tr class="evenrow"><td>Movement</td>       <td>{{ enemy.attributes.movement }}</td></tr>
+            <tr class="oddrow"> <td>Strike Rank</td>    <td>{{ enemy.attributes.strike_rank }}</td></tr>
+            <tr class="evenrow"><td>&nbsp;</td>         <td>{{ enemy.attributes. }}</td></tr>
+            <tr class="oddrow"> <td>&nbsp;</td>         <td>{{ enemy.attributes. }}</td></tr>
+        </table>
+    </td><td valign="top">
+        <table class="inner_enemy_table" id="hit_locations">
+            <tr class="toprow"><th>1D20</th><th>Location</th><th>AP/HP</th></tr>
+            {% for hl in enemy.hit_locations %}
+                <tr class="{% if forloop.counter|divisibleby:2 %}evenrow{% else %}oddrow{% endif %}">
+                    <td>{{ hl.range }}</td><td>{{ hl.name }}</td><td>{{ hl.ap }}/{{ hl.hp }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </td></tr>
+</table>
+    
+    <span class="title">Skills:</span><span class="item_list">
+        {% for skill in enemy.skills %}
+            {{ skill.name }} {{skill.value}}%{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </span><br>
+    
+    {% if enemy.folk_spells %}
+        <span class="title">Folk magic spells:</span><span class="item_list">
+            {% for spell in enemy.folk_spells %}
+                {{ spell }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </span><br>
+    {% endif %}
+    
+    {% if enemy.sorcery_spells %}
+        <span class="title">Sorcery spells:</span><span class="item_list">
+            {% for spell in enemy.sorcery_spells %}
+                {{ spell }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </span><br>
+    {% endif %}
+    
+    {% if enemy.theism_spells %}
+        <span class="title">Theism spells/Miracles:</span><span class="item_list">
+            {% for spell in enemy.theism_spells %}
+                {{ spell }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </span><br>
+    {% endif %}
+    
+    <span class="title">Combat Styles:</span><span class="item_list">
+        {% for cs in enemy.combat_styles %}
+            {{ cs.name }} {{ cs.value }}%{% if not forloop.last %}, {% endif %}
+            <table id="weapon_table">
+                <tr><th>Weapon</th><th>Size/Force</th><th>Reach</th><th>Damage</th><th>AP/HP</th></tr>
+                {% for weapon in cs.weapons %}
+                    <tr><td>{{ weapon.name }}</td><td>{{weapon.size}}</td><td>{{weapon.reach}}</td><td>{{weapon.damage}}</td><td>{{weapon.ap}}/{{weapon.hp}}</td></tr>
+                {% endfor %}
+            </table>
+        {% endfor %}
+    </span>
+</div>
+{% endfor %}
+</div>
+
+</body>
+</html>

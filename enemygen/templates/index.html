@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block content %}
+
+<form action="{% url 'generate_enemies' %}" method="post" target="_blank">
+{% csrf_token %}
+<table id="enemy_template_list">
+    <thead><tr>
+        <th class="sort-alpha">Enemy type</th>
+        <th>Amount</th>
+        <th class="sort-alpha">Rank</th>
+        <th class="sort-alpha">Creator</th>
+        <th></th>
+    </tr></thead>
+    {% for et in templates %}
+        <tr>
+            <td>{{ et.name }} {% if not et.published %}(not published){% endif %}</td>
+            <td><input name="enemy_template_id_{{et.id}}" min="1" max="40" type="number"></td>
+            <td>
+                {% if et.rank = 1 %}1 Rubble{% endif %}
+                {% if et.rank = 2 %}2 Novice{% endif %}
+                {% if et.rank = 3 %}3 Skilled{% endif %}
+                {% if et.rank = 4 %}4 Veteran{% endif %}
+                {% if et.rank = 5 %}5 Master{% endif %}
+            </td>
+            <td>{{ et.owner }}</td>
+            <td><a class="edit_item" href="{% url 'enemy_template' et.id %}">View</a></td>
+        </tr>
+    {% endfor %}
+</table>
+
+<div><p>Type to search: <input id="searchinput" /></p></div>
+
+<input type="submit" value="Generate">
+</form>
+
+<br><br>
+
+<script>
+$(document).ready(function(){
+    var table = new ttable('enemy_template_list'); 
+    table.sorting.enabled = true;
+    table.sorting.sortall = false;
+    table.search.enabled = true;
+    table.search.inputID = 'searchinput';
+    table.search.casesensitive = false;
+    
+    table.rendertable();
+    console.log('ready');
+});
+</script>
+
+{% endblock %}

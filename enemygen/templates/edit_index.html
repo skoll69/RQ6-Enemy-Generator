@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block content %}
+
+{% if enemy_templates %}
+    <h4>Enemy Templates</h4>
+    <table>
+    <tr><th>Template name</th><th>Rank</th><th>Published</th></tr>
+    {% for et in enemy_templates %}
+        <tr>
+            <td><a class="edit_item" href="{% url 'enemy_template' et.id %}">{{ et }}</a></td>
+            <td>
+                {% if et.rank = 1 %}Rubble{% endif %}
+                {% if et.rank = 2 %}Novice{% endif %}
+                {% if et.rank = 3 %}Skilled{% endif %}
+                {% if et.rank = 4 %}Veteran{% endif %}
+                {% if et.rank = 5 %}Master{% endif %}
+            </td>
+            <td>{% if et.published %}Yes{% else %}No{% endif %}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    <br>
+{% endif %}
+
+<h4>Create new template</h4>
+<p>Start creating a new template by selecting race.</p>
+<form action="{% url 'create_enemy_template'%}" method="post">
+{% csrf_token %}
+<select name="race_id">
+<option value="0">Select race</option>
+{% for race in races %}
+    <option value="{{ race.id }}">{{ race.name }}</option>
+{% endfor %}
+</select>
+<p><input type="submit" value="Create new template"></p>
+</form>
+
+{% endblock %}

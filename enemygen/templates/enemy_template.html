@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block content %}
+<h3>Enemy details</h3>
+<table><tr>
+    <th>Template name</th>
+    <td><input id="et_{{ et.id }}" class="data" type="text" item_id="{{ et.id }}" item_type="et_name" value="{{ et.name }}" /></td>
+</tr><tr>
+    <th>Rank</th>
+    <td>
+        <select id="et_rank_{{ et.id }}" class="data" item_id="{{ et.id }}" item_type="et_rank">
+            <option value="1" {% if et.rank == 1 %}selected="selected"{% endif %}>Rubble</option>
+            <option value="2" {% if et.rank == 2 %}selected="selected"{% endif %}>Novice</option>
+            <option value="3" {% if et.rank == 3 %}selected="selected"{% endif %}>Skilled</option>
+            <option value="4" {% if et.rank == 4 %}selected="selected"{% endif %}>Veteran</option>
+            <option value="5" {% if et.rank == 5 %}selected="selected"{% endif %}>Master</option>
+        </select>
+    </td>
+</tr><tr>
+    <th>Setting</th>
+    <td>
+        <select id="et_setting_{{ et.id }}" class="data" item_id="{{ et.id }}" item_type="et_setting">
+            <option value="1" {% if et.setting.id == 1 %}selected="selected"{% endif %}>Glorantha</option>
+            <option value="2" {% if et.setting.id == 2 %}selected="selected"{% endif %}>Generic fantasy</option>
+        </select>
+    </td>
+</tr><tr>
+    <th>Published</th>
+    <td><input id="et_pub_{{ et.id }}" class="data" type="checkbox" item_id="{{ et.id }}" item_type="et_published" {% if et.published %}checked="checked"{% endif %} /></td>
+</tr></table>
+
+<form action="{% url 'delete_template' et.id %}" method="post">
+{% csrf_token %}
+<div id="delete_template"><input type="submit" value="Delete template" /></div>
+</form>
+
+<table id="stats_and_hp"><tr><td valign="top">
+<table>
+<tr><th colspan="2">Stats</th></tr>
+{% for stat in et.stats %}
+    <tr>
+        <td>{{ stat.name }}</td>
+        <td>
+            <input id="stat_{{stat.id}}" class="data" type="text" item_id="{{stat.id}}" item_type="et_stat_value" value="{{ stat.die_set }}" />
+        </td>
+    </tr>
+{% endfor %}
+</table>
+</td><td valign="top">
+<table>
+<tr><th>D20</th><th>Hit location</th><th>Armor</th></tr>
+{% for hl in et.hit_locations %}
+    <tr>
+        <td>{{ hl.range }}</td>
+        <td>{{ hl.name }}</td>
+        <td>
+            <input id="hl_{{hl.id}}" class="data" type="text" item_id="{{hl.id}}" item_type="et_hl_armor" value="{{ hl.armor }}" />
+        </td>
+    </tr>
+{% endfor %}
+</table>
+</td></tr></table>
+
+<h3>Standard skills</h3>
+<table><tr>
+{% for skill in et.standard_skills %}
+        <td>{{ skill.name }}</td>
+        <td valign="top">
+            <input id="skill_include_{{skill.id}}" class="data" type="checkbox" item_id="{{skill.id}}" item_type="et_skill_include" {% if skill.include %}checked="checked"{% endif %} />
+            <input id="skill_{{skill.id}}" class="data" type="text" item_id="{{skill.id}}" item_type="et_skill_value" value="{{ skill.die_set }}" />
+        </td>
+        {% if forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
+{% endfor %}
+</tr></table>
+
+<h3>Professional skills</h3>
+<table><tr>
+{% for skill in et.professional_skills %}
+        <td>{{ skill.name }}</td>
+        <td valign="top">
+            <input id="skill_include_{{skill.id}}" class="data" type="checkbox" item_id="{{skill.id}}" item_type="et_skill_include" {% if skill.include %}checked="checked"{% endif %} />
+            <input id="skill_{{skill.id}}" class="data" type="text" item_id="{{skill.id}}" item_type="et_skill_value" value="{{ skill.die_set }}" />
+        </td>
+        {% if forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
+{% endfor %}
+</tr></table>
+
+<h3>Combat styles</h3>
+{% for cs in et.combat_styles %}
+<input id="combat_style_name_{{cs.id}}" class="data" type="text" item_id="{{cs.id}}" item_type="et_combat_style_name" value="{{ cs.name }}" />
+<input id="combat_style_value_{{cs.id}}" class="data" type="text" item_id="{{cs.id}}" item_type="et_combat_style_value" value="{{ cs.die_set }}" />
+
+<h3>Weapon options</h3>
+<table><tr><td valign="top">
+<h4>1-handed weapons</h4>
+<table>
+    {% for weapon in weapons.1h %}
+    <tr>
+        <td valign="top">
+            <input id="weapon_{{weapon.id}}" class="data" type="checkbox" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_include" {% if weapon in cs.weapon_options.all %}checked="checked"{% endif %} />
+            {{ weapon.name }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+</td>
+
+<td valign="top">
+<h4>2-handed weapons</h4>
+<table>
+    {% for weapon in weapons.2h %}
+    <tr>
+        <td valign="top">
+            <input id="weapon_{{weapon.id}}" class="data" type="checkbox" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_include" {% if weapon in cs.weapon_options.all %}checked="checked"{% endif %} />
+            {{ weapon.name }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+</td>
+
+<td valign="top">
+<h4>Ranged weapons</h4>
+<table>
+    {% for weapon in weapons.ranged %}
+    <tr>
+        <td valign="top">
+            <input id="weapon_{{weapon.id}}" class="data" type="checkbox" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_include" {% if weapon in cs.weapon_options.all %}checked="checked"{% endif %} />
+            {{ weapon.name }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+</td>
+
+<td valign="top">
+<h4>Shields</h4>
+<table>
+    {% for weapon in weapons.shields %}
+    <tr>
+        <td valign="top">
+            <input id="weapon_{{weapon.id}}" class="data" type="checkbox" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_include" {% if weapon in cs.weapon_options.all %}checked="checked"{% endif %} />
+            {{ weapon.name }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endfor %}
+<br>
+</td></tr></table>
+
+<h3>Folk spells</h3>
+Amount:
+<input id="et_folk_spells_{{ et.id }}" class="data" size="3" type="text" item_id="{{ et.id }}" item_type="et_folk_spell_amount" value="{{ et.folk_spell_amount }}" /><br>
+<table><tr>
+<tr><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th></tr>
+{% for spell in folk_spells %}
+    <td>
+        {{ spell.name }}
+        {% if spell.detail %}
+            <input id="spell_detail_{{spell.id}}" class="data" type="text" size="10" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_spell_detail" value="{{ spell.detail_text }}" />
+        {% endif %}
+    </td>
+    <td>
+        <input id="spell_{{spell.id}}" class="data number" type="number" min="0" max="100" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_spell_prob" value="{{ spell.probability }}" />
+    </td>
+    {% if not forloop.first and forloop.counter|divisibleby:"4" %}</tr><tr>{% endif %}
+{% endfor %}
+</tr></table>
+
+<h3>Theism spells</h3>
+Amount: 
+<input id="et_theism_spells_{{ et.id }}" class="data" size="3" type="text" item_id="{{ et.id }}" item_type="et_theism_spell_amount" value="{{ et.theism_spell_amount }}" /><br>
+<table>
+<tr><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th></tr>
+<tr>
+{% for spell in theism_spells %}
+    <td>
+        {{ spell.name }}
+        {% if spell.detail %}
+            <input id="spell_detail_{{spell.id}}" class="data" type="text" size="10" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_spell_detail" value="{{ spell.detail_text }}" />
+        {% endif %}
+    </td>
+    <td>
+        <input id="spell_{{spell.id}}" class="data number" type="number" min="0" max="100" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_spell_prob" value="{{ spell.probability }}" />
+    </td>
+    {% if not forloop.first and forloop.counter|divisibleby:"4" %}</tr><tr>{% endif %}
+{% endfor %}
+</tr></table>
+
+<h3>Sorcery spells</h3>
+Amount: 
+<input id="et_sorcery_spells_{{ et.id }}" class="data" size="3" type="text" item_id="{{ et.id }}" item_type="et_sorcery_spell_amount" value="{{ et.sorcery_spell_amount }}" /><br>
+<table>
+<tr><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.</th></tr>
+<tr>
+{% for spell in sorcery_spells %}
+    <td>
+        {{ spell.name }}
+        {% if spell.detail %}
+            <input id="spell_detail_{{spell.id}}" class="data" type="text" size="9" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_spell_detail" value="{{ spell.detail_text }}" />
+        {% endif %}
+    </td>
+    <td>
+        <input id="spell_{{spell.id}}" class="data number" type="number" min="0" max="100" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_spell_prob" value="{{ spell.probability }}" />
+    </td>
+    {% if not forloop.first and forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
+{% endfor %}
+</tr></table>
+
+{% endblock %}
