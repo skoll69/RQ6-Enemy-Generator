@@ -2,7 +2,7 @@ from django.contrib import admin
 from enemygen.models import EnemyTemplate, Setting, Ruleset, Race, HitLocation
 from enemygen.models import SkillAbstract, SpellAbstract, StatAbstract, Weapon
 from enemygen.models import EnemySkill, EnemySpell, EnemyStat, EnemyHitLocation, RaceStat
-from enemygen.models import CombatStyle
+from enemygen.models import CombatStyle, CustomSpell
 
 class EnemyTemplateAdmin(admin.ModelAdmin):
     list_display = ('name', 'ruleset', 'setting', 'race', 'rank', 'generated', 'published', 'owner')
@@ -52,6 +52,7 @@ admin.site.register(Setting)
 admin.site.register(CombatStyle)
 admin.site.register(Ruleset)
 admin.site.register(Race)
+admin.site.register(CustomSpell)
 admin.site.register(Weapon, WeaponAdmin)
 admin.site.register(RaceStat, RaceStatAdmin)
 admin.site.register(HitLocation, HitLocationAdmin)

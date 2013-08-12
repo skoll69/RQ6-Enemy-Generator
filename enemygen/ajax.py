@@ -2,13 +2,17 @@ from django.utils import simplejson
 from dajaxice.decorators import dajaxice_register
 from enemygen.models import EnemyStat, EnemySkill, EnemyTemplate, Ruleset, StatAbstract
 from enemygen.models import SpellAbstract, SkillAbstract, EnemySpell, EnemyHitLocation
-from enemygen.models import CombatStyle, Weapon, Setting
+from enemygen.models import CombatStyle, Weapon, Setting, CustomSpell
 
 from enemygen.enemygen_lib import to_bool
 
 @dajaxice_register
-def sayhello(request):
-    return simplejson.dumps({'message':'Hello World'})
+def add_custom_spell(request, et_id, type):
+    try:
+        CustomSpell.create(et_id, type)
+        return simplejson.dumps({'success': True})
+    except Exception as e:
+        return simplejson.dumps({'error': str(e)})
     
 @dajaxice_register
 def submit(request, value, id, object, parent_id=None, extra={}):
@@ -50,6 +54,18 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             except ValueError:
                 success = False
                 message = 'Probability must be a number.'
+        elif object == 'et_custom_spell_prob':
+            cs = CustomSpell.objects.get(id=id)
+            original_value = cs.probability
+            try:
+                cs.set_probability(int(value))
+            except ValueError:
+                success = False
+                message = 'Probability must be a number.'
+        elif object == 'et_custom_spell_name':
+            cs = CustomSpell.objects.get(id=id)
+            cs.name = value
+            cs.save()
         elif object == 'et_name':
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
             et.name = value
@@ -76,18 +92,18 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
             et.setting = Setting.objects.get(id=int(value))
             et.save()
-        elif object == 'stat_name':
-            stat = StatAbstract.objects.get(id=id)
-            stat.name = value
-            stat.save()
-        elif object == 'spell_name':
-            spell = SpellAbstract.objects.get(id=id)
-            spell.name = value
-            spell.save()
-        elif object == 'skill_name':
-            skill = SkillAbstract.objects.get(id=id)
-            skill.name = value
-            skill.save()
+        #elif object == 'stat_name':
+        #    stat = StatAbstract.objects.get(id=id)
+        #    stat.name = value
+        #    stat.save()
+        #elif object == 'spell_name':
+        #    spell = SpellAbstract.objects.get(id=id)
+        #    spell.name = value
+        #    spell.save()
+        #elif object == 'skill_name':
+        #    skill = SkillAbstract.objects.get(id=id)
+        #    skill.name = value
+        #    skill.save()
         elif object == 'et_folk_spell_amount':
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
             et.folk_spell_amount = value
@@ -102,8 +118,12 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             et.save()
         elif object == 'et_hl_armor':
             ehl = EnemyHitLocation.objects.get(id=id)
-            ehl.armor = value
-            ehl.save()
+            try:
+                ehl.set_armor(value)
+            except ValueError:
+                original_value = ehl.armor
+                success = False
+                message = "Not a valid dice set"
         elif object == 'et_combat_style_name':
             cs = CombatStyle.objects.get(id=id)
             cs.name = value

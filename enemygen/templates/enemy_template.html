@@ -156,18 +156,25 @@ Amount:
 <table><tr>
 <tr><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th></tr>
 {% for spell in folk_spells %}
-    <td>
-        {{ spell.name }}
+    <td>{% if not spell.custom %}
+            {{ spell.name }}
+        {% else %}
+            <input id="custom_spell_name_{{spell.id}}" class="data" type="text" size="10" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_custom_spell_name" value="{{ spell.name }}" />
+        {% endif %}
         {% if spell.detail %}
             <input id="spell_detail_{{spell.id}}" class="data" type="text" size="10" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_spell_detail" value="{{ spell.detail_text }}" />
         {% endif %}
     </td>
-    <td>
-        <input id="spell_{{spell.id}}" class="data number" type="number" min="0" max="100" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_spell_prob" value="{{ spell.probability }}" />
+    <td>{% if not spell.custom %}
+            <input id="spell_{{spell.id}}" class="data number" type="number" min="0" max="100" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_spell_prob" value="{{ spell.probability }}" />
+        {% else %}
+            <input id="custom_spell_{{spell.id}}" class="data number" type="number" min="0" max="100" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_custom_spell_prob" value="{{ spell.probability }}" />
+        {% endif %}
     </td>
     {% if not forloop.first and forloop.counter|divisibleby:"4" %}</tr><tr>{% endif %}
 {% endfor %}
 </tr></table>
+<button class="add_custom_spell" et_id="{{ et.id }}" type="folk">Add custom spell</button>
 
 <h3>Theism spells</h3>
 Amount: 
@@ -176,18 +183,25 @@ Amount:
 <tr><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th></tr>
 <tr>
 {% for spell in theism_spells %}
-    <td>
-        {{ spell.name }}
+    <td>{% if not spell.custom %}
+            {{ spell.name }}
+        {% else %}
+            <input id="custom_spell_name_{{spell.id}}" class="data" type="text" size="10" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_custom_spell_name" value="{{ spell.name }}" />
+        {% endif %}
         {% if spell.detail %}
             <input id="spell_detail_{{spell.id}}" class="data" type="text" size="10" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_spell_detail" value="{{ spell.detail_text }}" />
         {% endif %}
     </td>
-    <td>
-        <input id="spell_{{spell.id}}" class="data number" type="number" min="0" max="100" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_spell_prob" value="{{ spell.probability }}" />
+    <td>{% if not spell.custom %}
+            <input id="spell_{{spell.id}}" class="data number" type="number" min="0" max="100" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_spell_prob" value="{{ spell.probability }}" />
+        {% else %}
+            <input id="custom_spell_{{spell.id}}" class="data number" type="number" min="0" max="100" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_custom_spell_prob" value="{{ spell.probability }}" />
+        {% endif %}
     </td>
     {% if not forloop.first and forloop.counter|divisibleby:"4" %}</tr><tr>{% endif %}
 {% endfor %}
 </tr></table>
+<button class="add_custom_spell" et_id="{{ et.id }}" type="theism">Add custom spell</button>
 
 <h3>Sorcery spells</h3>
 Amount: 
@@ -196,17 +210,24 @@ Amount:
 <tr><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.</th></tr>
 <tr>
 {% for spell in sorcery_spells %}
-    <td>
-        {{ spell.name }}
+    <td>{% if not spell.custom %}
+            {{ spell.name }}
+        {% else %}
+            <input id="custom_spell_name_{{spell.id}}" class="data" type="text" size="10" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_custom_spell_name" value="{{ spell.name }}" />
+        {% endif %}
         {% if spell.detail %}
             <input id="spell_detail_{{spell.id}}" class="data" type="text" size="9" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_spell_detail" value="{{ spell.detail_text }}" />
         {% endif %}
     </td>
-    <td>
-        <input id="spell_{{spell.id}}" class="data number" type="number" min="0" max="100" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_spell_prob" value="{{ spell.probability }}" />
+    <td>{% if not spell.custom %}
+            <input id="spell_{{spell.id}}" class="data number" type="number" min="0" max="100" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_spell_prob" value="{{ spell.probability }}" />
+        {% else %}
+            <input id="custom_spell_{{spell.id}}" class="data number" type="number" min="0" max="100" item_id="{{spell.id}}" parent_id="{{et.id}}" item_type="et_custom_spell_prob" value="{{ spell.probability }}" />
+        {% endif %}
     </td>
     {% if not forloop.first and forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
 {% endfor %}
 </tr></table>
+<button class="add_custom_spell" et_id="{{ et.id }}" type="sorcery">Add custom spell</button>
 
 {% endblock %}

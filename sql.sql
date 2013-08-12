@@ -72,7 +72,7 @@ CREATE TABLE `enemygen_hitlocation` (
 ALTER TABLE `enemygen_hitlocation` ADD CONSTRAINT `race_id_refs_id_4dde725` FOREIGN KEY (`race_id`) REFERENCES `enemygen_race` (`id`);
 CREATE TABLE `enemygen_enemytemplate` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    `name` varchar(30) NOT NULL,
+    `name` varchar(50) NOT NULL,
     `owner_id` integer NOT NULL,
     `setting_id` integer NOT NULL,
     `ruleset_id` integer NOT NULL,
@@ -85,10 +85,10 @@ CREATE TABLE `enemygen_enemytemplate` (
     `rank` smallint NOT NULL
 )
 ;
-ALTER TABLE `enemygen_enemytemplate` ADD CONSTRAINT `ruleset_id_refs_id_661e3603` FOREIGN KEY (`ruleset_id`) REFERENCES `enemygen_ruleset` (`id`);
 ALTER TABLE `enemygen_enemytemplate` ADD CONSTRAINT `setting_id_refs_id_26481ce5` FOREIGN KEY (`setting_id`) REFERENCES `enemygen_setting` (`id`);
-ALTER TABLE `enemygen_enemytemplate` ADD CONSTRAINT `race_id_refs_id_43c18287` FOREIGN KEY (`race_id`) REFERENCES `enemygen_race` (`id`);
 ALTER TABLE `enemygen_enemytemplate` ADD CONSTRAINT `owner_id_refs_id_4b67d375` FOREIGN KEY (`owner_id`) REFERENCES `auth_user` (`id`);
+ALTER TABLE `enemygen_enemytemplate` ADD CONSTRAINT `ruleset_id_refs_id_661e3603` FOREIGN KEY (`ruleset_id`) REFERENCES `enemygen_ruleset` (`id`);
+ALTER TABLE `enemygen_enemytemplate` ADD CONSTRAINT `race_id_refs_id_43c18287` FOREIGN KEY (`race_id`) REFERENCES `enemygen_race` (`id`);
 CREATE TABLE `enemygen_combatstyle_weapon_options` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `combatstyle_id` integer NOT NULL,
@@ -177,4 +177,13 @@ CREATE TABLE `enemygen_enemyspell` (
 ;
 ALTER TABLE `enemygen_enemyspell` ADD CONSTRAINT `enemy_template_id_refs_id_54999a42` FOREIGN KEY (`enemy_template_id`) REFERENCES `enemygen_enemytemplate` (`id`);
 ALTER TABLE `enemygen_enemyspell` ADD CONSTRAINT `spell_id_refs_id_69c419dc` FOREIGN KEY (`spell_id`) REFERENCES `enemygen_spellabstract` (`id`);
+CREATE TABLE `enemygen_customspell` (
+    `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    `enemy_template_id` integer NOT NULL,
+    `name` varchar(30) NOT NULL,
+    `probability` smallint NOT NULL,
+    `type` varchar(30) NOT NULL
+)
+;
+ALTER TABLE `enemygen_customspell` ADD CONSTRAINT `enemy_template_id_refs_id_b8f1d0c` FOREIGN KEY (`enemy_template_id`) REFERENCES `enemygen_enemytemplate` (`id`);
 COMMIT;

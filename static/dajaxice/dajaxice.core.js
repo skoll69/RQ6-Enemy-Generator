@@ -9,8 +9,8 @@ var Dajaxice = {
     
     enemygen: {
     
-    sayhello: function(callback_function, argv, custom_settings){
-        return Dajaxice.call('enemygen.sayhello', 'POST', callback_function, argv, custom_settings);
+    add_custom_spell: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('enemygen.add_custom_spell', 'POST', callback_function, argv, custom_settings);
     },
 
     submit: function(callback_function, argv, custom_settings){

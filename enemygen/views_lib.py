@@ -1,5 +1,5 @@
 from enemygen.models import Setting, Ruleset, EnemyTemplate, Race, Weapon
-from enemygen.models import SpellAbstract, EnemySpell
+from enemygen.models import SpellAbstract, EnemySpell, CustomSpell
 
 def get_setting(request):
     return Setting.objects.get(id=request.session.get('setting_id', 1))
@@ -57,6 +57,7 @@ def _get_generated_amount():
     return n
     
 def spell_list(type, et_id):
+    ''' Returns the list of the given type of spells for the given EnemyTemplate '''
     output = []
     for spell in SpellAbstract.objects.filter(type=type):
         try:
@@ -68,5 +69,8 @@ def spell_list(type, et_id):
             detail_text = spell.default_detail
         sp = {'id': spell.id, 'name': spell.name, 'probability': prob, 'detail_text': detail_text}
         sp['detail'] = spell.detail
+        output.append(sp)
+    for spell in CustomSpell.objects.filter(enemy_template__id=et_id, type=type):
+        sp = {'id': spell.id, 'name': spell.name, 'probability': spell.probability, 'custom': True}
         output.append(sp)
     return output

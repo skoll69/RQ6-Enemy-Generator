@@ -152,21 +152,30 @@ class EnemyTemplate(models.Model, Printer):
     def professional_skills(self):
         return EnemySkill.objects.filter(enemy_template=self, skill__standard=False)
         
-    @property
-    def spells(self):
-        return EnemySpell.objects.filter(enemy_template=self)
+    #@property
+    #def spells(self):
+    #    return EnemySpell.objects.filter(enemy_template=self)
 
     @property
     def folk_spells(self):
-        return EnemySpell.objects.filter(enemy_template=self, spell__type="folk")
+        output = []
+        output.extend(list(EnemySpell.objects.filter(enemy_template=self, spell__type="folk")))
+        output.extend(list(CustomSpell.objects.filter(enemy_template=self, type="folk")))
+        return output
 
     @property
     def theism_spells(self):
-        return EnemySpell.objects.filter(enemy_template=self, spell__type="theism")
+        output = []
+        output.extend(list(EnemySpell.objects.filter(enemy_template=self, spell__type="theism")))
+        output.extend(list(CustomSpell.objects.filter(enemy_template=self, type="theism")))
+        return output
 
     @property
     def sorcery_spells(self):
-        return EnemySpell.objects.filter(enemy_template=self, spell__type="sorcery")
+        output = []
+        output.extend(list(EnemySpell.objects.filter(enemy_template=self, spell__type="sorcery")))
+        output.extend(list(CustomSpell.objects.filter(enemy_template=self, type="sorcery")))
+        return output
 
     @property
     def hit_locations(self):
@@ -175,7 +184,6 @@ class EnemyTemplate(models.Model, Printer):
     @property
     def combat_styles(self):
         return CombatStyle.objects.filter(enemy_template=self)
-        
 
 class CombatStyle(models.Model):
     name = models.CharField(max_length=30)
@@ -279,8 +287,9 @@ class EnemyHitLocation(models.Model, Printer):
         dice = Dice(self.armor)
         return dice.roll()
         
-    def set_value(self, value):
-        self.die_set = value
+    def set_armor(self, value):
+        Dice(value).roll()  #Test that the value is valid
+        self.armor = value
         self.save()
         
 class StatAbstract(models.Model, Printer):
@@ -325,12 +334,12 @@ class EnemyStat(models.Model, Printer):
         return dice.roll()
 
     def set_value(self, value):
-        #Test that the value is valid
-        Dice(value).roll()
+        Dice(value).roll()  #Test that the value is valid
         self.die_set = value
         self.save()
         
 class SpellAbstract(models.Model, Printer):
+    ''' A Spell. '''
     name = models.CharField(max_length=30)
     
     choices = (
@@ -346,6 +355,7 @@ class SpellAbstract(models.Model, Printer):
         ordering = ['name',]
     
 class EnemySpell(models.Model, Printer):
+    ''' Enemy-specific instance of a SpellAbstract '''
     spell = models.ForeignKey(SpellAbstract)
     enemy_template = models.ForeignKey(EnemyTemplate)
     probability = models.SmallIntegerField(default=0)
@@ -368,7 +378,36 @@ class EnemySpell(models.Model, Printer):
         if value == 0:
             self.delete()
 
+class CustomSpell(models.Model, Printer):
+    ''' Custom spells created by users '''
+    enemy_template = models.ForeignKey(EnemyTemplate)
+    name = models.CharField(max_length=30)
+    probability = models.SmallIntegerField(default=0)
+    type = models.CharField(max_length=30, choices=(('folk', 'Folk magic'),
+                                                    ('theism', 'Theism'),
+                                                    ('sorcery', 'Sorcery'),
+                                                    ))
+
+    @classmethod
+    def create(cls, et_id, type):
+        et = EnemyTemplate.objects.get(id=et_id)
+        cs = cls(enemy_template=et, type=type, name='Custom spell', probability=1)
+        cs.save()
+        return cs
+    
+    def set_probability(self, value):
+        self.probability = value
+        self.save()
+        if value == 0:
+            self.delete()
+
+    class Meta:
+        ordering = ['name',]
+
 class _Enemy:
+    ''' Enemy instance created based on an EnemyTemplate. This is the stuff that gets printed
+        for the user when Generate is clicked.
+    '''
     def __init__(self, enemy_template):
         self.name = ''
         self.et = enemy_template
@@ -409,7 +448,6 @@ class _Enemy:
             combat_style['value'] = cs.roll(self.stats)
             combat_style['name'] = cs.name
             combat_style['weapons'] = self._add_weapons(cs)
-            #combat_style['weapons'].append(cs.)
             self.combat_styles.append(combat_style)
             
     def _add_weapons(self, cs):
@@ -462,7 +500,10 @@ class _Enemy:
         for x in range(amount):
             spell = _select_random_spell(self.et.folk_spells, selected_spells)
             selected_spells.append(spell)
-            spell_name = spell.name + ' ' + spell.detail if spell.detail else spell.name
+            try:
+                spell_name = spell.name + ' ' + spell.detail if spell.detail else spell.name
+            except AttributeError:  # CustomSpell has not attribute detail
+                spell_name = spell.name
             self.folk_spells.append(spell_name)
         self.folk_spells.sort()
         

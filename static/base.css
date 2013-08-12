@@ -158,7 +158,7 @@ table#stats_and_hp td{
     padding-right: 20px;
 }
 
-input[type="submit"]{
+input[type="submit"], button{
     background-color:#543712;
     border-radius:6px;
     border: 3px solid white;
@@ -170,11 +170,11 @@ input[type="submit"]{
     text-decoration:none;
 }
 
-input[type="submit"]:hover {
+input[type="submit"]:hover, button:hover {
     background-color:#9B6B28;
 }
 
-input[type="submit"]:active {
+input[type="submit"]:active, button:active {
     position:relative;
     top:1px;
     left:1px;

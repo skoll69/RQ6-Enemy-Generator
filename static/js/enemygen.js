@@ -1,8 +1,5 @@
 function submit(id, type, input_object, value, parent_id){
 	//Called when a field is changed
-	//console.log(input_object);
-    //value = $(input_object).val();
-	//console.log('js: ' + value);
     (function(value, id, type, input_object){
         Dajaxice.enemygen.submit(function(result) {submit_callback(result, input_object)}, {'value': value, 'id': id, 'object': type, 'parent_id': parent_id});
     })(value, id, type, input_object);
@@ -48,6 +45,16 @@ function animate_background(selector, success){
 	item.animate({backgroundColor: original_background}, 3000);
 }
 
+function add_custom_spell(event){
+    var type = $(event.target).attr('type');
+    var et_id = $(event.target).attr('et_id');
+    Dajaxice.enemygen.add_custom_spell(add_custom_spell_callback, {'type': type, 'et_id': et_id})
+}
+
+function add_custom_spell_callback(result){
+    location.reload();
+}
+
 $(document).ready(function(){
 
 	$('.data:input[type=number], .data:input[type=text], select.data').blur(function(event){
@@ -61,5 +68,9 @@ $(document).ready(function(){
 	$('input.data').focus(function(event){
 		$(event.target).data("default_value", $(event.target).val());
 	});
+    
+    $('.add_custom_spell').click(function(event){
+        add_custom_spell(event);
+    })
 	
 });
