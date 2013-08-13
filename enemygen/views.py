@@ -6,7 +6,7 @@ from django.template import RequestContext
 
 from enemygen.models import EnemyTemplate, Setting, Ruleset, EnemyTemplate, Race, Weapon
 from enemygen.views_lib import get_setting, get_ruleset, get_context, get_enemies, spell_list
-from enemygen.views_lib import get_enemy_templates
+from enemygen.views_lib import get_enemy_templates, combat_styles
 
 def index(request):
     setting = get_setting(request)
@@ -38,7 +38,7 @@ def enemy_template(request, enemy_template_id):
     context = get_context(request)
     template = 'enemy_template.html'
     context['et'] = EnemyTemplate.objects.get(id=enemy_template_id)
-    if context['et'].owner != request.user:
+    if context['et'].owner != request.user and request.user.username != 'admin':
         template = 'enemy_template_read_only.html'
     #try:
     #    context['et'] = EnemyTemplate.objects.get(id=enemy_template_id, owner=request.user)
@@ -52,6 +52,7 @@ def enemy_template(request, enemy_template_id):
     context['theism_spells'] = spell_list('theism', enemy_template_id)
     context['folk_spells'] = spell_list('folk', enemy_template_id)
     context['sorcery_spells'] = spell_list('sorcery', enemy_template_id)
+    context['combat_styles'] = combat_styles(enemy_template_id)
     return render(request, template, context)
 
 @login_required

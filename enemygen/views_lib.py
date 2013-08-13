@@ -1,5 +1,6 @@
 from enemygen.models import Setting, Ruleset, EnemyTemplate, Race, Weapon
 from enemygen.models import SpellAbstract, EnemySpell, CustomSpell
+from enemygen.models import Weapon, CombatStyle, EnemyWeapon
 
 def get_setting(request):
     return Setting.objects.get(id=request.session.get('setting_id', 1))
@@ -33,6 +34,8 @@ def get_enemy_templates(ruleset, setting, user):
     # Add the unpublished templates of the logged-in user
     if user.is_authenticated():
         templates.extend(list(EnemyTemplate.objects.filter(ruleset=ruleset, setting=setting, published=False, owner=user)))
+    if user.is_authenticated() and user.username == 'admin':
+        templates.extend(list(EnemyTemplate.objects.filter(ruleset=ruleset, setting=setting, published=False)))
     return templates
     
 def get_enemies(request):
@@ -73,4 +76,27 @@ def spell_list(type, et_id):
     for spell in CustomSpell.objects.filter(enemy_template__id=et_id, type=type):
         sp = {'id': spell.id, 'name': spell.name, 'probability': spell.probability, 'custom': True}
         output.append(sp)
+    return output
+    
+def combat_styles(et_id):
+    ''' Returns a list of combat styles, that contains a list of weapons. The weaponlist contains
+        all weapons in the system. The weapons, that have been selected to the CombatStyle (by
+        assigning a probability) have also their probability listed.
+    '''
+    output = []
+    for cs in CombatStyle.objects.filter(enemy_template__id=et_id):
+        cs_out = {'id': cs.id, 'name': cs.name, 'die_set': cs.die_set,
+                  'one_h_amount': cs.one_h_amount ,'two_h_amount': cs.two_h_amount,
+                  'ranged_amount': cs.ranged_amount,'shield_amount': cs.shield_amount,
+                  '1h_melee': [], '2h_melee': [], 'ranged': [], 'shield': []}
+        for type in ('1h-melee', '2h-melee', 'ranged', 'shield'):
+            typeout = type.replace('-', '_') # '-' is not allowed in the lookup string in Django template
+            for weapon in Weapon.objects.filter(type=type):
+                try:
+                    ew = EnemyWeapon.objects.get(weapon=weapon, combat_style=cs)
+                    prob = ew.probability
+                except EnemyWeapon.DoesNotExist:
+                    prob = 0
+                cs_out[typeout].append({'id': weapon.id, 'name': weapon.name, 'probability': prob})
+        output.append(cs_out)
     return output

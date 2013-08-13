@@ -102,47 +102,47 @@ table#weapon_table tr td{
     </td></tr>
 </table>
     
-    <span class="title">Skills:</span><span class="item_list">
-        {% for skill in enemy.skills %}
-            {{ skill.name }} {{skill.value}}%{% if not forloop.last %}, {% endif %}
+<span class="title">Skills:</span><span class="item_list">
+    {% for skill in enemy.skills %}
+        {{ skill.name }} {{skill.value}}%{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</span><br>
+
+{% if enemy.folk_spells %}
+    <span class="title">Folk magic spells:</span><span class="item_list">
+        {% for spell in enemy.folk_spells %}
+            {{ spell.name }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}
         {% endfor %}
     </span><br>
-    
-    {% if enemy.folk_spells %}
-        <span class="title">Folk magic spells:</span><span class="item_list">
-            {% for spell in enemy.folk_spells %}
-                {{ spell }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-        </span><br>
-    {% endif %}
-    
-    {% if enemy.sorcery_spells %}
-        <span class="title">Sorcery spells:</span><span class="item_list">
-            {% for spell in enemy.sorcery_spells %}
-                {{ spell }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-        </span><br>
-    {% endif %}
-    
-    {% if enemy.theism_spells %}
-        <span class="title">Theism spells/Miracles:</span><span class="item_list">
-            {% for spell in enemy.theism_spells %}
-                {{ spell }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-        </span><br>
-    {% endif %}
-    
-    <span class="title">Combat Styles:</span><span class="item_list">
-        {% for cs in enemy.combat_styles %}
-            {{ cs.name }} {{ cs.value }}%{% if not forloop.last %}, {% endif %}
-            <table id="weapon_table">
-                <tr><th>Weapon</th><th>Size/Force</th><th>Reach</th><th>Damage</th><th>AP/HP</th></tr>
-                {% for weapon in cs.weapons %}
-                    <tr><td>{{ weapon.name }}</td><td>{{weapon.size}}</td><td>{{weapon.reach}}</td><td>{{weapon.damage}}</td><td>{{weapon.ap}}/{{weapon.hp}}</td></tr>
-                {% endfor %}
-            </table>
+{% endif %}
+
+{% if enemy.sorcery_spells %}
+    <span class="title">Sorcery spells:</span><span class="item_list">
+        {% for spell in enemy.sorcery_spells %}
+            {{ spell.name }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}
         {% endfor %}
-    </span>
+    </span><br>
+{% endif %}
+
+{% if enemy.theism_spells %}
+    <span class="title">Theism spells/Miracles:</span><span class="item_list">
+        {% for spell in enemy.theism_spells %}
+            {{ spell.name }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </span><br>
+{% endif %}
+
+<span class="title">Combat Styles:</span><span class="item_list">
+    {% for cs in enemy.combat_styles %}
+        {{ cs.name }} {{ cs.value }}%{% if not forloop.last %}, {% endif %}
+        <table id="weapon_table">
+            <tr><th>Weapon</th><th>Size/Force</th><th>Reach</th><th>Damage</th><th>AP/HP</th></tr>
+            {% for weapon in cs.weapons %}
+                <tr><td>{{ weapon.name }}</td><td>{{weapon.size}}</td><td>{{weapon.reach}}</td><td>{{weapon.damage}}</td><td>{{weapon.ap}}/{{weapon.hp}}</td></tr>
+            {% endfor %}
+        </table>
+    {% endfor %}
+</span>
 </div>
 {% endfor %}
 </div>

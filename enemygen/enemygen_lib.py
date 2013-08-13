@@ -1,17 +1,21 @@
 import random
 
-def _select_random_spell(spells, exclude = ()):
+def _select_random_item(items, exclude = ()):
+    ''' Input: List of items. The items need to have attribute 'probability' of type int 
+               Optional: Items to be excluded
+        Output: Randomly selected item from the list, based on the item probability
+    '''
     weight_total = 0
-    for spell in spells:
-        if spell not in exclude:
-            weight_total += spell.probability
+    for item in items:
+        if item not in exclude:
+            weight_total += item.probability
     n = random.randint(1, weight_total)
-    for spell in spells:
-        if spell not in exclude:
-            if n <= spell.probability:
+    for item in items:
+        if item not in exclude:
+            if n <= item.probability:
                 break
-            n -= spell.probability
-    return spell
+            n -= item.probability
+    return item
     
 class ValidationError(Exception):
     pass

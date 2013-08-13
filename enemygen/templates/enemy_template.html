@@ -87,20 +87,21 @@
 </tr></table>
 
 <h3>Combat styles</h3>
-{% for cs in et.combat_styles %}
+{% for cs in combat_styles %}
 <input id="combat_style_name_{{cs.id}}" class="data" type="text" item_id="{{cs.id}}" item_type="et_combat_style_name" value="{{ cs.name }}" />
 <input id="combat_style_value_{{cs.id}}" class="data" type="text" item_id="{{cs.id}}" item_type="et_combat_style_value" value="{{ cs.die_set }}" />
 
 <h3>Weapon options</h3>
 <table><tr><td valign="top">
 <h4>1-handed weapons</h4>
+Amount:
+<input id="et_one_h_amount_{{ cs.id }}" class="data" size="3" type="number"  min="0" max="10" item_id="{{ cs.id }}" item_type="et_one_h_amount" value="{{ cs.one_h_amount }}" /><br>
 <table>
-    {% for weapon in weapons.1h %}
+    <tr><th>Weapon</b></th><th>Prob.</th></tr>
+    {% for weapon in cs.1h_melee %}
     <tr>
-        <td valign="top">
-            <input id="weapon_{{weapon.id}}" class="data" type="checkbox" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_include" {% if weapon in cs.weapon_options.all %}checked="checked"{% endif %} />
-            {{ weapon.name }}
-        </td>
+        <td>{{ weapon.name }}</td>
+        <td><input id="weapon_{{weapon.id}}" class="data" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
     </tr>
     {% endfor %}
 </table>
@@ -108,13 +109,14 @@
 
 <td valign="top">
 <h4>2-handed weapons</h4>
+Amount:
+<input id="et_two_h_amount_{{ cs.id }}" class="data" size="3" type="number"  min="0" max="10" item_id="{{ cs.id }}" item_type="et_two_h_amount" value="{{ cs.two_h_amount }}" /><br>
 <table>
-    {% for weapon in weapons.2h %}
+    <tr><th>Weapon</b></th><th>Prob.</th></tr>
+    {% for weapon in cs.2h_melee %}
     <tr>
-        <td valign="top">
-            <input id="weapon_{{weapon.id}}" class="data" type="checkbox" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_include" {% if weapon in cs.weapon_options.all %}checked="checked"{% endif %} />
-            {{ weapon.name }}
-        </td>
+        <td>{{ weapon.name }}</td>
+        <td><input id="weapon_{{weapon.id}}" class="data" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
     </tr>
     {% endfor %}
 </table>
@@ -122,13 +124,14 @@
 
 <td valign="top">
 <h4>Ranged weapons</h4>
+Amount:
+<input id="et_ranged_amount_{{ cs.id }}" class="data" size="3" type="number"  min="0" max="10" item_id="{{ cs.id }}" item_type="et_ranged_amount" value="{{ cs.ranged_amount }}" /><br>
 <table>
-    {% for weapon in weapons.ranged %}
+    <tr><th>Weapon</b></th><th>Prob.</th></tr>
+    {% for weapon in cs.ranged %}
     <tr>
-        <td valign="top">
-            <input id="weapon_{{weapon.id}}" class="data" type="checkbox" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_include" {% if weapon in cs.weapon_options.all %}checked="checked"{% endif %} />
-            {{ weapon.name }}
-        </td>
+        <td>{{ weapon.name }}</td>
+        <td><input id="weapon_{{weapon.id}}" class="data" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
     </tr>
     {% endfor %}
 </table>
@@ -136,13 +139,14 @@
 
 <td valign="top">
 <h4>Shields</h4>
+Amount:
+<input id="et_shield_amount_{{ cs.id }}" class="data" size="3" type="number"  min="0" max="10" item_id="{{ cs.id }}" item_type="et_shield_amount" value="{{ cs.shield_amount }}" /><br>
 <table>
-    {% for weapon in weapons.shields %}
+    <tr><th>Weapon</b></th><th>Prob.</th></tr>
+    {% for weapon in cs.shield %}
     <tr>
-        <td valign="top">
-            <input id="weapon_{{weapon.id}}" class="data" type="checkbox" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_include" {% if weapon in cs.weapon_options.all %}checked="checked"{% endif %} />
-            {{ weapon.name }}
-        </td>
+        <td>{{ weapon.name }}</td>
+        <td><input id="weapon_{{weapon.id}}" class="data" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
     </tr>
     {% endfor %}
 </table>

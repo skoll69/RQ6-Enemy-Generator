@@ -2,7 +2,7 @@ from django.utils import simplejson
 from dajaxice.decorators import dajaxice_register
 from enemygen.models import EnemyStat, EnemySkill, EnemyTemplate, Ruleset, StatAbstract
 from enemygen.models import SpellAbstract, SkillAbstract, EnemySpell, EnemyHitLocation
-from enemygen.models import CombatStyle, Weapon, Setting, CustomSpell
+from enemygen.models import CombatStyle, Weapon, Setting, CustomSpell, EnemyWeapon
 
 from enemygen.enemygen_lib import to_bool
 
@@ -41,12 +41,25 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             es = EnemySkill.objects.get(id=id)
             es.include = to_bool(value)
             es.save()
+        elif object == 'et_weapon_prob':
+            we = Weapon.objects.get(id=id)
+            cs = CombatStyle.objects.get(id=parent_id, enemy_template__owner=request.user)
+            try:
+                ew = EnemyWeapon.objects.get(weapon=we, combat_style=cs)
+            except EnemyWeapon.DoesNotExist:
+                ew = EnemyWeapon.create(cs, we, 1)
+            original_value = ew.probability
+            try:
+                ew.set_probability(int(value))
+            except ValueError:
+                success = False
+                message = 'Probability must be a number.'
         elif object == 'et_spell_prob':
             sa = SpellAbstract.objects.get(id=id)
             et = EnemyTemplate.objects.get(id=parent_id, owner=request.user)
             try:
                 es = EnemySpell.objects.get(spell=sa, enemy_template=et)
-            except:
+            except EnemySpell.DoesNotExist:
                 es = EnemySpell(spell=sa, enemy_template=et, detail=sa.default_detail, probability=1)
             original_value = es.probability
             try:
@@ -92,18 +105,6 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
             et.setting = Setting.objects.get(id=int(value))
             et.save()
-        #elif object == 'stat_name':
-        #    stat = StatAbstract.objects.get(id=id)
-        #    stat.name = value
-        #    stat.save()
-        #elif object == 'spell_name':
-        #    spell = SpellAbstract.objects.get(id=id)
-        #    spell.name = value
-        #    spell.save()
-        #elif object == 'skill_name':
-        #    skill = SkillAbstract.objects.get(id=id)
-        #    skill.name = value
-        #    skill.save()
         elif object == 'et_folk_spell_amount':
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
             et.folk_spell_amount = value
@@ -116,6 +117,22 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
             et.sorcery_spell_amount = value
             et.save()
+        elif object == 'et_one_h_amount':
+            cs = CombatStyle.objects.get(id=id, enemy_template__owner=request.user)
+            cs.one_h_amount = value
+            cs.save()
+        elif object == 'et_two_h_amount':
+            cs = CombatStyle.objects.get(id=id, enemy_template__owner=request.user)
+            cs.two_h_amount = value
+            cs.save()
+        elif object == 'et_ranged_amount':
+            cs = CombatStyle.objects.get(id=id, enemy_template__owner=request.user)
+            cs.ranged_amount = value
+            cs.save()
+        elif object == 'et_shield_amount':
+            cs = CombatStyle.objects.get(id=id, enemy_template__owner=request.user)
+            cs.shield_amount = value
+            cs.save()
         elif object == 'et_hl_armor':
             ehl = EnemyHitLocation.objects.get(id=id)
             try:
