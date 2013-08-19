@@ -74,36 +74,40 @@
 <h3>Weapon options</h3>
 <table><tr><td valign="top">
 <h4>1-handed weapons</h4>
+<b>Amount: {{cs.one_h_amount}}</b>
 <table>
-    {% for weapon in cs.one_h_weapon_options %}
-    <tr><td>{{ weapon.name }}</td></tr>
+    {% for weapon in cs.one_h_options %}
+    <tr><td>{{ weapon.name }} ({{weapon.probability}})</td></tr>
     {% endfor %}
 </table>
 </td>
 
 <td valign="top">
 <h4>2-handed weapons</h4>
+<b>Amount: {{cs.two_h_amount}}</b>
 <table>
-    {% for weapon in cs.two_h_weapon_options %}
-    <tr><td>{{ weapon.name }}</td></tr>
+    {% for weapon in cs.two_h_options %}
+    <tr><td>{{ weapon.name }} ({{weapon.probability}})</td></tr>
     {% endfor %}
 </table>
 </td>
 
 <td valign="top">
 <h4>Ranged weapons</h4>
+<b>Amount: {{cs.ranged_amount}}</b>
 <table>
-    {% for weapon in cs.ranged_weapon_options %}
-    <tr><td>{{ weapon.name }}</td></tr>
+    {% for weapon in cs.ranged_options %}
+    <tr><td>{{ weapon.name }} ({{weapon.probability}})</td></tr>
     {% endfor %}
 </table>
 </td>
 
 <td valign="top">
 <h4>Shields</h4>
+<b>Amount: {{cs.shield_amount}}</b>
 <table>
     {% for weapon in cs.shield_options %}
-    <tr><td>{{ weapon.name }}</td></tr>
+    <tr><td>{{ weapon.name }} ({{weapon.probability}})</td></tr>
     {% endfor %}
 </table>
 {% endfor %}

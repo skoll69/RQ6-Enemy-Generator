@@ -189,27 +189,34 @@ class CombatStyle(models.Model):
     name = models.CharField(max_length=30)
     die_set = models.CharField(max_length=30, default="STR+DEX")
     enemy_template = models.ForeignKey(EnemyTemplate)
-    weapon_options = models.ManyToManyField(Weapon, null=True, blank=True)
     one_h_amount = models.SmallIntegerField(default=0)
     two_h_amount = models.SmallIntegerField(default=0)
     ranged_amount = models.SmallIntegerField(default=0)
     shield_amount = models.SmallIntegerField(default=0)
     
     @property
-    def one_h_weapon_options(self):
-        return self.weapon_options.filter(type='1h-melee')
+    def one_h_options(self):
+        output = list(EnemyWeapon.objects.filter(weapon__type='1h-melee', combat_style=self))
+        output.extend(list(CustomWeapon.objects.filter(type='1h-melee', combat_style=self)))
+        return output
         
     @property
-    def two_h_weapon_options(self):
-        return self.weapon_options.filter(type='2h-melee')
+    def two_h_options(self):
+        output = list(EnemyWeapon.objects.filter(weapon__type='2h-melee', combat_style=self))
+        output.extend(list(CustomWeapon.objects.filter(type='2h-melee', combat_style=self)))
+        return output
         
     @property
-    def ranged_weapon_options(self):
-        return self.weapon_options.filter(type='ranged')
+    def ranged_options(self):
+        output = list(EnemyWeapon.objects.filter(weapon__type='ranged', combat_style=self))
+        output.extend(list(CustomWeapon.objects.filter(type='ranged', combat_style=self)))
+        return output
         
     @property
     def shield_options(self):
-        return self.weapon_options.filter(type='shield')
+        output = list(EnemyWeapon.objects.filter(weapon__type='shield', combat_style=self))
+        output.extend(list(CustomWeapon.objects.filter(type='shield', combat_style=self)))
+        return output
         
     def roll(self, replace):
         die_set = self._replaced_die_set(replace)
@@ -281,6 +288,50 @@ class EnemyWeapon(models.Model, Printer):
         ew = EnemyWeapon(combat_style=combat_style, weapon=weapon, probability=probability)
         ew.save()
         return ew
+        
+class CustomWeapon(models.Model, Printer):
+    combat_style = models.ForeignKey(CombatStyle)
+    name = models.CharField(max_length=30)
+    probability = models.SmallIntegerField(default=0)
+    damage = models.CharField(max_length=30, default=0)
+    type = models.CharField(max_length=30, default='1h-melee', choices=(
+                                ('1h-melee', '1-h Melee'),
+                                ('2h-melee', '2-h Melee'),
+                                ('ranged', 'Ranged'),
+                                ('shield', 'Shield'),
+                            ))
+    size = models.CharField(max_length=1, default='M', choices=(
+                                            ('S', 'S'),
+                                            ('M', 'M'),
+                                            ('L', 'L'),
+                                            ('H', 'H'),
+                                            ('E', 'E'),
+                                        ))
+    reach = models.CharField(max_length=2, default='M', choices=(
+                                        ('-', '-'),
+                                        ('T', 'T'),
+                                        ('S', 'S'),
+                                        ('M', 'M'),
+                                        ('L', 'L'),
+                                        ('VL', 'VL'),
+                                    ))
+    ap = models.SmallIntegerField(default=0)
+    hp = models.SmallIntegerField(default=0)
+    damage_modifier = models.BooleanField(default=False)
+
+    def set_probability(self, value):
+        self.probability = value
+        self.save()
+        if value == 0:
+            self.delete()
+    
+    @classmethod
+    def create(cls, cs_id, type):
+        cs = CombatStyle.objects.get(id=cs_id)
+        cw = cls(combat_style=cs, type=type, name='Custom weapon', probability=1)
+        cw.save()
+        return cw
+    
         
 class SkillAbstract(models.Model, Printer):
     name = models.CharField(max_length=30)
@@ -535,18 +586,18 @@ class _Enemy:
         ''' Returns a list of weapons based on the given CombatStyle's weapon selections and probabilities
         '''
         output = []
-        one_h_options = list(EnemyWeapon.objects.filter(weapon__type='1h-melee', combat_style=cs))
-        two_h_options = list(EnemyWeapon.objects.filter(weapon__type='2h-melee', combat_style=cs))
-        ranged_options = list(EnemyWeapon.objects.filter(weapon__type='ranged', combat_style=cs))
-        shield_options = list(EnemyWeapon.objects.filter(weapon__type='shield', combat_style=cs))
-        one_h_amount = min(cs.one_h_amount, len(one_h_options))
-        two_h_amount = min(cs.two_h_amount, len(two_h_options))
-        ranged_amount = min(cs.ranged_amount, len(ranged_options))
-        shield_amount = min(cs.shield_amount, len(shield_options))
-        output.extend(self._get_items(one_h_options, one_h_amount))
-        output.extend(self._get_items(two_h_options, two_h_amount))
-        output.extend(self._get_items(ranged_options, ranged_amount))
-        output.extend(self._get_items(shield_options, shield_amount))
+        #one_h_options = list(EnemyWeapon.objects.filter(weapon__type='1h-melee', combat_style=cs))
+        #two_h_options = list(EnemyWeapon.objects.filter(weapon__type='2h-melee', combat_style=cs))
+        #ranged_options = list(EnemyWeapon.objects.filter(weapon__type='ranged', combat_style=cs))
+        #shield_options = list(EnemyWeapon.objects.filter(weapon__type='shield', combat_style=cs))
+        one_h_amount = min(cs.one_h_amount, len(cs.one_h_options))
+        two_h_amount = min(cs.two_h_amount, len(cs.two_h_options))
+        ranged_amount = min(cs.ranged_amount, len(cs.ranged_options))
+        shield_amount = min(cs.shield_amount, len(cs.shield_options))
+        output.extend(self._get_items(cs.one_h_options, one_h_amount))
+        output.extend(self._get_items(cs.two_h_options, two_h_amount))
+        output.extend(self._get_items(cs.ranged_options, ranged_amount))
+        output.extend(self._get_items(cs.shield_options, shield_amount))
         return output
         
     def _add_hit_locations(self):
@@ -616,9 +667,3 @@ class _Enemy:
             index = ((str_siz - 1 - 50) / 10) + 10
         self.attributes['damage_modifier'] = DICE_STEPS[index]
         
-
-        
-# DB modifications
-# EnemyWeapon model
-# CombatStyle: 4 amount fields
-# CombatStyle poista weapon options

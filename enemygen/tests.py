@@ -364,7 +364,7 @@ class TestMisc(TestCase):
         spells[1].save()
         spells[2].probability = 1
         spells[2].save()
-        
+
         exclude = (spells[0], spells[1])
         random_spell = _select_random_item(spells, exclude)
         self.assertEquals(random_spell, spells[2])
@@ -377,5 +377,4 @@ def get_enemy_template():
     if race.name != 'Human': raise Exception("Race doesn't match")
     setting = Setting.objects.get(id=1)
     et = EnemyTemplate.create(user, ruleset, setting, race, 'Test Template')
-    et.combat_styles[0].weapon_options.add(Weapon.objects.get(id=7))
     return et

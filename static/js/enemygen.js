@@ -55,6 +55,17 @@ function add_custom_spell_callback(result){
     location.reload();
 }
 
+function add_custom_weapon(event){
+    var type = $(event.target).attr('type');
+    var cs_id = $(event.target).attr('cs_id');
+    Dajaxice.enemygen.add_custom_weapon(add_custom_weapon_callback, {'type': type, 'cs_id': cs_id})
+}
+
+function add_custom_weapon_callback(result){
+    console.log(result);
+    location.reload();
+}
+
 $(document).ready(function(){
 
 	$('.data:input[type=number], .data:input[type=text], select.data').blur(function(event){
@@ -72,5 +83,9 @@ $(document).ready(function(){
     $('.add_custom_spell').click(function(event){
         add_custom_spell(event);
     })
-	
+
+    $('.add_custom_weapon').click(function(event){
+        add_custom_weapon(event);
+    })
+    
 });

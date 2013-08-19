@@ -13,6 +13,10 @@ var Dajaxice = {
         return Dajaxice.call('enemygen.add_custom_spell', 'POST', callback_function, argv, custom_settings);
     },
 
+    add_custom_weapon: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('enemygen.add_custom_weapon', 'POST', callback_function, argv, custom_settings);
+    },
+
     submit: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.submit', 'POST', callback_function, argv, custom_settings);
     }

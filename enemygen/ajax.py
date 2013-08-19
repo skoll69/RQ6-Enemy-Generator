@@ -2,7 +2,7 @@ from django.utils import simplejson
 from dajaxice.decorators import dajaxice_register
 from enemygen.models import EnemyStat, EnemySkill, EnemyTemplate, Ruleset, StatAbstract
 from enemygen.models import SpellAbstract, SkillAbstract, EnemySpell, EnemyHitLocation
-from enemygen.models import CombatStyle, Weapon, Setting, CustomSpell, EnemyWeapon
+from enemygen.models import CombatStyle, Weapon, Setting, CustomSpell, EnemyWeapon, CustomWeapon
 
 from enemygen.enemygen_lib import to_bool
 
@@ -10,6 +10,14 @@ from enemygen.enemygen_lib import to_bool
 def add_custom_spell(request, et_id, type):
     try:
         CustomSpell.create(et_id, type)
+        return simplejson.dumps({'success': True})
+    except Exception as e:
+        return simplejson.dumps({'error': str(e)})
+    
+@dajaxice_register
+def add_custom_weapon(request, cs_id, type):
+    try:
+        CustomWeapon.create(cs_id, type)
         return simplejson.dumps({'success': True})
     except Exception as e:
         return simplejson.dumps({'error': str(e)})
@@ -54,6 +62,60 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             except ValueError:
                 success = False
                 message = 'Probability must be a number.'
+        
+        # Custom weapon
+        elif object == 'et_custom_weapon_prob':
+            cw = CustomWeapon.objects.get(id=id)
+            original_value = cw.probability
+            try:
+                cw.set_probability(int(value))
+            except ValueError:
+                success = False
+                message = 'Probability must be a number.'
+        elif object == 'et_custom_weapon_name':
+            cw = CustomWeapon.objects.get(id=id)
+            cw.name = value
+            cw.save()
+        elif object == 'et_custom_weapon_damage':
+            cw = CustomWeapon.objects.get(id=id)
+            cw.damage = value
+            cw.save()
+        elif object == 'et_custom_weapon_ap':
+            cw = CustomWeapon.objects.get(id=id)
+            try:
+                cw.ap = int(value)
+            except ValueError:
+                original_value = cw.ap
+                success = False
+                message = 'Probability must be a number.'
+            cw.save()
+        elif object == 'et_custom_weapon_hp':
+            cw = CustomWeapon.objects.get(id=id)
+            try:
+                cw.hp = int(value)
+            except ValueError:
+                original_value = cw.hp
+                success = False
+                message = 'Probability must be a number.'
+            cw.save()
+        elif object == 'et_custom_weapon_size':
+            cw = CustomWeapon.objects.get(id=id)
+            cw.size = value
+            cw.save()
+        elif object == 'et_custom_weapon_reach':
+            cw = CustomWeapon.objects.get(id=id)
+            cw.reach = value
+            cw.save()
+        elif object == 'et_custom_weapon_type':
+            cw = CustomWeapon.objects.get(id=id)
+            cw.type = value
+            cw.save()
+        elif object == 'et_custom_weapon_damage_modifier':
+            cw = CustomWeapon.objects.get(id=id)
+            cw.damage_modifier = to_bool(value)
+            cw.save()
+            
+        #Spells
         elif object == 'et_spell_prob':
             sa = SpellAbstract.objects.get(id=id)
             et = EnemyTemplate.objects.get(id=parent_id, owner=request.user)
@@ -148,14 +210,6 @@ def submit(request, value, id, object, parent_id=None, extra={}):
         elif object == 'et_combat_style_value':
             cs = CombatStyle.objects.get(id=id)
             cs.die_set = value
-            cs.save()
-        elif object == 'et_weapon_include':
-            cs = CombatStyle.objects.get(id=int(parent_id))
-            weapon = Weapon.objects.get(id=id)
-            if to_bool(value):
-                cs.weapon_options.add(weapon)
-            else:
-                cs.weapon_options.remove(weapon)
             cs.save()
         elif object == 'et_published':
             et = EnemyTemplate.objects.get(id=id, owner=request.user)

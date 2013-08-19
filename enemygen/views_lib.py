@@ -1,6 +1,6 @@
 from enemygen.models import Setting, Ruleset, EnemyTemplate, Race, Weapon
 from enemygen.models import SpellAbstract, EnemySpell, CustomSpell
-from enemygen.models import Weapon, CombatStyle, EnemyWeapon
+from enemygen.models import Weapon, CombatStyle, EnemyWeapon, CustomWeapon
 
 def get_setting(request):
     return Setting.objects.get(id=request.session.get('setting_id', 1))
@@ -88,7 +88,7 @@ def combat_styles(et_id):
         cs_out = {'id': cs.id, 'name': cs.name, 'die_set': cs.die_set,
                   'one_h_amount': cs.one_h_amount ,'two_h_amount': cs.two_h_amount,
                   'ranged_amount': cs.ranged_amount,'shield_amount': cs.shield_amount,
-                  '1h_melee': [], '2h_melee': [], 'ranged': [], 'shield': []}
+                  '1h_melee': [], '2h_melee': [], 'ranged': [], 'shield': [], 'customs': []}
         for type in ('1h-melee', '2h-melee', 'ranged', 'shield'):
             typeout = type.replace('-', '_') # '-' is not allowed in the lookup string in Django template
             for weapon in Weapon.objects.filter(type=type):
@@ -98,5 +98,8 @@ def combat_styles(et_id):
                 except EnemyWeapon.DoesNotExist:
                     prob = 0
                 cs_out[typeout].append({'id': weapon.id, 'name': weapon.name, 'probability': prob})
+            # Append Custom weapons
+            for cw in CustomWeapon.objects.filter(combat_style=cs, type=type):
+                cs_out['customs'].append(cw)
         output.append(cs_out)
     return output
