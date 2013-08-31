@@ -1,12 +1,16 @@
 <html>
 <head>
 <style type="text/css">
-body{
+body, table{
     font-size: 12px;
 }
 
-div#table_container{
+#table_container{
     width:720px;
+}
+
+#table_container tr td{
+    vertical-align: top;
 }
 
 .template_name{
@@ -54,7 +58,7 @@ div.enemy_container{
     font-weight: bold;
 }
 
-.item_list{
+table .item_list{
     font-style: italic;
 }
 
@@ -65,8 +69,10 @@ table#weapon_table tr td{
 </head>
 <body>
 
-<div id="table_container">
+<div id="_table_container">
+<table id="table_container"><tr>
 {% for enemy in enemies %}
+<td>
 <div class="enemy_container">
 <table class="enemy_table">
     <tr><td colspan="3"><span class="template_name">{{ enemy.name }}</span></td></tr>
@@ -136,15 +142,24 @@ table#weapon_table tr td{
     {% for cs in enemy.combat_styles %}
         {{ cs.name }} {{ cs.value }}%{% if not forloop.last %}, {% endif %}
         <table id="weapon_table">
-            <tr><th>Weapon</th><th>Size/Force</th><th>Reach</th><th>Damage</th><th>AP/HP</th></tr>
+            <tr><th align="left">Weapon</th><th>Size/Force</th><th>Reach</th><th>Damage</th><th>AP/HP</th></tr>
             {% for weapon in cs.weapons %}
-                <tr><td>{{ weapon.name }}</td><td>{{weapon.size}}</td><td>{{weapon.reach}}</td><td>{{weapon.damage}}</td><td>{{weapon.ap}}/{{weapon.hp}}</td></tr>
+                <tr>
+                    <td>{{ weapon.name }}</td>
+                    <td>{{weapon.size}}</td>
+                    <td>{{weapon.reach}}</td>
+                    <td>{{weapon.damage}}{% if enemy.attributes.damage_modifier != '+0' %}{{ enemy.attributes.damage_modifier }}{% endif %}</td>
+                    <td>{{weapon.ap}}/{{weapon.hp}}</td>
+                </tr>
             {% endfor %}
         </table>
     {% endfor %}
 </span>
 </div>
+</td>
+{% if not forloop.first and forloop.counter|divisibleby:"2" %}</tr><tr>{% endif %}
 {% endfor %}
+</tr></table>
 </div>
 
 </body>

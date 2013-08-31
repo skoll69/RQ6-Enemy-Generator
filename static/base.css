@@ -17,6 +17,7 @@ h2{
     margin-top: 4px;
     margin-bottom: 7px;
     font-family: Lucida Sans Unicode;
+    color: #F99C2A;
 }
 
 h3{
@@ -34,13 +35,13 @@ h4{
 
 #main_container{
     background: #FFFFFF;
-    width: 850px;
+    width: 890px;
     margin-left: auto;
     margin-right: auto;
 }
 
 #header{
-    width: 814px;
+    width: 854px;
     font-size: 42px;
     background: #9B6B28;
     margin: 10px;
@@ -98,7 +99,7 @@ h4{
     margin: 10px 10px 0px 10px;
     background: #7F5924;
     height: 100%;
-    width: 814px;
+    width: 854px;
     display: inline-block;
     padding: 8px;
     color: white;
@@ -187,6 +188,22 @@ div#delete_template{
     top: 10px;
 }
 
+div#clone_template_container{
+    position: absolute;
+    right: 12px;
+    top: 50px;
+}
+
+input[type="submit"]#clone_template{
+    width: 140px;
+}
+
+div#delete_race{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
 table.read_only th{
     font-weight: normal;
 }
@@ -194,4 +211,8 @@ table.read_only th{
 table.read_only td{
     padding-right: 20px;
     font-style: italic;
+}
+
+.del_hit_location{
+    cursor: pointer;
 }

@@ -2,6 +2,7 @@
 {% load url from future %}
 
 {% block content %}
+<div><p>Type to search: <input id="searchinput" /></p></div>
 
 <form action="{% url 'generate_enemies' %}" method="post" target="_blank">
 {% csrf_token %}
@@ -9,16 +10,18 @@
     <thead><tr>
         <th class="sort-alpha">Enemy type</th>
         <th>Amount</th>
+        <th class="sort-alpha">Race</th>
         <th class="sort-alpha">Rank</th>
         <th class="sort-alpha">Creator</th>
         <th></th>
     </tr></thead>
     {% for et in templates %}
         <tr>
-            <td>{{ et.name }} {% if not et.published %}(not published){% endif %}</td>
+            <td>{{ et.name }} {% if not et.published %}<b>*</b>{% endif %}</td>
             <td><input name="enemy_template_id_{{et.id}}" min="1" max="40" type="number"></td>
+            <td>{{ et.race.name }}</td>
             <td>
-                {% if et.rank = 1 %}1 Rubble{% endif %}
+                {% if et.rank = 1 %}1 Rabble{% endif %}
                 {% if et.rank = 2 %}2 Novice{% endif %}
                 {% if et.rank = 3 %}3 Skilled{% endif %}
                 {% if et.rank = 4 %}4 Veteran{% endif %}
@@ -29,8 +32,9 @@
         </tr>
     {% endfor %}
 </table>
-
-<div><p>Type to search: <input id="searchinput" /></p></div>
+{% if user.username %}
+<p><b>*</b> Unpublished</p>
+{% endif %}
 
 <input type="submit" value="Generate">
 </form>

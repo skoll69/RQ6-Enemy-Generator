@@ -3,8 +3,9 @@
 
 {% block content %}
 
+<table><tr><td valign="top">
 {% if enemy_templates %}
-    <h4>Enemy Templates</h4>
+    <h3>Enemy Templates</h3>
     <table>
     <tr><th>Template name</th><th>Rank</th><th>Published</th></tr>
     {% for et in enemy_templates %}
@@ -21,10 +22,23 @@
         </tr>
     {% endfor %}
     </table>
-    <br>
 {% endif %}
+</td><td width="20">
+</td><td valign="top">
+{% if races %}
+    <h3>Races</h3>
+    <table>
+    {% for race in edit_races %}
+        <tr>
+            <td><a class="edit_item" href="{% url 'race' race.id %}">{{ race.name }}</a></td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endif %}
+</td></tr></table>
+<br>
 
-<h4>Create new template</h4>
+<h3>Create new template</h3>
 <p>Start creating a new template by selecting race.</p>
 <form action="{% url 'create_enemy_template'%}" method="post">
 {% csrf_token %}
@@ -36,5 +50,13 @@
 </select>
 <p><input type="submit" value="Create new template"></p>
 </form>
+
+{% if race_admin %}
+<h3>Create new race</h3>
+<form action="{% url 'create_race'%}" method="post">
+{% csrf_token %}
+<p><input type="submit" value="Create new race"></p>
+</form>
+{% endif %}
 
 {% endblock %}

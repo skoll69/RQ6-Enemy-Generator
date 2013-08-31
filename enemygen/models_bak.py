@@ -156,7 +156,6 @@ class EnemyTemplate(models.Model, Printer):
     rank_choices = ((1, 'Rabble'), (2, 'Novice'), (3, 'Skilled'), (4, 'Veteran'), (5, 'Master'))
     rank = models.SmallIntegerField(max_length=30, default=2, choices=rank_choices)
     movement = models.SmallIntegerField(default=6)
-    notes = models.TextField(null=True, blank=True)
     
     @classmethod
     def create(cls, owner, ruleset, setting, race, name="Enemy Template"):
@@ -198,10 +197,6 @@ class EnemyTemplate(models.Model, Printer):
     @property
     def included_standard_skills(self):
         return EnemySkill.objects.filter(enemy_template=self, skill__standard=True, include=True)
-        
-    @property
-    def raw_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self)
         
     @property
     def standard_skills(self):
@@ -251,55 +246,7 @@ class EnemyTemplate(models.Model, Printer):
     @property
     def combat_styles(self):
         return CombatStyle.objects.filter(enemy_template=self)
-        
-    def clone(self, owner):
-        name = "Copy of %s" % self.name
-        new = EnemyTemplate(owner=owner, ruleset=self.ruleset, setting=self.setting, race=self.race, name=name)
-        new.movement = self.movement
-        new.rank = self.rank
-        new.folk_spell_amount = self.folk_spell_amount
-        new.theism_spell_amount = self.theism_spell_amount
-        new.sorcery_spell_amount = self.sorcery_spell_amount
-        new.save()
-        for stat in self.stats:
-            es = EnemyStat(stat=stat.stat, enemy_template=new, die_set=stat.die_set); es.save()
-        for hl in self.hit_locations:
-            new_hl = EnemyHitLocation.create(hl.hit_location, enemy_template=new, armor=hl.armor)
-        for skill in self.raw_skills:
-            es = EnemySkill(skill=skill.skill, enemy_template=new, die_set=skill.die_set, include=skill.include)
-            es.save()
-        for skill in self.custom_skills:
-            es = CustomSkill(name=skill.name, enemy_template=new, die_set=skill.die_set, include=skill.include)
-            es.save()
-        for combat_style in self.combat_styles:
-            combat_style.clone(new)
-        for spell in EnemySpell.objects.filter(enemy_template=self):
-            s = EnemySpell(enemy_template=new, spell=spell.spell, probability=spell.probability, detail=spell.detail)
-            s.save()
-        for spell in CustomSpell.objects.filter(enemy_template=self):
-            s = CustomSpell(enemy_template=new, name=spell.name, probability=spell.probability, type=spell.type)
-            s.save()
-        return new
 
-    def apply_skill_bonus(self, bonus):
-        # Validate bonus
-        replace = {'STR': 0, 'SIZ': 0, 'CON': 0, 'INT': 0, 'DEX': 0, 'POW': 0, 'CHA': 0}
-        temp_value = replace_die_set(bonus, replace)
-        Dice(temp_value).roll()
-        
-        if bonus[0] != '+':
-            bonus = '+' + bonus
-            
-        for skill in self.raw_skills:
-            skill.die_set = skill.die_set + bonus
-            skill.save()
-        for skill in self.custom_skills:
-            skill.die_set = skill.die_set + bonus
-            skill.save()
-        for combat_style in self.combat_styles:
-            combat_style.die_set = combat_style.die_set + bonus
-            combat_style.save()
-        
 class CombatStyle(models.Model):
     name = models.CharField(max_length=80)
     die_set = models.CharField(max_length=30, default="STR+DEX")
@@ -369,24 +316,6 @@ class CombatStyle(models.Model):
         Dice(value).roll()  #Test that the value is valid
         self.shield_amount = value
         self.save()
-        
-    def clone(self, et):
-        new = CombatStyle(name=self.name, die_set=self.die_set, enemy_template=et,
-                          one_h_amount=self.one_h_amount, two_h_amount=self.two_h_amount,
-                          ranged_amount=self.ranged_amount, shield_amount=self.shield_amount)
-        new.save()
-        for weapon in EnemyWeapon.objects.filter(combat_style=self):
-            EnemyWeapon.create(combat_style=new, weapon=weapon.weapon, probability=weapon.probability)
-        for weapon in CustomWeapon.objects.filter(combat_style=self):
-            cw = CustomWeapon.create(new.id, weapon.type, weapon.name, weapon.probability)
-            cw.damage = weapon.damage
-            cw.size = weapon.size
-            cw.reach = weapon.reach
-            cw.ap = weapon.ap
-            cw.hp = weapon.hp
-            cw.damage_modifier = weapon.damage_modifier
-            cw.save()
-            
         
 class EnemyWeapon(models.Model, Printer):
     ''' Enemy-specific instance of a Weapon. Links selected weapon to CombatStyle and records
@@ -482,9 +411,9 @@ class CustomWeapon(models.Model, Printer):
             self.delete()
     
     @classmethod
-    def create(cls, cs_id, type, name='Custom weapon', probability=1):
+    def create(cls, cs_id, type):
         cs = CombatStyle.objects.get(id=cs_id)
-        cw = cls(combat_style=cs, type=type, name=name, probability=probability)
+        cw = cls(combat_style=cs, type=type, name='Custom weapon', probability=1)
         cw.save()
         return cw
         
@@ -578,14 +507,10 @@ class EnemyHitLocation(models.Model, Printer):
         self.save()
         
     @classmethod
-    def create(cls, hit_location, enemy_template, armor=None):
-        # When creating a new template, armor defaults to race armor
-        # When cloning a template, we copy also the armor value
-        if armor is None:
-            armor = hit_location.armor
+    def create(cls, hit_location, enemy_template):
         ehl = EnemyHitLocation(hit_location=hit_location,
                                enemy_template=enemy_template,
-                               armor=armor)
+                               armor=hit_location.armor)
         ehl.save()
         return ehl
         

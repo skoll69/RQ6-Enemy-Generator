@@ -5,12 +5,12 @@
 <h3>Enemy details</h3>
 <table><tr>
     <th>Template name</th>
-    <td><input id="et_{{ et.id }}" class="data" type="text" item_id="{{ et.id }}" item_type="et_name" value="{{ et.name }}" /></td>
+    <td><input id="et_{{ et.id }}" class="data" type="text" size="40" item_id="{{ et.id }}" item_type="et_name" value="{{ et.name }}" /></td>
 </tr><tr>
     <th>Rank</th>
     <td>
         <select id="et_rank_{{ et.id }}" class="data" item_id="{{ et.id }}" item_type="et_rank">
-            <option value="1" {% if et.rank == 1 %}selected="selected"{% endif %}>Rubble</option>
+            <option value="1" {% if et.rank == 1 %}selected="selected"{% endif %}>Rabble</option>
             <option value="2" {% if et.rank == 2 %}selected="selected"{% endif %}>Novice</option>
             <option value="3" {% if et.rank == 3 %}selected="selected"{% endif %}>Skilled</option>
             <option value="4" {% if et.rank == 4 %}selected="selected"{% endif %}>Veteran</option>
@@ -28,12 +28,22 @@
 </tr><tr>
     <th>Published</th>
     <td><input id="et_pub_{{ et.id }}" class="data" type="checkbox" item_id="{{ et.id }}" item_type="et_published" {% if et.published %}checked="checked"{% endif %} /></td>
+</tr><tr>
+    <th>Notes</th>
+    <td><textarea id="et_notes_{{ et.id }}" class="data" cols="80" rows="3" item_id="{{ et.id }}" item_type="et_notes">{{ et.notes }}</textarea></td>
 </tr></table>
 
 <form action="{% url 'delete_template' et.id %}" method="post">
 {% csrf_token %}
 <div id="delete_template"><input type="submit" value="Delete template" /></div>
 </form>
+
+<div id="clone_template_container">
+<form action="{% url 'clone_template' et.id %}" method="post">
+{% csrf_token %}
+<input id="clone_template" type="submit" value="Clone" />
+</form>
+</div>
 
 <table id="stats_and_hp"><tr><td valign="top">
 <table>
@@ -42,7 +52,7 @@
     <tr>
         <td>{{ stat.name }}</td>
         <td>
-            <input id="stat_{{stat.id}}" class="data" type="text" item_id="{{stat.id}}" item_type="et_stat_value" value="{{ stat.die_set }}" />
+            <input id="stat_{{stat.id}}" class="data" type="text" size="8" item_id="{{stat.id}}" item_type="et_stat_value" value="{{ stat.die_set }}" />
         </td>
     </tr>
 {% endfor %}
@@ -55,37 +65,22 @@
         <td>{{ hl.range }}</td>
         <td>{{ hl.name }}</td>
         <td>
-            <input id="hl_{{hl.id}}" class="data" type="text" item_id="{{hl.id}}" item_type="et_hl_armor" value="{{ hl.armor }}" />
+            <input id="hl_{{hl.id}}" class="data" type="text" size="10" item_id="{{hl.id}}" item_type="et_hl_armor" value="{{ hl.armor }}" />
         </td>
     </tr>
 {% endfor %}
 </table>
+</td><td valign="top">
+<table>
+<tr><th colspan="2">Attributes</th></tr>
+<tr>
+    <td>Movement</td>
+    <td><input id="movement_{{spell.id}}" class="data number" size="5" type="number" min="0" max="30" item_id="{{et.id}}" item_type="et_movement" value="{{ et.movement }}" /></td>
+</tr>
+</table>
 </td></tr></table>
 
-<h3>Standard skills</h3>
-<table><tr>
-{% for skill in et.standard_skills %}
-        <td>{{ skill.name }}</td>
-        <td valign="top">
-            <input id="skill_include_{{skill.id}}" class="data" type="checkbox" item_id="{{skill.id}}" item_type="et_skill_include" {% if skill.include %}checked="checked"{% endif %} />
-            <input id="skill_{{skill.id}}" class="data" type="text" item_id="{{skill.id}}" item_type="et_skill_value" value="{{ skill.die_set }}" />
-        </td>
-        {% if forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
-{% endfor %}
-</tr></table>
-
-<h3>Professional skills</h3>
-<table><tr>
-{% for skill in et.professional_skills %}
-        <td>{{ skill.name }}</td>
-        <td valign="top">
-            <input id="skill_include_{{skill.id}}" class="data" type="checkbox" item_id="{{skill.id}}" item_type="et_skill_include" {% if skill.include %}checked="checked"{% endif %} />
-            <input id="skill_{{skill.id}}" class="data" type="text" item_id="{{skill.id}}" item_type="et_skill_value" value="{{ skill.die_set }}" />
-        </td>
-        {% if forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
-{% endfor %}
-</tr></table>
-
+{% include 'enemy_template_skills.html' %}
 
 {% include 'enemy_template_weapons.html' %}
 

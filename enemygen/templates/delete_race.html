@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block content %}
+
+{% if race %}
+    <h4>Confirm delete race</h4>
+    <p>Are you sure you want to delete the race {{ race.name }} (id: {{ race.id }})?</p>
+    <form action="{% url 'delete_race' race.id %}" method="post">
+    {% csrf_token %}
+    <p>
+        <input type="submit" name="answer" class="my_button" value="Yes">
+        <input type="submit" name="answer" class="my_button" value="No">
+    </p>
+    </form>
+{% else %}
+    <h4>Invalid race</h4>
+    <p>The race you are trying to delete either doesn't exist, or you don't have rights to delete it.</p>
+{% endif %}
+
+{% endblock %}

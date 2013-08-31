@@ -2,6 +2,16 @@
 {% load url from future %}
 
 {% block content %}
+
+{% if user.username %}
+<div id="clone_template_container">
+<form action="{% url 'clone_template' et.id %}" method="post">
+{% csrf_token %}
+<input id="clone_template" type="submit" value="Clone" />
+</form>
+</div>
+{% endif %}
+
 <h3>{{ et.name }}</h3>
 <table><tr>
     <th>Rank</th>
@@ -58,6 +68,17 @@
 <h3>Professional skills</h3>
 <table class="read_only"><tr>
 {% for skill in et.included_professional_skills %}
+    <th>{{ skill.name }}</th>
+    <td>{{ skill.die_set }}</td>
+    {% if forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
+{% endfor %}
+</tr></table>
+{% endif %}
+
+{% if et.included_custom_skills %}
+<h3>Custom skills</h3>
+<table class="read_only"><tr>
+{% for skill in et.included_custom_skills %}
     <th>{{ skill.name }}</th>
     <td>{{ skill.die_set }}</td>
     {% if forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}

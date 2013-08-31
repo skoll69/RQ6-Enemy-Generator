@@ -1,0 +1,50 @@
+{% load url from future %}
+
+<h3>Apply skill bonus</h3>
+<p>Applies to a bonus to all skills</p>
+<form action="{% url 'apply_skill_bonus' et.id %}" method="post">
+{% csrf_token %}
+<input name="bonus" type="text"/>
+<input type="submit" value="Apply" />
+</form>
+
+<h3>Standard skills</h3>
+<table><tr>
+{% for skill in et.standard_skills %}
+        <td>{{ skill.name }}</td>
+        <td valign="top">
+            <input id="skill_include_{{skill.id}}" class="data" type="checkbox" item_id="{{skill.id}}" item_type="et_skill_include" {% if skill.include %}checked="checked"{% endif %} />
+            <input id="skill_{{skill.id}}" class="data" type="text" size="17" item_id="{{skill.id}}" item_type="et_skill_value" value="{{ skill.die_set }}" />
+        </td>
+        {% if forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
+{% endfor %}
+</tr></table>
+
+<h3>Professional skills</h3>
+<table><tr>
+{% for skill in et.professional_skills %}
+        <td>{{ skill.name }}</td>
+        <td valign="top">
+            <input id="pro_skill_include_{{skill.id}}" class="data" type="checkbox" item_id="{{skill.id}}" item_type="et_skill_include" {% if skill.include %}checked="checked"{% endif %} />
+            <input id="pro_skill_{{skill.id}}" class="data" type="text" size="17" item_id="{{skill.id}}" item_type="et_skill_value" value="{{ skill.die_set }}" />
+        </td>
+        {% if forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
+{% endfor %}
+</tr></table>
+
+{% if et.custom_skills %}
+<h3>Custom skills</h3>
+<table>
+{% for skill in et.custom_skills %}
+<tr>
+    <td><input id="custom_skill_name_{{skill.id}}" class="data" type="text" item_id="{{skill.id}}" item_type="et_custom_skill_name" value="{{skill.name}}" /></td>
+    <td valign="top">
+        <input id="custom_skill_include_{{skill.id}}" class="data" type="checkbox" item_id="{{skill.id}}" item_type="et_custom_skill_include" {% if skill.include %}checked="checked"{% endif %} />
+        <input id="custom_skill_{{skill.id}}" class="data" type="text" size="17" item_id="{{skill.id}}" item_type="et_custom_skill_value" value="{{ skill.die_set }}" />
+    </td>
+</tr>
+{% endfor %}
+</tr></table>
+{% endif %}
+
+<button class="add_custom_skill" et_id="{{ et.id }}">Add custom skill</button>

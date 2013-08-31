@@ -26,3 +26,11 @@ def to_bool(input):
     else: 
         return bool(input)
     
+
+def replace_die_set(die_set, replace):
+    ''' Replaces stat names in the die-set with actual values 
+        Input is dict like {'STR': 12, 'SIZ': 16}
+    '''
+    for key, value in replace.items():
+        die_set = die_set.replace(key, str(value))
+    return die_set

@@ -6,7 +6,7 @@ from django.template import RequestContext
 
 from enemygen.models import EnemyTemplate, Setting, Ruleset, EnemyTemplate, Race, Weapon
 from enemygen.views_lib import get_setting, get_ruleset, get_context, get_enemies, spell_list
-from enemygen.views_lib import get_enemy_templates, combat_styles
+from enemygen.views_lib import get_enemy_templates, combat_styles, is_race_admin
 
 def index(request):
     setting = get_setting(request)
@@ -32,6 +32,8 @@ def select_setting_ruleset(request):
 def edit_index(request):
     context = get_context(request)
     context['enemy_templates'] = EnemyTemplate.objects.filter(owner=request.user)
+    context['edit_races'] = Race.objects.filter(owner=request.user)
+    context['race_admin'] = is_race_admin(request.user)
     return render(request, 'edit_index.html', context)
     
 def enemy_template(request, enemy_template_id):
@@ -40,10 +42,6 @@ def enemy_template(request, enemy_template_id):
     context['et'] = EnemyTemplate.objects.get(id=enemy_template_id)
     if context['et'].owner != request.user and request.user.username != 'admin':
         template = 'enemy_template_read_only.html'
-    #try:
-    #    context['et'] = EnemyTemplate.objects.get(id=enemy_template_id, owner=request.user)
-    #except EnemyTemplate.DoesNotExist:
-    #    return redirect(edit_index)
     context['weapons'] = {}
     context['weapons']['1h'] = Weapon.objects.filter(type='1h-melee')
     context['weapons']['2h'] = Weapon.objects.filter(type='2h-melee')
@@ -54,7 +52,19 @@ def enemy_template(request, enemy_template_id):
     context['sorcery_spells'] = spell_list('sorcery', enemy_template_id)
     context['combat_styles'] = combat_styles(enemy_template_id)
     return render(request, template, context)
+    
+@login_required
+def race(request, race_id):
+    context = get_context(request)
+    context['race'] = Race.objects.get(id=race_id, owner=request.user)
+    return render(request, 'race.html', context)
 
+@login_required
+def create_race(request):
+    rc = Race.create(owner=request.user)
+    return redirect(race, rc.id)
+
+    
 @login_required
 def ruleset(request, ruleset_id):
     context = get_context(request)
@@ -87,6 +97,38 @@ def delete_template(request, template_id):
             return redirect(edit_index)
         elif answer == 'No':
             return redirect(enemy_template, template_id)
-            
     return render(request, 'delete_template.html', context)
+    
+@login_required
+def clone_template(request, template_id):
+    et = EnemyTemplate.objects.get(id=template_id)
+    new = et.clone(request.user)
+    return redirect(enemy_template, new.id)
+    
+@login_required
+def apply_skill_bonus(request, template_id):
+    et = EnemyTemplate.objects.get(id=template_id)
+    if request.POST:
+        et.apply_skill_bonus(request.POST.get('bonus'))
+    return redirect(enemy_template, et.id)
+    
+@login_required
+def delete_race(request, race_id):
+    context = get_context(request)
+    try:
+        rc = Race.objects.get(id=race_id, owner=request.user)
+    except Race.DoesNotExist:
+        rc = None
+    context['race'] = rc
+    if request.POST:
+        answer = request.POST.get('answer')
+        if answer == 'Yes':
+            rc.delete()
+            return redirect(edit_index)
+        elif answer == 'No':
+            return redirect(race, race_id)
+    return render(request, 'delete_race.html', context)
         
+def instructions(request):
+    context = get_context(request)
+    return render(request, 'instructions.html', context)

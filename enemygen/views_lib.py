@@ -17,25 +17,13 @@ def get_context(request):
     context['generated'] = _get_generated_amount()
     return context
 
-def get_enemy_templates_old(ruleset, setting, user):
-    templates = []
-    for rank in ((1, 'Rubble'), (2, 'Novice'), (3, 'Skilled'), (4, 'Veteran'), (5, 'Master')):
-        templist = list(EnemyTemplate.objects.filter(ruleset=ruleset, setting=setting, 
-                                                     published=True, rank=rank[0]))
-        # Add the unpublished templates of the logged-in user
-        if user.is_authenticated():
-            templist.extend(list(EnemyTemplate.objects.filter(ruleset=ruleset, setting=setting,
-                                                              published=False, rank=rank[0], owner=user)))
-        templates.append({'name': rank[1], 'id': rank[0], 'templates': templist})
-    return templates
-    
 def get_enemy_templates(ruleset, setting, user):
     templates = list(EnemyTemplate.objects.filter(ruleset=ruleset, setting=setting, published=True).order_by('rank'))
     # Add the unpublished templates of the logged-in user
     if user.is_authenticated():
         templates.extend(list(EnemyTemplate.objects.filter(ruleset=ruleset, setting=setting, published=False, owner=user)))
-    if user.is_authenticated() and user.username == 'admin':
-        templates.extend(list(EnemyTemplate.objects.filter(ruleset=ruleset, setting=setting, published=False)))
+    if user.is_authenticated() and is_superuser(user):
+        templates.extend(list(EnemyTemplate.objects.filter(ruleset=ruleset, setting=setting, published=False).exclude(owner=user)))
     return templates
     
 def get_enemies(request):
@@ -103,3 +91,10 @@ def combat_styles(et_id):
                 cs_out['customs'].append(cw)
         output.append(cs_out)
     return output
+    
+def is_race_admin(user):
+    return bool(user.groups.filter(name='race_admin').count())
+    
+def is_superuser(user):
+    return bool(user.groups.filter(name='superuser').count())
+    

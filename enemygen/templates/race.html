@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block content %}
+<h3>Race</h3>
+<table><tr>
+    <th>Name</th>
+    <td><input id="race_{{ race.id }}" class="data" type="text" item_id="{{ race.id }}" item_type="race_name" value="{{ race.name }}" /></td>
+</tr><tr>
+    <th>Movement</th>
+    <td><input id="race_movement_{{ race.id }}" class="data" type="number" size="3" min="0" max="30" item_id="{{ race.id }}" item_type="race_movement" value="{{race.movement}}" /></td>
+</tr><tr>
+    <th>Published</th>
+    <td><input id="race_pub_{{ race.id }}" class="data" type="checkbox" item_id="{{ race.id }}" item_type="race_published" {% if race.published %}checked="checked"{% endif %} /></td>
+</tr></table>
+
+<form action="{% url 'delete_race' race.id %}" method="post">
+{% csrf_token %}
+<div id="delete_race"><input type="submit" value="Delete race" /></div>
+</form>
+
+<h3>Stats</h3>
+<table>
+<tr><th>Stat</th><th>Value</th></tr>
+{% for stat in race.stats %}
+    <tr>
+        <td>{{ stat.name }}</td>
+        <td>
+            <input id="race_stat_{{stat.id}}" class="data" type="text" size="6" item_id="{{stat.id}}" item_type="race_stat_value" value="{{ stat.default_value }}" />
+        </td>
+    </tr>
+{% endfor %}
+</table>
+
+<h3>Hit locations</h3>
+<table>
+<tr><th>Range start</th><th>Range end</th><th>Name</th><th>Armor</th><th>HP Modifier</th><th></th></tr>
+{% for hl in race.hit_locations %}
+    <tr>
+        <td><input id="hl_rs_{{hl.id}}" class="data" type="number" size="2" min="1" max="20" item_id="{{hl.id}}" item_type="race_hl_range_start" value="{{ hl.range_start }}" />
+        <td><input id="hl_re_{{hl.id}}" class="data" type="number" size="2" min="1" max="20" item_id="{{hl.id}}" item_type="race_hl_range_end" value="{{ hl.range_end }}" />
+        <td><input id="hl_name_{{hl.id}}" class="data" type="text" size="10" item_id="{{hl.id}}" item_type="race_hl_name" value="{{ hl.name }}" /></td>
+        <td><input id="hl_armor_{{hl.id}}" class="data" type="text" size="3" item_id="{{hl.id}}" item_type="race_hl_armor" value="{{ hl.armor }}" />
+        <td><input id="hl_hp_mod_{{hl.id}}" class="data" type="number" size="2" min="-5" max="5" item_id="{{hl.id}}" item_type="race_hl_hp_modifier" value="{{ hl.hp_modifier }}" />
+        <td><img src="/rq_static/minus.png" width="23" height="23" class="del_hit_location" hl_id="{{ hl.id }}" /></td>
+    </tr>
+{% endfor %}
+</table>
+<button id="add_hit_location" race_id="{{ race.id }}">Add Hit Location</button>
+
+{% endblock %}
