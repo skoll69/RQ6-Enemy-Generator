@@ -34,6 +34,7 @@ h4{
 }
 
 #main_container{
+    position: relative;
     background: #FFFFFF;
     width: 890px;
     margin-left: auto;
@@ -49,6 +50,12 @@ h4{
     display: inline-block;
     text-align: center;
     font-family: Lucida Sans Unicode;
+}
+
+#rq_gateway{
+    position: absolute;
+    top: 12px;
+    right: 10px;
 }
 
 #menu{
