@@ -48,14 +48,14 @@ h4{
     margin: 10px;
     padding: 8px;
     display: inline-block;
-    text-align: center;
+    text-align: left;
     font-family: Lucida Sans Unicode;
 }
 
 #rq_gateway{
     position: absolute;
-    top: 12px;
-    right: 10px;
+    top: -4px;
+    right: -15px;
 }
 
 #menu{
