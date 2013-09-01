@@ -28,6 +28,7 @@ def get_enemy_templates(ruleset, setting, user):
     
 def get_enemies(request):
     enemies = []
+    index = []
     for key, amount in request.POST.items():
         if not 'enemy_template_id_' in key: continue
         enemy_template_id = int(key.replace('enemy_template_id_', ''))
@@ -37,6 +38,9 @@ def get_enemies(request):
         except ValueError:
             amount = 0
         if amount > 40: amount = 40
+        index.append((et, amount))
+    index.sort(key=lambda tup: tup[0].rank, reverse=True)
+    for et, amount in index:
         for i in xrange(amount):
             enemies.append(et.generate(i+1))
     return enemies

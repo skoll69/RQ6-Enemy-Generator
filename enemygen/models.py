@@ -162,6 +162,7 @@ class EnemyTemplate(models.Model, Printer):
     def create(cls, owner, ruleset, setting, race, name="Enemy Template"):
         enemy_template = cls(name=name, owner=owner, ruleset=ruleset, setting=setting, race=race)
         enemy_template.movement = race.movement
+        enemy_template.notes = race.special
         enemy_template.save()
         if name == 'Enemy Template':
             enemy_template.name = '%s Template %s' % (race.name, enemy_template.id)
@@ -260,6 +261,7 @@ class EnemyTemplate(models.Model, Printer):
         new.folk_spell_amount = self.folk_spell_amount
         new.theism_spell_amount = self.theism_spell_amount
         new.sorcery_spell_amount = self.sorcery_spell_amount
+        new.notes = self.notes
         new.save()
         for stat in self.stats:
             es = EnemyStat(stat=stat.stat, enemy_template=new, die_set=stat.die_set); es.save()
@@ -519,7 +521,7 @@ class EnemySkill(models.Model, Printer):
         replace = {'STR': 0, 'SIZ': 0, 'CON': 0, 'INT': 0, 'DEX': 0, 'POW': 0, 'CHA': 0}
         temp_value = replace_die_set(value, replace)
         Dice(temp_value).roll()
-        self.die_set = value
+        self.die_set = value.upper()
         self.save()
         
 class CustomSkill(models.Model, Printer):
@@ -538,7 +540,7 @@ class CustomSkill(models.Model, Printer):
         replace = {'STR': 0, 'SIZ': 0, 'CON': 0, 'INT': 0, 'DEX': 0, 'POW': 0, 'CHA': 0}
         temp_value = replace_die_set(value, replace)
         Dice(temp_value).roll()
-        self.die_set = value
+        self.die_set = value.upper()
         self.save()
         
     @classmethod
@@ -574,7 +576,7 @@ class EnemyHitLocation(models.Model, Printer):
         
     def set_armor(self, value):
         Dice(value).roll()  #Test that the value is valid
-        self.armor = value
+        self.armor = value.upper()
         self.save()
         
     @classmethod
@@ -611,7 +613,7 @@ class RaceStat(models.Model, Printer):
     def set_value(self, value):
         #Test that the value is valid
         Dice(value).roll()
-        self.default_value = value
+        self.default_value = value.upper()
         self.save()
         
 class EnemyStat(models.Model, Printer):
@@ -632,7 +634,7 @@ class EnemyStat(models.Model, Printer):
 
     def set_value(self, value):
         Dice(value).roll()  #Test that the value is valid
-        self.die_set = value
+        self.die_set = value.upper()
         self.save()
         
 class SpellAbstract(models.Model, Printer):
@@ -718,6 +720,7 @@ class _Enemy:
         self.template = enemy_template.name
         self.attributes = {}
         self.combat_styles = []
+        self.notes = enemy_template.notes
 
     def generate(self, suffix=None):
         self.name = self.et.name
@@ -822,6 +825,9 @@ class _Enemy:
         elif dex_int <= 48: self.attributes['action_points'] = 4
         
     def _calculate_damage_modifier(self):
+        if self.stats['STR'] == 0 or self.stats['SIZ'] == 0:
+            self.attributes['damage_modifier'] = '0'
+            return
         DICE_STEPS = ('-1D8', '-1D6', '-1D4', '-1D2', '+0', '+1D2', '+1D4', '+1D6', '+1D8', '+1D10', '+1D12',
                       '+2D6', '+1D8+1D6', '+2D8', '+1D10+1D8', '+2D10', '+2D10+1D2', '+2D10+1D4', '+2D10+1D6')
         str_siz = self.stats['STR'] + self.stats['SIZ']

@@ -29,6 +29,9 @@
         {% if et.setting.id == 2 %}Generic fantasy{% endif %}
     </td>
 </tr><tr>
+    <th>Race</th>
+    <td><a class="edit_item" href="{% url 'race' et.race.id %}">{{ et.race.name }}</a></td>
+</tr><tr>
     <th>Creator</th><td>{{ et.owner.username }}</td>
 </tr></table>
 

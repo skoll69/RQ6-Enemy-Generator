@@ -26,11 +26,14 @@
         </select>
     </td>
 </tr><tr>
+    <th>Race</th>
+    <td><a class="edit_item" href="{% url 'race' et.race.id %}">{{ et.race.name }}</a></td>
+</tr><tr>
     <th>Published</th>
     <td><input id="et_pub_{{ et.id }}" class="data" type="checkbox" item_id="{{ et.id }}" item_type="et_published" {% if et.published %}checked="checked"{% endif %} /></td>
 </tr><tr>
     <th>Notes</th>
-    <td><textarea id="et_notes_{{ et.id }}" class="data" cols="80" rows="3" item_id="{{ et.id }}" item_type="et_notes">{{ et.notes }}</textarea></td>
+    <td><textarea id="et_notes_{{ et.id }}" class="data" cols="60" rows="3" item_id="{{ et.id }}" item_type="et_notes">{{ et.notes }}</textarea></td>
 </tr></table>
 
 <form action="{% url 'delete_template' et.id %}" method="post">
@@ -57,6 +60,7 @@
     </tr>
 {% endfor %}
 </table>
+{% if et.hit_locations %}
 </td><td valign="top">
 <table>
 <tr><th>D20</th><th>Hit location</th><th>Armor</th></tr>
@@ -70,6 +74,7 @@
     </tr>
 {% endfor %}
 </table>
+{% endif %}
 </td><td valign="top">
 <table>
 <tr><th colspan="2">Attributes</th></tr>

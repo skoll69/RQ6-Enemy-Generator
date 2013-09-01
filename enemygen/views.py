@@ -53,11 +53,13 @@ def enemy_template(request, enemy_template_id):
     context['combat_styles'] = combat_styles(enemy_template_id)
     return render(request, template, context)
     
-@login_required
 def race(request, race_id):
+    template = 'race.html'
     context = get_context(request)
-    context['race'] = Race.objects.get(id=race_id, owner=request.user)
-    return render(request, 'race.html', context)
+    context['race'] = Race.objects.get(id=race_id)
+    if context['race'].owner != request.user:
+        template = 'race_read_only.html'
+    return render(request, template, context)
 
 @login_required
 def create_race(request):

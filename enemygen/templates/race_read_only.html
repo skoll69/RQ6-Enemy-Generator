@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block content %}
+<h3>Race</h3>
+<table>
+    <tr><th>Name</th><td>{{ race.name }}</td></tr>
+    <tr><th>Movement</th><td>{{race.movement}}</td></tr>
+    <tr><th>Notes</th><td>{{ race.special }}</td></tr>
+</table>
+
+<h3>Stats</h3>
+<table>
+<tr><th>Stat</th><th>Value</th></tr>
+{% for stat in race.stats %}
+    <tr>
+        <td>{{ stat.name }}</td>
+        <td>{{ stat.default_value }}</td>
+    </tr>
+{% endfor %}
+</table>
+
+<h3>Hit locations</h3>
+<table>
+<tr><th>Range start</th><th>Range end</th><th>Name</th><th>Armor</th><th>HP Modifier</th><th></th></tr>
+{% for hl in race.hit_locations %}
+    <tr>
+        <td>{{ hl.range_start }}</td>
+        <td>{{ hl.range_end }}</td>
+        <td>{{ hl.name }}</td>
+        <td>{{ hl.armor }}</td>
+        <td>{{ hl.hp_modifier }}</td>
+    </tr>
+{% endfor %}
+</table>
+{% endblock %}

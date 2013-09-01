@@ -2,15 +2,22 @@
 {% load url from future %}
 
 {% block content %}
+<div><p>Type to search: <input id="searchinput" /></p></div>
 
 <table><tr><td valign="top">
 {% if enemy_templates %}
     <h3>Enemy Templates</h3>
-    <table>
-    <tr><th>Template name</th><th>Rank</th><th>Published</th></tr>
+    <table id="enemy_template_list">
+    <thead><tr>
+        <th class="sort-alpha">Template name</th>
+        <th class="sort-alpha">Race</th>
+        <th class="sort-alpha">Rank</th>
+        <th class="sort-alpha">Published</th>
+    </tr></thead>
     {% for et in enemy_templates %}
         <tr>
             <td><a class="edit_item" href="{% url 'enemy_template' et.id %}">{{ et }}</a></td>
+            <td><a class="edit_item" href="{% url 'race' et.race.id %}">{{ et.race.name }}</a></td>
             <td>
                 {% if et.rank = 1 %}Rubble{% endif %}
                 {% if et.rank = 2 %}Novice{% endif %}
@@ -58,5 +65,18 @@
 <p><input type="submit" value="Create new race"></p>
 </form>
 {% endif %}
+
+<script>
+$(document).ready(function(){
+    var table = new ttable('enemy_template_list'); 
+    table.sorting.enabled = true;
+    table.sorting.sortall = false;
+    table.search.enabled = true;
+    table.search.inputID = 'searchinput';
+    table.search.casesensitive = false;
+    table.style.num = false;
+    table.rendertable();
+});
+</script>
 
 {% endblock %}

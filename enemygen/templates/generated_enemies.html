@@ -1,3 +1,5 @@
+{% load url from future %}
+
 <html>
 <head>
 <style type="text/css">
@@ -6,11 +8,15 @@ body, table{
 }
 
 #table_container{
-    width:720px;
+    width:780px;
 }
 
 #table_container tr td{
     vertical-align: top;
+}
+
+#table_container tr{
+    margin-bottom: 50px;
 }
 
 .template_name{
@@ -19,9 +25,9 @@ body, table{
 
 div.enemy_container{
     margin-top: 15px;
-    margin-right: 10px;
+    margin-right: 0px;
     float: left;
-    width: 340px;
+    width: 350px;
 }
 
 .enemy_table{
@@ -62,8 +68,21 @@ table .item_list{
     font-style: italic;
 }
 
-table#weapon_table tr td{
+table.weapon_table{
+    border-spacing: 0px;
+}
+
+table.weapon_table tr td{
     font-size: 12px;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+a:hover{
+    text-decoration: underline;
 }
 </style>
 </head>
@@ -75,7 +94,7 @@ table#weapon_table tr td{
 <td>
 <div class="enemy_container">
 <table class="enemy_table">
-    <tr><td colspan="3"><span class="template_name">{{ enemy.name }}</span></td></tr>
+    <tr><td colspan="3"><span class="template_name"><a href="{% url 'enemy_template' enemy.et.id %}">{{ enemy.name }}</a></span></td></tr>
     <tr><td valign="top">
         <table class="inner_enemy_table" id="characteristics">
             <tr class="toprow"><th>Chars</th></tr>
@@ -96,15 +115,17 @@ table#weapon_table tr td{
             <tr class="evenrow"><td>&nbsp;</td>         <td>{{ enemy.attributes. }}</td></tr>
             <tr class="oddrow"> <td>&nbsp;</td>         <td>{{ enemy.attributes. }}</td></tr>
         </table>
+    {% if enemy.hit_locations %}
     </td><td valign="top">
         <table class="inner_enemy_table" id="hit_locations">
             <tr class="toprow"><th>1D20</th><th>Location</th><th>AP/HP</th></tr>
             {% for hl in enemy.hit_locations %}
                 <tr class="{% if forloop.counter|divisibleby:2 %}evenrow{% else %}oddrow{% endif %}">
-                    <td>{{ hl.range }}</td><td>{{ hl.name }}</td><td>{{ hl.ap }}/{{ hl.hp }}</td>
+                    <td>{{ hl.range }}</td><td>{{ hl.name }}</td><td align="right">{{ hl.ap }}/{{ hl.hp }}</td>
                 </tr>
             {% endfor %}
         </table>
+    {% endif %}
     </td></tr>
 </table>
     
@@ -138,10 +159,12 @@ table#weapon_table tr td{
     </span><br>
 {% endif %}
 
-<span class="title">Combat Styles:</span><span class="item_list">
+<span class="title">Combat Styles:</span>
+<span class="item_list">
     {% for cs in enemy.combat_styles %}
         {{ cs.name }} {{ cs.value }}%{% if not forloop.last %}, {% endif %}
-        <table id="weapon_table">
+        {% if cs.weapons %}
+        <table class="weapon_table">
             <tr><th align="left">Weapon</th><th>Size/Force</th><th>Reach</th><th>Damage</th><th>AP/HP</th></tr>
             {% for weapon in cs.weapons %}
                 <tr>
@@ -153,11 +176,20 @@ table#weapon_table tr td{
                 </tr>
             {% endfor %}
         </table>
+        {% endif %}
     {% endfor %}
 </span>
+
+{% if enemy.notes %}
+<span class="title">Notes:</span>
+<span class="item_list">{{ enemy.notes }}</span>
+{% endif %}
+
 </div>
 </td>
-{% if not forloop.first and forloop.counter|divisibleby:"2" %}</tr><tr>{% endif %}
+{% if not forloop.first and not forloop.last and forloop.counter|divisibleby:"2" %}
+    </tr><tr><td colspan="2"><br><br></td></tr><tr>
+{% endif %}
 {% endfor %}
 </tr></table>
 </div>

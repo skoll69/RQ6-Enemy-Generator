@@ -76,13 +76,26 @@ function del_hit_location(event){
     Dajaxice.enemygen.del_hit_location(refresh_page, {'hl_id': hl_id})
 }
 
+function apply_notes_to_templates(event){
+    var race_id = $(event.target).attr('item_id');
+    var notes = $('#race_notes').html();
+    Dajaxice.enemygen.apply_notes_to_templates(apply_notes_to_templates_callback, {'race_id': race_id, 'notes': notes});
+}
+
 function refresh_page(result){
     location.reload();
 }
 
+function apply_notes_to_templates_callback(result){
+    if (result.success){
+        $('#apply_notes_to_templates_confirmation').show();
+        setTimeout(function(){$('#apply_notes_to_templates_confirmation').fadeOut(1000);}, 3000);
+    }
+}
+
 $(document).ready(function(){
 
-	$('.data:input[type=number], .data:input[type=text], select.data').blur(function(event){
+	$('.data:input[type=number], .data:input[type=text], select.data, textarea.data').blur(function(event){
 		bind_change_listeners(event);
 	});
 
@@ -112,6 +125,10 @@ $(document).ready(function(){
     
     $('.del_hit_location').click(function(event){
         del_hit_location(event);
+    })
+    
+    $('#apply_notes_to_templates').click(function(event){
+        apply_notes_to_templates(event);
     })
     
 });

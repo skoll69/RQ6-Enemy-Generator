@@ -8,6 +8,18 @@ from enemygen.models import Race, RaceStat, HitLocation, CustomSkill
 from enemygen.enemygen_lib import to_bool
 
 @dajaxice_register
+def apply_notes_to_templates(request, race_id, notes):
+    try:
+        race = Race.objects.get(id=int(race_id))
+        for et in EnemyTemplate.objects.filter(race=race, owner=request.user):
+            if notes not in et.notes:
+                et.notes = et.notes + '\n' + notes
+                et.save()
+        return simplejson.dumps({'success': True})
+    except Exception as e:
+        return simplejson.dumps({'error': str(e)})
+    
+@dajaxice_register
 def add_custom_spell(request, et_id, type):
     try:
         CustomSpell.create(et_id, type)
@@ -318,6 +330,16 @@ def submit(request, value, id, object, parent_id=None, extra={}):
                 original_value = hl.armor
                 success = False
                 message = "%s is not a valid die set." % value
+        elif object == 'race_notes':
+            race = Race.objects.get(id=id, owner=request.user)
+            race.special = value
+            race.save()
+                
+        # Misc
+        elif object == 'et_notes':
+            et = EnemyTemplate.objects.get(id=id, owner=request.user)
+            et.notes = value
+            et.save()
             
         return simplejson.dumps({'success': success, 'message': message, 'original_value': original_value})
     except Exception as e:

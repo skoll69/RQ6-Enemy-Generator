@@ -13,6 +13,10 @@ var Dajaxice = {
         return Dajaxice.call('enemygen.del_hit_location', 'POST', callback_function, argv, custom_settings);
     },
 
+    apply_notes_to_templates: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('enemygen.apply_notes_to_templates', 'POST', callback_function, argv, custom_settings);
+    },
+
     add_hit_location: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.add_hit_location', 'POST', callback_function, argv, custom_settings);
     },
