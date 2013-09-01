@@ -134,3 +134,7 @@ def delete_race(request, race_id):
 def instructions(request):
     context = get_context(request)
     return render(request, 'instructions.html', context)
+
+def disclaimer(request):
+    context = get_context(request)
+    return render(request, 'disclaimer.html', context)

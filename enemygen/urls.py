@@ -5,6 +5,7 @@ from enemygen import views
 urlpatterns = patterns('',
     url(r'^$', views.index, name='index'),
     url(r'^instructions/$', views.instructions, name='instructions'),
+    url(r'^disclaimer/$', views.disclaimer, name='disclaimer'),
     url(r'^generate_enemies/$', views.generate_enemies, name='generate_enemies'),
     url(r'^select_setting_ruleset/$', views.select_setting_ruleset, name='select_setting_ruleset'),
     url(r'^edit_index/$', views.edit_index, name='edit_index'),
