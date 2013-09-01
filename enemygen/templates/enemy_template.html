@@ -21,8 +21,9 @@
     <th>Setting</th>
     <td>
         <select id="et_setting_{{ et.id }}" class="data" item_id="{{ et.id }}" item_type="et_setting">
-            <option value="1" {% if et.setting.id == 1 %}selected="selected"{% endif %}>Glorantha</option>
             <option value="2" {% if et.setting.id == 2 %}selected="selected"{% endif %}>Generic fantasy</option>
+            <option value="1" {% if et.setting.id == 1 %}selected="selected"{% endif %}>Glorantha</option>
+            <option value="3" {% if et.setting.id == 3 %}selected="selected"{% endif %}>Monster Island</option>
         </select>
     </td>
 </tr><tr>
