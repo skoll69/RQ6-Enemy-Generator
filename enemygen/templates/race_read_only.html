@@ -2,6 +2,15 @@
 {% load url from future %}
 
 {% block content %}
+{% if user.username %}
+<div id="clone_race_container">
+<form action="{% url 'clone_race' race.id %}" method="post">
+{% csrf_token %}
+<input id="clone_race" type="submit" value="Clone" />
+</form>
+</div>
+{% endif %}
+
 <h3>Race</h3>
 <table>
     <tr><th>Name</th><td>{{ race.name }}</td></tr>
@@ -33,4 +42,17 @@
     </tr>
 {% endfor %}
 </table>
+
+<h3>Templates</h3>
+{% if race.templates %}
+<table>
+<tr><th>Name</th><th>Creator</th></tr>
+{% for et in race.templates %}
+<tr><td><a href="{% url 'enemy_template' et.id %}">{{et.name}}</a></td><td>{{et.owner}}</td></tr>
+{% endfor %}
+</table>
+{% else %}
+<p>None</p>
+{% endif %}
+
 {% endblock %}

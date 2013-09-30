@@ -71,9 +71,10 @@ function add_hit_location(event){
     Dajaxice.enemygen.add_hit_location(refresh_page, {'race_id': race_id})
 }
 
-function del_hit_location(event){
-    var hl_id = $(event.target).attr('hl_id');
-    Dajaxice.enemygen.del_hit_location(refresh_page, {'hl_id': hl_id})
+function del_item(event){
+    var item_id = $(event.target).attr('item_id');
+    var item_type = $(event.target).attr('item_type');
+    Dajaxice.enemygen.del_item(refresh_page, {'item_id': item_id, 'item_type': item_type})
 }
 
 function apply_notes_to_templates(event){
@@ -90,6 +91,8 @@ function apply_notes_to_templates_callback(result){
     if (result.success){
         $('#apply_notes_to_templates_confirmation').show();
         setTimeout(function(){$('#apply_notes_to_templates_confirmation').fadeOut(1000);}, 3000);
+    } else {
+        console.log(result);
     }
 }
 
@@ -123,8 +126,8 @@ $(document).ready(function(){
         add_hit_location(event);
     })
     
-    $('.del_hit_location').click(function(event){
-        del_hit_location(event);
+    $('.del_item').click(function(event){
+        del_item(event);
     })
     
     $('#apply_notes_to_templates').click(function(event){

@@ -3,9 +3,10 @@ from dajaxice.decorators import dajaxice_register
 from enemygen.models import EnemyStat, EnemySkill, EnemyTemplate, Ruleset, StatAbstract
 from enemygen.models import SpellAbstract, SkillAbstract, EnemySpell, EnemyHitLocation
 from enemygen.models import CombatStyle, Weapon, Setting, CustomSpell, EnemyWeapon, CustomWeapon
-from enemygen.models import Race, RaceStat, HitLocation, CustomSkill
+from enemygen.models import Race, RaceStat, HitLocation, CustomSkill, Party, TemplateToParty
 
-from enemygen.enemygen_lib import to_bool
+import logging
+from enemygen.enemygen_lib import to_bool, int_or_zero
 
 @dajaxice_register
 def apply_notes_to_templates(request, race_id, notes):
@@ -17,7 +18,7 @@ def apply_notes_to_templates(request, race_id, notes):
                 et.save()
         return simplejson.dumps({'success': True})
     except Exception as e:
-        return simplejson.dumps({'error': str(e)})
+        return simplejson.dumps({'error': str(e), 'notes': et.notes})
     
 @dajaxice_register
 def add_custom_spell(request, et_id, type):
@@ -52,16 +53,28 @@ def add_hit_location(request, race_id):
         return simplejson.dumps({'error': str(e)})
     
 @dajaxice_register
-def del_hit_location(request, hl_id):
+def del_item(request, item_id, item_type):
     try:
-        hl = HitLocation.objects.get(id=int(hl_id))
-        hl.delete()
-        return simplejson.dumps({'success': True})
+        id = int(item_id)
+        if item_type == 'hit_location':
+            hl = HitLocation.objects.get(id=id)
+            hl.delete()
+            return simplejson.dumps({'success': True})
+        elif item_type == 'custom_weapon':
+            cw = CustomWeapon.objects.get(id=id)
+            cw.delete()
+            return simplejson.dumps({'success': True})
+        elif item_type == 'party_template_spec':
+            ttp = TemplateToParty.objects.get(id=id)
+            ttp.delete()
+            return simplejson.dumps({'success': True})
     except Exception as e:
         return simplejson.dumps({'error': str(e)})
     
+    
 @dajaxice_register
 def submit(request, value, id, object, parent_id=None, extra={}):
+    logger = logging.getLogger(__name__)
     try:
         id = int(id)
         success = True
@@ -98,7 +111,7 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             es = EnemySkill.objects.get(id=id)
             original_value = es.die_set
             try:
-                es.set_value(value)
+                es.set_value(value.upper())
             except ValueError:
                 success = False
                 message = '%s is not a valid die value.' % value
@@ -111,7 +124,7 @@ def submit(request, value, id, object, parent_id=None, extra={}):
         elif object == 'et_custom_skill_value':
             cs = CustomSkill.objects.get(id=id)
             try:
-                cs.set_value(value)
+                cs.set_value(value.upper())
             except ValueError:
                 original_value = cs.die_set
                 success = False
@@ -197,23 +210,23 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             cs.save()
         elif object == 'et_combat_style_value':
             cs = CombatStyle.objects.get(id=id)
-            cs.die_set = value
+            cs.die_set = value.upper()
             cs.save()
         elif object == 'et_one_h_amount':
             cs = CombatStyle.objects.get(id=id, enemy_template__owner=request.user)
-            cs.one_h_amount = value
+            cs.one_h_amount = value.lower()
             cs.save()
         elif object == 'et_two_h_amount':
             cs = CombatStyle.objects.get(id=id, enemy_template__owner=request.user)
-            cs.two_h_amount = value
+            cs.two_h_amount = value.lower()
             cs.save()
         elif object == 'et_ranged_amount':
             cs = CombatStyle.objects.get(id=id, enemy_template__owner=request.user)
-            cs.ranged_amount = value
+            cs.ranged_amount = value.lower()
             cs.save()
         elif object == 'et_shield_amount':
             cs = CombatStyle.objects.get(id=id, enemy_template__owner=request.user)
-            cs.shield_amount = value
+            cs.shield_amount = value.lower()
             cs.save()
         elif object == 'et_weapon_prob':
             we = Weapon.objects.get(id=id)
@@ -244,7 +257,7 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             cw.save()
         elif object == 'et_custom_weapon_damage':
             cw = CustomWeapon.objects.get(id=id)
-            cw.damage = value
+            cw.damage = value.lower()
             cw.save()
         elif object == 'et_custom_weapon_ap':
             cw = CustomWeapon.objects.get(id=id)
@@ -296,7 +309,7 @@ def submit(request, value, id, object, parent_id=None, extra={}):
                 original_value = race.published
         elif object == 'race_movement':
             race = Race.objects.get(id=id, owner=request.user)
-            race.movement = int(value)
+            race.movement = value
             race.save()
         elif object == 'race_stat_value':
             rs = RaceStat.objects.get(id=id, race__owner=request.user)
@@ -308,20 +321,35 @@ def submit(request, value, id, object, parent_id=None, extra={}):
                 message = "%s is not a valid die set." % value
         elif object == 'race_hl_range_start':
             hl = HitLocation.objects.get(id=id, race__owner=request.user)
-            hl.range_start = int(value)
-            hl.save()
+            try:
+                hl.range_start = int(value)
+                hl.save()
+            except ValueError:
+                original_value = hl.range_start
+                success = False
+                message = "Range must be a number"
         elif object == 'race_hl_range_end':
             hl = HitLocation.objects.get(id=id, race__owner=request.user)
-            hl.range_end = int(value)
-            hl.save()
+            try:
+                hl.range_end = int(value)
+                hl.save()
+            except ValueError:
+                original_value = hl.range_end
+                success = False
+                message = "Range must be a number"
         elif object == 'race_hl_name':
             hl = HitLocation.objects.get(id=id, race__owner=request.user)
             hl.name = value
             hl.save()
         elif object == 'race_hl_hp_modifier':
             hl = HitLocation.objects.get(id=id, race__owner=request.user)
-            hl.hp_modifier = int(value)
-            hl.save()
+            try:
+                hl.hp_modifier = int_or_zero(value)
+                hl.save()
+            except ValueError:
+                original_value = hl.hp_modifier
+                success = False
+                message = "HP Modifier must be a number"
         elif object == 'race_hl_armor':
             hl = HitLocation.objects.get(id=id, race__owner=request.user)
             try:
@@ -334,7 +362,34 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             race = Race.objects.get(id=id, owner=request.user)
             race.special = value
             race.save()
-                
+            
+        # Party
+        elif object == 'party_name':
+            p = Party.objects.get(id=id, owner=request.user)
+            p.name = value
+            p.save()
+        elif object == 'party_template_amount':
+            p = Party.objects.get(id=int(parent_id), owner=request.user)
+            t = EnemyTemplate.objects.get(id=id)
+            p.set_amount(t, value)
+            message = str(p) + ' ' + str(t)
+        elif object == 'party_published':
+            p = Party.objects.get(id=id, owner=request.user)
+            try:
+                p.set_published(to_bool(value))
+            except:
+                success = False
+                message = 'Something is wrong with the template'
+                original_value = p.published
+        elif object == 'party_setting':
+            p = Party.objects.get(id=id, owner=request.user)
+            p.setting = Setting.objects.get(id=int(value))
+            p.save()
+        elif object == 'party_notes':
+            party = Party.objects.get(id=id, owner=request.user)
+            party.notes = value
+            party.save()
+
         # Misc
         elif object == 'et_notes':
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
@@ -343,4 +398,5 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             
         return simplejson.dumps({'success': success, 'message': message, 'original_value': original_value})
     except Exception as e:
+        logger.error(str(e))
         return simplejson.dumps({'error': str(e)})

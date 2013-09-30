@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load url from future %}
 
+{% block title %}RQ: {{ et.name }}{% endblock %}
+
 {% block content %}
 
 {% if user.username %}
@@ -11,6 +13,15 @@
 </form>
 </div>
 {% endif %}
+
+<div id="generate_enemy_container">
+<form action="{% url 'generate_enemies' %}" method="post" target="generated">
+{% csrf_token %}
+<input name="enemy_template_id_{{et.id}}" type="hidden" value="4">
+<input name="dont_increment" type="hidden" value="1">
+<input style="width: 140px;" type="submit" value="Generate" />
+</form>
+</div>
 
 <h3>{{ et.name }}</h3>
 <table><tr>
@@ -30,7 +41,10 @@
     </td>
 </tr><tr>
     <th>Race</th>
-    <td><a class="edit_item" href="{% url 'race' et.race.id %}">{{ et.race.name }}</a></td>
+    <td><a href="{% url 'race' et.race.id %}">{{ et.race.name }}</a></td>
+</tr><tr>
+    <th>Notes</th>
+    <td>{{ et.notes }}</td>
 </tr><tr>
     <th>Creator</th><td>{{ et.owner.username }}</td>
 </tr></table>
@@ -50,7 +64,7 @@
 <tr><th>D20</th><th>Hit location</th><th>Armor</th></tr>
 {% for hl in et.hit_locations %}
     <tr>
-        <td>{{ hl.range }}</td>
+        <td>{{ hl.range|safe }}</td>
         <td>{{ hl.name }}</td>
         <td>{{ hl.armor }}</td>
     </tr>

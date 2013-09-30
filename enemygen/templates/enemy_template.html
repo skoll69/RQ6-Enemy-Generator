@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load url from future %}
 
+{% block title %}RQ: {{ et.name }}{% endblock %}
+
 {% block content %}
 <h3>Enemy details</h3>
 <table><tr>
@@ -49,6 +51,15 @@
 </form>
 </div>
 
+<div id="generate_enemy_container">
+<form action="{% url 'generate_enemies' %}" method="post" target="generated">
+{% csrf_token %}
+<input name="enemy_template_id_{{et.id}}" type="hidden" value="4">
+<input name="dont_increment" type="hidden" value="1">
+<input style="width: 140px;" type="submit" value="Generate" />
+</form>
+</div>
+
 <table id="stats_and_hp"><tr><td valign="top">
 <table>
 <tr><th colspan="2">Stats</th></tr>
@@ -67,7 +78,7 @@
 <tr><th>D20</th><th>Hit location</th><th>Armor</th></tr>
 {% for hl in et.hit_locations %}
     <tr>
-        <td>{{ hl.range }}</td>
+        <td>{{ hl.range|safe }}</td>
         <td>{{ hl.name }}</td>
         <td>
             <input id="hl_{{hl.id}}" class="data" type="text" size="10" item_id="{{hl.id}}" item_type="et_hl_armor" value="{{ hl.armor }}" />
@@ -81,7 +92,7 @@
 <tr><th colspan="2">Attributes</th></tr>
 <tr>
     <td>Movement</td>
-    <td><input id="movement_{{spell.id}}" class="data number" size="5" type="number" min="0" max="30" item_id="{{et.id}}" item_type="et_movement" value="{{ et.movement }}" /></td>
+    <td><input id="movement_{{et.id}}" class="data" type="text" size="8" item_id="{{et.id}}" item_type="et_movement" value="{{ et.movement }}" /></td>
 </tr>
 </table>
 </td></tr></table>

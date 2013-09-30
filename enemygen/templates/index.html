@@ -6,7 +6,8 @@
 
 <form action="{% url 'generate_enemies' %}" method="post" target="_blank">
 {% csrf_token %}
-<table id="enemy_template_list">
+<div id="enemy_template_list_container">
+<table id="enemy_template_list" class="index_list">
     <thead><tr>
         <th class="sort-alpha">Enemy type</th>
         <th>Amount</th>
@@ -30,6 +31,7 @@
         </tr>
     {% endfor %}
 </table>
+</div>
 {% if user.username %}
 <p><b>*</b> Unpublished</p>
 {% endif %}
@@ -40,6 +42,15 @@
 <br><br>
 
 <script>
+function template_list_height(){
+    list_container_height = $(window).height() - 385
+    if (list_container_height > $('#enemy_template_list').height()){
+        list_container_height = $('#enemy_template_list').height()
+    }
+    return list_container_height;
+
+}
+
 $(document).ready(function(){
     var table = new ttable('enemy_template_list'); 
     table.sorting.enabled = true;
@@ -49,6 +60,11 @@ $(document).ready(function(){
     table.search.casesensitive = false;
     table.style.num = false;
     table.rendertable();
+    
+    $('#enemy_template_list_container').css('height', template_list_height());
+    $(window).resize(function(event){
+        $('#enemy_template_list_container').css('height', template_list_height());
+    })
 });
 </script>
 

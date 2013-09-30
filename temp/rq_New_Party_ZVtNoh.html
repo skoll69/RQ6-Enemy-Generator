@@ -1,0 +1,295 @@
+
+
+<html>
+<head>
+<title>RQ: New Party</title>
+
+<style type="text/css">
+body, table{
+    font-size: 12px;
+}
+
+.template_name{
+    font-weight: bold;
+}
+
+div.row_container{
+    width: 880px;
+    position: relative;
+    page-break-inside: avoid;
+    padding-bottom: 50px;
+    vertical-align: top;
+}
+
+div.enemy_container{
+    margin-top: 15px;
+    margin-right: 0px;
+    width: 420px;
+    display: inline-block;
+    page-break-inside: avoid;
+    vertical-align: top;
+}
+
+.enemy_table{
+    background: white;
+    font-family: Serif;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.enemy_table td, th{
+    font-size: 12px;
+}
+
+.inner_enemy_table{
+    border-collapse: collapse;
+}
+
+.inner_enemy_table td{
+    padding: 2px;
+}
+
+.toprow{
+    background: #555;
+    color: white;
+}
+.evenrow{
+    line-height: 15px;
+}
+
+.oddrow{
+    background: #CCC;
+    line-height: 15px;
+}
+
+.title{
+    font-weight: bold;
+}
+
+table .item_list{
+    font-style: italic;
+}
+
+table.weapon_table{
+    border-spacing: 0px;
+}
+
+table.weapon_table tr td{
+    font-size: 12px;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+a:hover{
+    text-decoration: underline;
+}
+
+.page_break{
+    page-break-after: always;
+}
+
+div#pdf_export{
+    position: absolute;
+    top: 5px;
+    left: 700px;
+    z-index: 3;
+}
+
+@media print{
+    div#pdf_export{
+        display: none;
+    }
+}
+
+</style>
+</head>
+<body>
+
+
+
+
+<div class="row_container">
+
+<div class="enemy_container">
+<table class="enemy_table">
+    <tr><td colspan="3"><span class="template_name"><a href="/rq_tools/enemygen/enemy_template/39/">Centaur Warrior 1</a></span></td></tr>
+    <tr><td valign="top">
+        <table class="inner_enemy_table" id="characteristics">
+            <tr class="toprow"><th>Chars</th></tr>
+            
+                <tr><td class="oddrow">
+                    STR:&nbsp;16
+                </td></tr>
+            
+                <tr><td class="evenrow">
+                    CON:&nbsp;7
+                </td></tr>
+            
+                <tr><td class="oddrow">
+                    SIZ:&nbsp;28
+                </td></tr>
+            
+                <tr><td class="evenrow">
+                    DEX:&nbsp;4
+                </td></tr>
+            
+                <tr><td class="oddrow">
+                    INT:&nbsp;10
+                </td></tr>
+            
+                <tr><td class="evenrow">
+                    POW:&nbsp;19
+                </td></tr>
+            
+                <tr><td class="oddrow">
+                    CHA:&nbsp;8
+                </td></tr>
+            
+        </table>
+    </td><td valign="top">
+        <table class="inner_enemy_table" id="attributes">
+            <tr class="toprow"> <th colspan="2">Attributes</th></tr>
+            <tr class="oddrow"> <td>Action Points</td>  <td>2</td></tr>
+            <tr class="evenrow"><td>Damage Modifier</td><td>+1d8</td></tr>
+            <tr class="oddrow"> <td>Magic Points</td>   <td>19</td></tr>
+            <tr class="evenrow"><td>Movement</td>       <td>12</td></tr>
+            <tr class="oddrow"> <td>Strike Rank</td>    <td>-2(7-9)</td></tr>
+            <tr class="evenrow"><td>&nbsp;</td>         <td></td></tr>
+            <tr class="oddrow"> <td>&nbsp;</td>         <td></td></tr>
+        </table>
+    
+    </td><td valign="top">
+        <table class="inner_enemy_table" id="hit_locations">
+            <tr class="toprow"><th>1D20</th><th>Location</th><th>AP/HP</th></tr>
+            
+                <tr class="oddrow">
+                    <td>01&#8209;03</td><td>Right rear leg</td><td align="right">12/7</td>
+                </tr>
+            
+                <tr class="evenrow">
+                    <td>04&#8209;06</td><td>Left rear leg</td><td align="right">1/7</td>
+                </tr>
+            
+                <tr class="oddrow">
+                    <td>07&#8209;08</td><td>Hindquarters</td><td align="right">11/8</td>
+                </tr>
+            
+                <tr class="evenrow">
+                    <td>09&#8209;10</td><td>Forequarters</td><td align="right">1/9</td>
+                </tr>
+            
+                <tr class="oddrow">
+                    <td>11&#8209;12</td><td>Right Front Leg</td><td align="right">1/7</td>
+                </tr>
+            
+                <tr class="evenrow">
+                    <td>13&#8209;14</td><td>Left front leg</td><td align="right">1/7</td>
+                </tr>
+            
+                <tr class="oddrow">
+                    <td>15&#8209;16</td><td>Chest</td><td align="right">6/6</td>
+                </tr>
+            
+                <tr class="evenrow">
+                    <td>17</td><td>Right arm</td><td align="right">4/3</td>
+                </tr>
+            
+                <tr class="oddrow">
+                    <td>18</td><td>Left arm</td><td align="right">4/3</td>
+                </tr>
+            
+                <tr class="evenrow">
+                    <td>19&#8209;20</td><td>Head</td><td align="right">4/4</td>
+                </tr>
+            
+        </table>
+    
+    </td></tr>
+</table>
+    
+<span class="title">Skills:</span><span class="item_list">
+    
+        Athletics 40%, 
+    
+        Brawn 74%, 
+    
+        Custom skill 19%, 
+    
+        Endurance 44%, 
+    
+        Evade 18%, 
+    
+        Folk Magic 47%, 
+    
+        Perception 44%, 
+    
+        Unarmed 20%, 
+    
+        Willpower 58%
+    
+</span><br>
+
+
+    <span class="title">Folk magic spells:</span><span class="item_list">
+        
+            Bladesharp
+        
+    </span><br>
+
+
+
+
+
+
+<span class="title">Combat Styles:</span>
+<span class="item_list">
+    
+        Centaur Rager 54%
+        
+        <table class="weapon_table">
+            <tr><th align="left">Weapon</th><th>Size/Force</th><th>Reach</th><th>Damage</th><th>AP/HP</th></tr>
+            
+                <tr>
+                    <td>Broadsword</td>
+                    <td>M</td>
+                    <td>M</td>
+                    <td>1D8+1d8</td>
+                    <td>6/10</td>
+                </tr>
+            
+                <tr>
+                    <td>Club</td>
+                    <td>M</td>
+                    <td>S</td>
+                    <td>1D6+1d8</td>
+                    <td>4/4</td>
+                </tr>
+            
+                <tr>
+                    <td>Ball &amp; Chain</td>
+                    <td>M</td>
+                    <td>M</td>
+                    <td>1D6+1+1d8</td>
+                    <td>6/8</td>
+                </tr>
+            
+        </table>
+        
+    
+</span>
+
+
+<span class="title">Notes:</span>
+<span class="item_list">centaur notes</span>
+
+
+</div>
+
+
+</div>
+
+</body>
+</html>

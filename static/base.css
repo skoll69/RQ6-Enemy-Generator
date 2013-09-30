@@ -3,6 +3,7 @@ body{
     background: #CECECE;
     height: 100%;
     color: white;
+    margin: 0px;
 }
 
 html{
@@ -50,12 +51,14 @@ h4{
     display: inline-block;
     text-align: left;
     font-family: Lucida Sans Unicode;
+    line-height: 51px;
 }
 
 #rq_gateway{
     position: absolute;
     top: -4px;
     right: -15px;
+    border-width: 0px;
 }
 
 #menu{
@@ -112,6 +115,11 @@ h4{
     color: white;
 }
 
+#enemy_template_list_container{
+    height: 200px;
+    overflow: auto;
+}
+
 table#enemy_template_list{
     border-spacing: 0px;
     border-collapse: collapse;
@@ -121,13 +129,13 @@ table#enemy_template_list td, table#enemy_template_list th {
     padding-right: 20px;
 }
 
-table#enemy_template_list th {
+table.index_list th {
     cursor: pointer;
-    padding-right: 20px;
+    padding-right: 10px;
 }
 
 
-table#enemy_template_list th:hover {
+table.index_list th:hover {
     background: #A57230;
 }
 .edit_item{
@@ -189,6 +197,12 @@ input[type="submit"]:active, button:active {
     left:1px;
 }
 
+input[type="submit"].party_submit{
+    padding: 1px 12px;
+    font-size: 13px;
+    border: 2px solid white;
+}
+
 div#delete_template{
     position: absolute;
     right: 10px;
@@ -205,11 +219,32 @@ input[type="submit"]#clone_template{
     width: 140px;
 }
 
-div#delete_race{
+div#generate_enemy_container{
+    position: absolute;
+    right: 12px;
+    top: 90px;
+}
+
+div#clone_race_container{
+    position: absolute;
+    right: 10px;
+    top: 50px;
+}
+
+input[type="submit"]#clone_race{
+    width: 140px;
+}
+
+div#delete_race_container{
     position: absolute;
     right: 10px;
     top: 10px;
 }
+
+input[type="submit"]#delete_race{
+    width: 140px;
+}
+
 
 table.read_only th{
     font-weight: normal;
@@ -220,6 +255,51 @@ table.read_only td{
     font-style: italic;
 }
 
-.del_hit_location{
+.del_item{
     cursor: pointer;
 }
+
+#apply_notes_to_templates_confirmation{
+    width: 200px;
+    height: 50px;
+    border: 5px white solid;
+    background: #9B6B28;
+    position: absolute;
+    top: 60px;
+    margin-left: 40%;
+    display: none;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 50px;
+}
+
+#party_list_container{
+    height: 200px;
+    overflow: auto;
+}
+
+/* Party details start */
+div#delete_party_container{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+input[type="submit"]#delete_party{
+    width: 140px;
+}
+
+div#generate_party_container{
+    position: absolute;
+    right: 10px;
+    top: 50px;
+}
+
+/* Party details end */
+
+/* Edit index starts */
+div.create_new_container{
+    display: inline-block;
+}
+/* Edit index starts */
+

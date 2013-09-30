@@ -85,7 +85,7 @@
     <h4>Custom weapons</h4>
     <table>
     <tr>
-        <th>Name</th><th>Type</th><th>Damage</th><th>Size</th><th>Reach</th><th>AP</th><th>HP</th><th>Prob.</th>
+        <th>Name</th><th>Type</th><th>Damage</th><th>Size</th><th>Reach</th><th>AP</th><th>HP</th><th>Prob.</th><th></th>
     </tr>
     {% for weapon in cs.customs %}
     <tr>
@@ -101,11 +101,13 @@
         <td><input id="custom_weapon_damage_{{weapon.id}}" class="data" type="text" size="6" item_id="{{weapon.id}}" item_type="et_custom_weapon_damage" value="{{weapon.damage}}"></td>
         <td>
             <select id="custom_weapon_size_{{weapon.id}}" class="data" item_id="{{ weapon.id }}" item_type="et_custom_weapon_size">
+                <option value="-" {% if weapon.size == '-' %}selected="selected"{% endif %}>-</option>
                 <option value="S" {% if weapon.size == 'S' %}selected="selected"{% endif %}>S</option>
                 <option value="M" {% if weapon.size == 'M' %}selected="selected"{% endif %}>M</option>
                 <option value="L" {% if weapon.size == 'L' %}selected="selected"{% endif %}>L</option>
                 <option value="H" {% if weapon.size == 'H' %}selected="selected"{% endif %}>H</option>
                 <option value="E" {% if weapon.size == 'E' %}selected="selected"{% endif %}>E</option>
+                <option value="C" {% if weapon.size == 'C' %}selected="selected"{% endif %}>C</option>
             </select>
         </td>
         <td>
@@ -121,6 +123,7 @@
         <td><input id="custom_weapon_ap_{{weapon.id}}" class="data" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_ap" value="{{weapon.ap}}"></td>
         <td><input id="custom_weapon_hp_{{weapon.id}}" class="data" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_hp" value="{{weapon.hp}}"></td>
         <td><input id="custom_weapon_prob_{{weapon.id}}" class="data" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_prob" value="{{ weapon.probability }}" /></td>
+        <td><img src="/rq_static/minus.png" width="23" height="23" class="del_item" item_id="{{ weapon.id }}" item_type="custom_weapon"/></td>
     </tr>
     {% endfor %}
     </table>

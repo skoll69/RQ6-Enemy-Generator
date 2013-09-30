@@ -26,19 +26,19 @@ RQ Encounter Generator
 
 {% include 'menu.html' %}
 
-{% if setting %}
 <div id="ruleset_setting">
     Setting: 
     <form action="{% url 'select_setting_ruleset' %}" method="post" style="display: inline-block;">
+    <input type="hidden" name="coming_from" value="{{request.path}}">
     {% csrf_token %}
     <select name="setting_id" onchange="this.form.submit()">
+            <option value="0" {% if setting_id = 0%}selected="selected"{% endif %}>All</option>
         {% for sett in settings %}
-            <option value="{{ sett.id }}" {% if sett.name = setting %}selected="selected"{% endif %}>{{ sett.name }}</option>
+            <option value="{{ sett.id }}" {% if sett.id = setting_id %}selected="selected"{% endif %}>{{ sett.name }}</option>
         {% endfor %}
     </select>
     </form>
 </div>
-{% endif %}
 
 <div id="main_content">
     {% block content %}{% endblock %}

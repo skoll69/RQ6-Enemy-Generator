@@ -2,21 +2,33 @@
 {% load url from future %}
 
 {% block content %}
-<div><p>Type to search: <input id="searchinput" /></p></div>
 
 <table><tr><td valign="top">
-{% if enemy_templates %}
     <h3>Enemy Templates</h3>
+
+    <form action="{% url 'create_enemy_template'%}" method="post">
+    {% csrf_token %}
+    <select name="race_id">
+    <option value="0">Select race for new template</option>
+    {% for race in races %}
+        <option value="{{ race.id }}">{{ race.name }}</option>
+    {% endfor %}
+    </select>
+    <input type="submit" value="Create new template">
+    </form>
+
+    <div><p>Type to search: <input id="searchinput" /></p></div>
+    
+    {% if enemy_templates %}
     <table id="enemy_template_list">
     <thead><tr>
         <th class="sort-alpha">Template name</th>
         <th class="sort-alpha">Race</th>
         <th class="sort-alpha">Rank</th>
-        <th class="sort-alpha">Published</th>
     </tr></thead>
     {% for et in enemy_templates %}
         <tr>
-            <td><a class="edit_item" href="{% url 'enemy_template' et.id %}">{{ et }}</a></td>
+            <td><a class="edit_item" href="{% url 'enemy_template' et.id %}">{{ et.name }}</a>{% if not et.published %} *{% endif %}</td>
             <td><a class="edit_item" href="{% url 'race' et.race.id %}">{{ et.race.name }}</a></td>
             <td>
                 {% if et.rank = 1 %}Rubble{% endif %}
@@ -25,46 +37,43 @@
                 {% if et.rank = 4 %}Veteran{% endif %}
                 {% if et.rank = 5 %}Master{% endif %}
             </td>
-            <td>{% if et.published %}Yes{% else %}No{% endif %}</td>
         </tr>
     {% endfor %}
     </table>
 {% endif %}
 </td><td width="20">
 </td><td valign="top">
+    <h3>Party</h3>
+    <form action="{% url 'create_party'%}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Create new party">
+    </form>
+    <table>
+    {% for party in edit_parties %}
+        <tr>
+            <td><a class="edit_item" href="{% url 'party' party.id %}">{{ party.name }}</a>{% if not party.published %} *{% endif %}</td>
+        </tr>
+    {% endfor %}
+    </table>
 {% if races %}
+</td><td width="20">
+</td><td valign="top">
     <h3>Races</h3>
+    <form action="{% url 'create_race'%}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Create new race">
+    </form>
     <table>
     {% for race in edit_races %}
         <tr>
-            <td><a class="edit_item" href="{% url 'race' race.id %}">{{ race.name }}</a></td>
+            <td><a class="edit_item" href="{% url 'race' race.id %}">{{ race.name }}</a>{% if not race.published %} *{% endif %}</td>
         </tr>
     {% endfor %}
     </table>
 {% endif %}
 </td></tr></table>
-<br>
+<p>* Unpublished</p>
 
-<h3>Create new template</h3>
-<p>Start creating a new template by selecting race.</p>
-<form action="{% url 'create_enemy_template'%}" method="post">
-{% csrf_token %}
-<select name="race_id">
-<option value="0">Select race</option>
-{% for race in races %}
-    <option value="{{ race.id }}">{{ race.name }}</option>
-{% endfor %}
-</select>
-<p><input type="submit" value="Create new template"></p>
-</form>
-
-{% if race_admin %}
-<h3>Create new race</h3>
-<form action="{% url 'create_race'%}" method="post">
-{% csrf_token %}
-<p><input type="submit" value="Create new race"></p>
-</form>
-{% endif %}
 
 <script>
 $(document).ready(function(){

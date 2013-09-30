@@ -2,15 +2,17 @@
 
 <div id="menu">
 <span class="item"><a href="{% url 'index' %}">Index</a></span> | 
-<span class="item">{% if user %}<a href="{% url 'edit_index' %}">Manage templates</a>{% endif %}</span> |
+<span class="item"><a href="{% url 'party_index' %}">Party Index</a></span> | 
+<span class="item">{% if user %}<a href="{% url 'edit_index' %}">My templates</a>{% endif %}</span> |
 {% if user.username %}
-    <span class="item"><a href="{% url 'auth_logout' %}">Log out ({{ user.username }})</a></span> |
+    <span class="item"><a href="{% url 'auth_logout' %}">Log out</a></span> |
     <span class="item"><a href="{% url 'auth_password_change' %}">Change password</a></span> 
 {% else %}
     <span class="item"><a href="{% url 'auth_login' %}">Log in</a></span> |
     <span class="item"><a href="/rq_tools/accounts/register/">Register</a></span>
 {% endif %}
-    | <span class="item"><a href="{% url 'instructions' %}">Instructions</a></span>
+    | <span class="item"><a href="{% url 'instructions' %}">Help</a></span>
+    | <span class="item"><a href="{% url 'statistics' %}">Statistics</a></span>
     | <span class="item"><a href="{% url 'disclaimer' %}">Fan Policy Acknowledgement</a></span>
 
 </div>

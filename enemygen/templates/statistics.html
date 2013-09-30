@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block content %}
+
+<style>
+div.statistics{
+    float: left;
+    margin-right: 10px;
+}
+</style>
+
+<div class="statistics">
+<h2>Templates</h2>
+<table>
+<tr><th>Template</th><th>Gen.</th></tr>
+{% for template in statistics.templates %}
+<tr><td><a href="{% url 'enemy_template' template.id %}">{{template.name}}</a></td><td>{{template.generated}}</td></tr>
+{% endfor %}
+</table>
+</div>
+
+<div class="statistics">
+<h2>Races</h2>
+<table>
+<tr><th>Race</th><th>Templates</th></tr>
+{% for race in statistics.races %}
+<tr><td><a href="{% url 'race' race.id %}">{{race.name}}</a></td><td>{{race.template_amount}}</td></tr>
+{% endfor %}
+</table>
+</div>
+
+<div class="statistics">
+<h2>Users with most templates</h2>
+<table>
+<tr><th>User</th><th>Templates</th></tr>
+{% for user in statistics.users %}
+<tr><td>{{user.name}}</td><td>{{user.template_amount}}</td></tr>
+{% endfor %}
+</table>
+</div>
+{% endblock %}

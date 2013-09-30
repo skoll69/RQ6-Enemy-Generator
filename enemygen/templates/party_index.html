@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block content %}
+<div><p>Type to search: <input id="searchinput" /></p></div>
+
+<div id="party_list_container">
+<table id="party_list" class="index_list">
+    <thead><tr>
+        <th class="sort-alpha">Party</th>
+        <th class="sort-alpha">Creator</th>
+        {% if setting_id = 0 %}<th class="sort-alpha">Setting</th>{% endif %}
+        <td></td>
+    </tr></thead>
+    {% for p in parties %}
+        <form action="{% url 'generate_party' %}" method="post" target="_blank">
+        <input type="hidden" name="party_id" value="{{ p.id }}">
+        {% csrf_token %}
+        <tr>
+            <td><a class="edit_item" href="{% url 'party' p.id %}">{{ p.name }}</a></td>
+            <td>{{ p.owner }}</td>
+            {% if setting_id = 0 %}<td>{{ p.setting.name }}</td>{% endif %}
+            <td><input type="submit" class="party_submit" value="Generate"></td>
+        </tr>
+        </form>
+    {% endfor %}
+</table>
+</div>
+
+<br><br>
+
+<script>
+function party_list_height(){
+    list_container_height = $(window).height() - 385
+    if (list_container_height > $('#party_list').height()){
+        list_container_height = $('#party_list').height()
+    }
+    return list_container_height;
+
+}
+
+$(document).ready(function(){
+    var table = new ttable('party_list'); 
+    table.sorting.enabled = true;
+    table.sorting.sortall = false;
+    table.search.enabled = true;
+    table.search.inputID = 'searchinput';
+    table.search.casesensitive = false;
+    table.style.num = false;
+    table.rendertable();
+    
+    $('#party_list_container').css('height', party_list_height());
+    $(window).resize(function(event){
+        $('#party_list_container').css('height', party_list_height());
+    })
+});
+</script>
+
+{% endblock %}

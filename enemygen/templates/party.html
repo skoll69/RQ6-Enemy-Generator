@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block title %}RQ: {{party.name}}{% endblock %}
+
+{% block content %}
+
+<form action="{% url 'delete_party' party.id %}" method="post">
+{% csrf_token %}
+<div id="delete_party_container"><input id="delete_party" type="submit" value="Delete party" /></div>
+</form>
+
+<div id="generate_party_container">
+<form action="{% url 'generate_party' %}" method="post" target="_blank">
+{% csrf_token %}
+<input name="party_id" type="hidden" value="{{ party.id }}">
+<input name="party_id" type="hidden" value="{{ party.id }}">
+<input name="dont_increment" type="hidden" value="1">
+<input style="width: 140px;" type="submit" value="Generate" />
+</form>
+</div>
+
+<h2>Party</h2>
+<table>
+    <tr>
+        <th>Name</th>
+        <td><input id="party_name" item_type="party_name" item_id="{{ party.id }}" class="data" type="text" value="{{party.name}}"></td>
+    </tr>
+    <tr>
+        <th>Published</th>
+        <td><input id="party_pub" class="data" type="checkbox" item_id="{{ party.id }}" item_type="party_published" {% if party.published %}checked="checked"{% endif %} /></td>
+    </tr>
+    <tr>
+        <th>Setting</th>
+        <td>
+            <select id="party_setting_{{ party.id }}" class="data" item_id="{{ party.id }}" item_type="party_setting">
+                <option value="2" {% if party.setting.id == 2 %}selected="selected"{% endif %}>Generic fantasy</option>
+                <option value="1" {% if party.setting.id == 1 %}selected="selected"{% endif %}>Glorantha</option>
+                <option value="3" {% if party.setting.id == 3 %}selected="selected"{% endif %}>Monster Island</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <th>Notes</th>
+        <td><textarea id="party_notes" class="data" cols="60" rows="3" item_id="{{ party.id }}" item_type="party_notes">{{ party.notes }}</textarea></td>
+    </tr>
+</table>
+
+<h3>Templates</h3>
+<table>
+<tr><th>Template</th><th>Amount</th></tr>
+{% for ts in party.template_specs %}
+    <tr>
+        <td><a href="{% url 'enemy_template' ts.template.id %}">{{ ts.template.name }}</a></td>
+        <td><input id="party_ts_{{ts.id}}" class="data" type="text" size="6" item_type="party_template_amount" parent_id="{{ party.id }}" item_id="{{ ts.template.id }}" value="{{ ts.amount }}"></td>
+        <td><img src="/rq_static/minus.png" width="23" height="23" class="del_item" item_id="{{ ts.id }}" item_type="party_template_spec" /></td>
+    </tr>
+{% endfor %}
+</table>
+
+<form action="{% url 'add_template_to_party' %}" method="POST">
+    {% csrf_token %}
+    <select name="template_id">
+        {% for template in templates %}
+            <option value="{{ template.id }}">{{ template.name }}</option>
+        {% endfor %}
+    </select>
+    <input type="hidden" name="party_id" value="{{party.id}}">
+    <input type="submit" value="Add Template">
+</form>
+
+
+{% endblock %}

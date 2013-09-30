@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block title %}RQ: {{party.name}}{% endblock %}
+
+{% block content %}
+
+<div id="generate_party_container">
+<form action="{% url 'generate_party' %}" method="post" target="_blank">
+{% csrf_token %}
+<input name="party_id" type="hidden" value="{{ party.id }}">
+<input name="dont_increment" type="hidden" value="1">
+<input style="width: 140px;" type="submit" value="Generate" />
+</form>
+</div>
+
+<h2>Party</h2>
+<table>
+    <tr>
+        <th>Name</th>
+        <td>{{ party.name }}</td>
+    </tr>
+    <tr>
+        <th>Setting</th>
+        <td>{{ party.setting.name }}</td>
+    </tr>
+    <tr>
+        <th>Owner</th>
+        <td>{{ party.owner.username }}</td>
+    </tr>
+    <tr>
+        <th>Notes</th>
+        <td>{{ party.notes }}</td>
+    </tr>
+</table>
+
+<h3>Templates</h3>
+<table>
+<tr><th>Template</th><th>Amount</th></tr>
+{% for ts in party.template_specs %}
+    <tr>
+        <td><a href="{% url 'enemy_template' ts.template.id %}">{{ ts.template.name }}</a></td>
+        <td>{{ ts.amount }}</td>
+    </tr>
+{% endfor %}
+</table>
+
+{% endblock %}

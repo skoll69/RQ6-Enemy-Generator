@@ -9,8 +9,8 @@ var Dajaxice = {
     
     enemygen: {
     
-    del_hit_location: function(callback_function, argv, custom_settings){
-        return Dajaxice.call('enemygen.del_hit_location', 'POST', callback_function, argv, custom_settings);
+    del_item: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('enemygen.del_item', 'POST', callback_function, argv, custom_settings);
     },
 
     apply_notes_to_templates: function(callback_function, argv, custom_settings){

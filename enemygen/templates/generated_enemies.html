@@ -2,32 +2,32 @@
 
 <html>
 <head>
+<title>RQ: {% if party %}{{ party.name }}{% else %}{{ enemies.0.name }}{% endif %}</title>
+
 <style type="text/css">
 body, table{
     font-size: 12px;
-}
-
-#table_container{
-    width:780px;
-}
-
-#table_container tr td{
-    vertical-align: top;
-}
-
-#table_container tr{
-    margin-bottom: 50px;
 }
 
 .template_name{
     font-weight: bold;
 }
 
+div.row_container{
+    width: 880px;
+    position: relative;
+    page-break-inside: avoid;
+    padding-bottom: 50px;
+    vertical-align: top;
+}
+
 div.enemy_container{
     margin-top: 15px;
     margin-right: 0px;
-    float: left;
-    width: 350px;
+    width: 420px;
+    display: inline-block;
+    page-break-inside: avoid;
+    vertical-align: top;
 }
 
 .enemy_table{
@@ -54,10 +54,12 @@ div.enemy_container{
     color: white;
 }
 .evenrow{
+    line-height: 15px;
 }
 
 .oddrow{
     background: #CCC;
+    line-height: 15px;
 }
 
 .title{
@@ -84,14 +86,44 @@ a {
 a:hover{
     text-decoration: underline;
 }
+
+.page_break{
+    page-break-after: always;
+}
+
+div#pdf_export{
+    position: absolute;
+    top: 5px;
+    left: 700px;
+    z-index: 3;
+}
+
+@media print{
+    div#pdf_export{
+        display: none;
+    }
+}
+
 </style>
 </head>
 <body>
+{% if party.notes %}
+    <p>Notes:</p>
+    <p>{{ party.notes }}</p>
+{% endif %}
 
-<div id="_table_container">
-<table id="table_container"><tr>
+{% if generated_html %}
+<div id="pdf_export">
+<form action="{% url 'pdf_export' %}" method="GET">
+<input type="hidden" name="generated_html" value="{{ generated_html }}">
+<input type="hidden" name="action" value="pdf_export">
+<input type="submit" value="PDF Export">
+</form>
+</div>
+{% endif %}
+
+<div class="row_container">
 {% for enemy in enemies %}
-<td>
 <div class="enemy_container">
 <table class="enemy_table">
     <tr><td colspan="3"><span class="template_name"><a href="{% url 'enemy_template' enemy.et.id %}">{{ enemy.name }}</a></span></td></tr>
@@ -100,7 +132,7 @@ a:hover{
             <tr class="toprow"><th>Chars</th></tr>
             {% for stat in enemy.get_stats %}
                 <tr><td class="{% if forloop.counter|divisibleby:2 %}evenrow{% else %}oddrow{% endif %}">
-                    {{ stat.name }}: {{ stat.value }}
+                    {{ stat.name }}:&nbsp;{{ stat.value }}
                 </td></tr>
             {% endfor %}
         </table>
@@ -121,7 +153,7 @@ a:hover{
             <tr class="toprow"><th>1D20</th><th>Location</th><th>AP/HP</th></tr>
             {% for hl in enemy.hit_locations %}
                 <tr class="{% if forloop.counter|divisibleby:2 %}evenrow{% else %}oddrow{% endif %}">
-                    <td>{{ hl.range }}</td><td>{{ hl.name }}</td><td align="right">{{ hl.ap }}/{{ hl.hp }}</td>
+                    <td>{{ hl.range|safe }}</td><td>{{ hl.name }}</td><td align="right">{{ hl.ap }}/{{ hl.hp }}</td>
                 </tr>
             {% endfor %}
         </table>
@@ -186,12 +218,8 @@ a:hover{
 {% endif %}
 
 </div>
-</td>
-{% if not forloop.first and not forloop.last and forloop.counter|divisibleby:"2" %}
-    </tr><tr><td colspan="2"><br><br></td></tr><tr>
-{% endif %}
+{% if not forloop.first and not forloop.last and forloop.counter|divisibleby:"2" %}</div><div class="row_container">{% endif %}
 {% endfor %}
-</tr></table>
 </div>
 
 </body>

@@ -8,7 +8,7 @@
     <td><input id="race" class="data" type="text" item_id="{{ race.id }}" item_type="race_name" value="{{ race.name }}" /></td>
 </tr><tr>
     <th>Movement</th>
-    <td><input id="race_movement" class="data" type="number" size="3" min="0" max="30" item_id="{{ race.id }}" item_type="race_movement" value="{{race.movement}}" /></td>
+    <td><input id="race_movement" class="data" type="text" size="8" item_id="{{ race.id }}" item_type="race_movement" value="{{race.movement}}" /></td>
 </tr><tr>
     <th>Published</th>
     <td><input id="race_pub" class="data" type="checkbox" item_id="{{ race.id }}" item_type="race_published" {% if race.published %}checked="checked"{% endif %} /></td>
@@ -20,27 +20,19 @@
     <td><button id="apply_notes_to_templates" item_id="{{ race.id }}">Copy notes to templates</button></td>
 </tr></table>
 
-<style>
-#apply_notes_to_templates_confirmation{
-    width: 200px;
-    height: 50px;
-    border: 5px white solid;
-    background: #9B6B28;
-    position: absolute;
-    top: 60px;
-    margin-left: 40%;
-    display: none;
-    text-align: center;
-    vertical-align: middle;
-    line-height: 50px;
-}
-</style>
 <div id="apply_notes_to_templates_confirmation">Notes copied successfully.</div>
 
 <form action="{% url 'delete_race' race.id %}" method="post">
 {% csrf_token %}
-<div id="delete_race"><input type="submit" value="Delete race" /></div>
+<div id="delete_race_container"><input id="delete_race" type="submit" value="Delete race" /></div>
 </form>
+
+<div id="clone_race_container">
+<form action="{% url 'clone_race' race.id %}" method="post">
+{% csrf_token %}
+<input id="clone_race" type="submit" value="Clone" />
+</form>
+</div>
 
 <h3>Stats</h3>
 <table>
@@ -65,10 +57,22 @@
         <td><input id="hl_name_{{hl.id}}" class="data" type="text" size="10" item_id="{{hl.id}}" item_type="race_hl_name" value="{{ hl.name }}" /></td>
         <td><input id="hl_armor_{{hl.id}}" class="data" type="text" size="3" item_id="{{hl.id}}" item_type="race_hl_armor" value="{{ hl.armor }}" /></td>
         <td><input id="hl_hp_mod_{{hl.id}}" class="data" type="number" size="2" min="-5" max="5" item_id="{{hl.id}}" item_type="race_hl_hp_modifier" value="{{ hl.hp_modifier }}" /></td>
-        <td><img src="/rq_static/minus.png" width="23" height="23" class="del_hit_location" hl_id="{{ hl.id }}" /></td>
+        <td><img src="/rq_static/minus.png" width="23" height="23" class="del_item" item_id="{{ hl.id }}" item_type="hit_location" /></td>
     </tr>
 {% endfor %}
 </table>
 <button id="add_hit_location" race_id="{{ race.id }}">Add Hit Location</button>
+
+<h3>Templates</h3>
+{% if race.templates %}
+<table>
+<tr><th>Name</th><th>Creator</th></tr>
+{% for et in race.templates %}
+<tr><td><a href="{% url 'enemy_template' et.id %}">{{et.name}}</a></td><td>{{et.owner}}</td></tr>
+{% endfor %}
+</table>
+{% else %}
+<p>None</p>
+{% endif %}
 
 {% endblock %}

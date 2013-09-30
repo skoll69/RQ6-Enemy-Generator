@@ -54,10 +54,13 @@ class Weapon(models.Model, Printer):
     hp = models.SmallIntegerField(default=0)
     damage_modifier = models.BooleanField(default=False)
         
+    class Meta:
+        ordering = ['name',]
+        
 class Race(models.Model, Printer):
     name = models.CharField(max_length=30)
     owner = models.ForeignKey(User)
-    movement = models.SmallIntegerField(default=6)
+    movement = models.CharField(max_length=50, default=6)
     special = models.TextField(blank=True)
     published = models.BooleanField(default=False)
     
@@ -106,7 +109,23 @@ class Race(models.Model, Printer):
             self.save()
         else:
             raise ValidationError
+            
+    @property
+    def templates(self):
+        return EnemyTemplate.objects.filter(race=self)
 
+    def clone(self, owner):
+        race = Race(name='Copy of %s' % self.name, owner=owner, movement=self.movement, special=self.special)
+        race.save()
+        for stat in self.stats:
+            rs = RaceStat(stat=stat.stat, race=race, default_value=stat.default_value)
+            rs.save()
+        for loc in self.hit_locations:
+            hl = HitLocation(name=loc.name, range_start=loc.range_start, range_end=loc.range_end, 
+                             race=race, hp_modifier=loc.hp_modifier)
+            hl.save()
+        return race
+        
 class HitLocation(models.Model, Printer):
     name = models.CharField(max_length=30)
     armor = models.CharField(max_length=30, blank=True, default='0') # die_set
@@ -123,7 +142,7 @@ class HitLocation(models.Model, Printer):
         if self.range_start == self.range_end:
             return '%02d' % self.range_start
         else:
-            return '%02d-%02d' % (self.range_start, self.range_end)
+            return '%02d&#8209;%02d' % (self.range_start, self.range_end)
             
     @classmethod
     def create(cls, race_id):
@@ -139,7 +158,7 @@ class HitLocation(models.Model, Printer):
         
     def set_armor(self, value):
         Dice(value).roll()  #Test that the value is valid
-        self.armor = value
+        self.armor = value.lower()
         self.save()
     
 class EnemyTemplate(models.Model, Printer):
@@ -152,10 +171,11 @@ class EnemyTemplate(models.Model, Printer):
     theism_spell_amount = models.CharField(max_length=30, null=True, blank=True, default='0')
     sorcery_spell_amount = models.CharField(max_length=30, null=True, blank=True, default='0')
     generated = models.IntegerField(default=0)
+    used = models.IntegerField(default=0)
     published = models.BooleanField(default=False)
     rank_choices = ((1, 'Rabble'), (2, 'Novice'), (3, 'Skilled'), (4, 'Veteran'), (5, 'Master'))
     rank = models.SmallIntegerField(max_length=30, default=2, choices=rank_choices)
-    movement = models.SmallIntegerField(default=6)
+    movement = models.CharField(max_length=50, default=6)
     notes = models.TextField(null=True, blank=True)
     
     @classmethod
@@ -178,12 +198,18 @@ class EnemyTemplate(models.Model, Printer):
         cs = CombatStyle(name="Primary Combat Style", enemy_template=enemy_template)
         cs.save()
         return enemy_template
-
-    def generate(self, suffix=None):
-        self.generated += 1
-        self.save()
+        
+    def generate(self, suffix=None, increment=False):
+        if increment:
+            self.generated += 1
+            self.save()
         return _Enemy(self).generate(suffix)
 
+    def increment_used(self):
+        ''' Increments the used-count by one. '''
+        self.used += 1
+        self.save()
+        
     @property
     def stats(self):
         return EnemyStat.objects.filter(enemy_template=self)
@@ -284,11 +310,15 @@ class EnemyTemplate(models.Model, Printer):
         return new
 
     def apply_skill_bonus(self, bonus):
+        if len(bonus) == 0:
+            return
         # Validate bonus
         replace = {'STR': 0, 'SIZ': 0, 'CON': 0, 'INT': 0, 'DEX': 0, 'POW': 0, 'CHA': 0}
         temp_value = replace_die_set(bonus, replace)
         Dice(temp_value).roll()
         
+        bonus = bonus.upper()
+
         if bonus[0] != '+':
             bonus = '+' + bonus
             
@@ -301,6 +331,59 @@ class EnemyTemplate(models.Model, Printer):
         for combat_style in self.combat_styles:
             combat_style.die_set = combat_style.die_set + bonus
             combat_style.save()
+
+class Party(models.Model, Printer):
+    name = models.CharField(max_length=50)
+    owner = models.ForeignKey(User)
+    setting = models.ForeignKey(Setting)
+    published = models.BooleanField(default=False)
+    notes = models.TextField(null=True, blank=True, default='')
+    
+    class Meta:
+        ordering = ['name',]
+        
+    @classmethod
+    def create(cls, owner, setting):
+        p = cls(name='New Party', owner=owner, setting=setting)
+        p.save()
+        return p
+        
+    def add(self, template):
+        ''' Adds a template to the Party '''
+        if len(TemplateToParty.objects.filter(template=template, party=self)) == 0:
+            ttp = TemplateToParty(template=template, party=self, amount='1')
+            ttp.save()
+            
+    def set_amount(self, template, amount):
+        Dice(amount).roll()  #Test that the value is valid
+        ttp = TemplateToParty.objects.get(template=template, party=self)
+        ttp.amount = amount
+        ttp.save()
+    
+    @property
+    def template_specs(self):
+        return TemplateToParty.objects.filter(party=self).order_by('template__rank').reverse()
+        
+    def set_published(self, published):
+        if not published:
+            self.published = published
+            self.save()
+            return
+        # Add validation
+        ok = True
+        if ok:
+            self.published = published
+            self.save()
+        else:
+            raise ValidationError
+
+class TemplateToParty(models.Model):
+    template = models.ForeignKey(EnemyTemplate)
+    party = models.ForeignKey(Party)
+    amount = models.CharField(max_length=50)
+    
+    def get_amount(self):
+        return Dice(self.amount).roll()        
         
 class CombatStyle(models.Model):
     name = models.CharField(max_length=80)
@@ -354,22 +437,22 @@ class CombatStyle(models.Model):
         
     def set_one_h_amount(self, value):
         Dice(value).roll()  #Test that the value is valid
-        self.one_h_amount = value
+        self.one_h_amount = value.lower()
         self.save()
         
     def set_two_h_amount(self, value):
         Dice(value).roll()  #Test that the value is valid
-        self.two_h_amount = value
+        self.two_h_amount = value.lower()
         self.save()
         
     def set_ranged_amount(self, value):
         Dice(value).roll()  #Test that the value is valid
-        self.ranged_amount = value
+        self.ranged_amount = value.lower()
         self.save()
         
     def set_shield_amount(self, value):
         Dice(value).roll()  #Test that the value is valid
-        self.shield_amount = value
+        self.shield_amount = value.lower()
         self.save()
         
     def clone(self, et):
@@ -388,7 +471,6 @@ class CombatStyle(models.Model):
             cw.hp = weapon.hp
             cw.damage_modifier = weapon.damage_modifier
             cw.save()
-            
         
 class EnemyWeapon(models.Model, Printer):
     ''' Enemy-specific instance of a Weapon. Links selected weapon to CombatStyle and records
@@ -397,6 +479,9 @@ class EnemyWeapon(models.Model, Printer):
     combat_style = models.ForeignKey(CombatStyle)
     weapon = models.ForeignKey(Weapon)
     probability = models.SmallIntegerField(default=1)
+    
+    class Meta:
+        unique_together = ('combat_style', 'weapon')
     
     #def __getattr__(self, attr):
     #    jalla = self.weapon
@@ -459,11 +544,13 @@ class CustomWeapon(models.Model, Printer):
                                 ('shield', 'Shield'),
                             ))
     size = models.CharField(max_length=1, default='M', choices=(
+                                            ('-', '-'),
                                             ('S', 'S'),
                                             ('M', 'M'),
                                             ('L', 'L'),
                                             ('H', 'H'),
                                             ('E', 'E'),
+                                            ('C', 'C'),
                                         ))
     reach = models.CharField(max_length=2, default='M', choices=(
                                         ('-', '-'),
@@ -480,8 +567,6 @@ class CustomWeapon(models.Model, Printer):
     def set_probability(self, value):
         self.probability = value
         self.save()
-        if value == 0:
-            self.delete()
     
     @classmethod
     def create(cls, cs_id, type, name='Custom weapon', probability=1):
@@ -507,6 +592,7 @@ class EnemySkill(models.Model, Printer):
     
     class Meta:
         ordering = ['skill',]
+        unique_together = ('enemy_template', 'skill')
     
     @property
     def name(self):
@@ -576,7 +662,7 @@ class EnemyHitLocation(models.Model, Printer):
         
     def set_armor(self, value):
         Dice(value).roll()  #Test that the value is valid
-        self.armor = value.upper()
+        self.armor = value.lower()
         self.save()
         
     @classmethod
@@ -613,7 +699,7 @@ class RaceStat(models.Model, Printer):
     def set_value(self, value):
         #Test that the value is valid
         Dice(value).roll()
-        self.default_value = value.upper()
+        self.default_value = value.lower()
         self.save()
         
 class EnemyStat(models.Model, Printer):
@@ -634,7 +720,7 @@ class EnemyStat(models.Model, Printer):
 
     def set_value(self, value):
         Dice(value).roll()  #Test that the value is valid
-        self.die_set = value.upper()
+        self.die_set = value.lower()
         self.save()
         
 class SpellAbstract(models.Model, Printer):
@@ -648,7 +734,7 @@ class SpellAbstract(models.Model, Printer):
                 )
     type = models.CharField(max_length=30, choices=choices)
     detail = models.BooleanField(default=False)
-    default_detail = models.CharField(max_length=30, null=True, blank=True)
+    default_detail = models.CharField(max_length=50, null=True, blank=True)
     
     class Meta:
         ordering = ['name',]
@@ -658,10 +744,12 @@ class EnemySpell(models.Model, Printer):
     spell = models.ForeignKey(SpellAbstract)
     enemy_template = models.ForeignKey(EnemyTemplate)
     probability = models.SmallIntegerField(default=0)
-    detail = models.CharField(max_length=30, null=True, blank=True)
+    detail = models.CharField(max_length=50, null=True, blank=True)
         
     class Meta:
         ordering = ['spell',]
+        unique_together = ('spell', 'enemy_template')
+    
     
     @property
     def name(self):
@@ -731,8 +819,8 @@ class _Enemy:
             self.stats_list.append({'name': stat.name, 'value': self.stats[stat.name]})
         self._add_skills()
         self._add_spells()
-        self._calculate_attributes()
         self._add_hit_locations()
+        self._calculate_attributes()
         self._add_combat_styles()
         return self
         
@@ -768,20 +856,11 @@ class _Enemy:
         return output
         
     def _add_hit_locations(self):
+        con_siz = self.stats['CON'] + self.stats['SIZ']
+        base_hp = ((con_siz-1) / 5) + 1 # used by Head and Legs
         for hl in self.et.hit_locations:
-            con_siz = self.stats['CON'] + self.stats['SIZ']
-            base_hp = ((con_siz-1) / 5) + 1 # used by Head and Legs
             hp = base_hp + hl.hp_modifier
             ap = hl.roll()
-            enemy_hl = {'name': hl.name, 'range': hl.range, 'hp': hp, 'ap': ap}
-            self.hit_locations.append(enemy_hl)
-        
-    def _add_hit_locations_old(self):
-        for hl in self.et.race.hit_locations:
-            con_siz = self.stats['CON'] + self.stats['SIZ']
-            base_hp = ((con_siz-1) / 5) + 1 # used by Head and Legs
-            hp = base_hp + hl.hp_modifier
-            ap = 0
             enemy_hl = {'name': hl.name, 'range': hl.range, 'hp': hp, 'ap': ap}
             self.hit_locations.append(enemy_hl)
         
@@ -811,11 +890,23 @@ class _Enemy:
         return output
         
     def _calculate_attributes(self):
+        sr_natural = (self.stats['INT'] + self.stats['DEX']) / 2
+        sr = sr_natural - self._sr_penalty()
         self._calculate_action_points()
         self._calculate_damage_modifier()
         self.attributes['magic_points'] = self.stats['POW']
-        self.attributes['strike_rank'] = '+' + str((self.stats['INT'] + self.stats['DEX']) / 2)
+        self.attributes['strike_rank'] = '%s(%s-%s)' % (sr, sr_natural, self._sr_penalty())
         self.attributes['movement'] = self.et.movement
+        
+    def _sr_penalty(self):
+        enc = 0
+        for hl in self.hit_locations:
+            ap = hl['ap']
+            if ap == 1:
+                enc += 2
+            elif ap > 1:
+                enc += ap-1
+        return _divide_round_up(enc, 5)
     
     def _calculate_action_points(self):
         dex_int = self.stats['DEX'] + self.stats['INT']
@@ -828,8 +919,12 @@ class _Enemy:
         if self.stats['STR'] == 0 or self.stats['SIZ'] == 0:
             self.attributes['damage_modifier'] = '0'
             return
-        DICE_STEPS = ('-1D8', '-1D6', '-1D4', '-1D2', '+0', '+1D2', '+1D4', '+1D6', '+1D8', '+1D10', '+1D12',
-                      '+2D6', '+1D8+1D6', '+2D8', '+1D10+1D8', '+2D10', '+2D10+1D2', '+2D10+1D4', '+2D10+1D6')
+        DICE_STEPS = ('-1d8', '-1d6', '-1d4', '-1d2', '+0', '+1d2', '+1d4', '+1d6', '+1d8', '+1d10', '+1d12',
+                      '+2d6', '+1d8+1d6', '+2d8', '+1d10+1d8', 
+                      '+2d10', '+2d10+1d2', '+2d10+1d4', '+2d10+1d6', '+2d10+1d8',
+                      '+3d10', '+3d10+1d2', '+3d10+1d4', '+3d10+1d6', '+3d10+1d8',
+                      '+4d10', '+4d10+1d2', '+4d10+1d4', '+4d10+1d6', '+4d10+1d8',
+                      )
         str_siz = self.stats['STR'] + self.stats['SIZ']
         if str_siz <= 50:
             index = (str_siz-1) / 5
@@ -837,3 +932,5 @@ class _Enemy:
             index = ((str_siz - 1 - 50) / 10) + 10
         self.attributes['damage_modifier'] = DICE_STEPS[index]
         
+def _divide_round_up(n, d):
+    return (n + (d - 1))/d
