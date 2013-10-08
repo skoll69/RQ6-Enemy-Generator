@@ -15,6 +15,7 @@
 <table>
     <tr><th>Name</th><td>{{ race.name }}</td></tr>
     <tr><th>Movement</th><td>{{race.movement}}</td></tr>
+    {% if race.discorporate %}<tr><th>Discorporate</th><td>Yes</td></tr>{% endif %}
     <tr><th>Notes</th><td>{{ race.special }}</td></tr>
 </table>
 

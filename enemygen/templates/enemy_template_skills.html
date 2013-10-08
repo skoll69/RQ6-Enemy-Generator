@@ -13,34 +13,36 @@
 {% for skill in et.standard_skills %}
         <td>{{ skill.name }}</td>
         <td valign="top">
-            <input id="skill_include_{{skill.id}}" class="data" type="checkbox" item_id="{{skill.id}}" item_type="et_skill_include" {% if skill.include %}checked="checked"{% endif %} />
-            <input id="skill_{{skill.id}}" class="data" type="text" size="17" item_id="{{skill.id}}" item_type="et_skill_value" value="{{ skill.die_set }}" />
+            <input id="skill_include_{{skill.skill.id}}" class="data" type="checkbox" item_id="{{skill.id}}" item_type="et_skill_include" {% if skill.include %}checked="checked"{% endif %} />
+            <input id="skill_{{skill.skill.id}}" class="data" type="text" size="17" item_id="{{skill.id}}" item_type="et_skill_value" value="{{ skill.die_set }}" />
         </td>
         {% if forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
 {% endfor %}
 </tr></table>
 
+{% if et.professional_skills %}
 <h3>Professional skills</h3>
 <table><tr>
 {% for skill in et.professional_skills %}
         <td>{{ skill.name }}</td>
         <td valign="top">
-            <input id="pro_skill_include_{{skill.id}}" class="data" type="checkbox" item_id="{{skill.id}}" item_type="et_skill_include" {% if skill.include %}checked="checked"{% endif %} />
-            <input id="pro_skill_{{skill.id}}" class="data" type="text" size="17" item_id="{{skill.id}}" item_type="et_skill_value" value="{{ skill.die_set }}" />
+            <input id="pro_skill_include_{{skill.skill.id}}" class="data" type="checkbox" item_id="{{skill.id}}" item_type="et_skill_include" {% if skill.include %}checked="checked"{% endif %} />
+            <input id="pro_skill_{{skill.skill.id}}" class="data" type="text" size="17" item_id="{{skill.id}}" item_type="et_skill_value" value="{{ skill.die_set }}" />
         </td>
         {% if forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
 {% endfor %}
 </tr></table>
+{% endif %}
 
 {% if et.custom_skills %}
 <h3>Custom skills</h3>
 <table>
 {% for skill in et.custom_skills %}
 <tr>
-    <td><input id="custom_skill_name_{{skill.id}}" class="data" type="text" item_id="{{skill.id}}" item_type="et_custom_skill_name" value="{{skill.name}}" /></td>
+    <td><input id="custom_skill_name_{{skill.skill.id}}" class="data" type="text" item_id="{{skill.id}}" item_type="et_custom_skill_name" value="{{skill.name}}" /></td>
     <td valign="top">
         <input id="custom_skill_include_{{skill.id}}" class="data" type="checkbox" item_id="{{skill.id}}" item_type="et_custom_skill_include" {% if skill.include %}checked="checked"{% endif %} />
-        <input id="custom_skill_{{skill.id}}" class="data" type="text" size="17" item_id="{{skill.id}}" item_type="et_custom_skill_value" value="{{ skill.die_set }}" />
+        <input id="custom_skill_{{skill.skill.id}}" class="data" type="text" size="17" item_id="{{skill.id}}" item_type="et_custom_skill_value" value="{{ skill.die_set }}" />
     </td>
 </tr>
 {% endfor %}

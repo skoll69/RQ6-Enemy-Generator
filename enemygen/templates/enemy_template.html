@@ -32,6 +32,27 @@
     <th>Race</th>
     <td><a class="edit_item" href="{% url 'race' et.race.id %}">{{ et.race.name }}</a></td>
 </tr><tr>
+    <th>Cult Rank</th>
+    <td>
+        <select id="et_cult_rank_{{ et.id }}" class="data" item_id="{{ et.id }}" item_type="et_cult_rank">
+            {% if et.is_theist %}
+                <option value="0" {% if et.cult_rank == 0 %}selected="selected"{% endif %}>None</option>
+                <option value="1" {% if et.cult_rank == 1 %}selected="selected"{% endif %}>Lay Member</option>
+                <option value="2" {% if et.cult_rank == 2 %}selected="selected"{% endif %}>Initiate</option>
+                <option value="3" {% if et.cult_rank == 3 %}selected="selected"{% endif %}>Acolyte</option>
+                <option value="4" {% if et.cult_rank == 4 %}selected="selected"{% endif %}>Priest</option>
+                <option value="5" {% if et.cult_rank == 5 %}selected="selected"{% endif %}>High Priest</option>
+            {% else %}
+                <option value="0" {% if et.cult_rank == 0 %}selected="selected"{% endif %}>None</option>
+                <option value="1" {% if et.cult_rank == 1 %}selected="selected"{% endif %}>Common</option>
+                <option value="2" {% if et.cult_rank == 2 %}selected="selected"{% endif %}>Dedicated</option>
+                <option value="3" {% if et.cult_rank == 3 %}selected="selected"{% endif %}>Proven</option>
+                <option value="4" {% if et.cult_rank == 4 %}selected="selected"{% endif %}>Overseer</option>
+                <option value="5" {% if et.cult_rank == 5 %}selected="selected"{% endif %}>Leader</option>
+            {% endif %}
+        </select>
+    </td>
+</tr><tr>
     <th>Published</th>
     <td><input id="et_pub_{{ et.id }}" class="data" type="checkbox" item_id="{{ et.id }}" item_type="et_published" {% if et.published %}checked="checked"{% endif %} /></td>
 </tr><tr>
@@ -99,7 +120,9 @@
 
 {% include 'enemy_template_skills.html' %}
 
-{% include 'enemy_template_weapons.html' %}
+{% if not et.is_spirit %}
+    {% include 'enemy_template_weapons.html' %}
+{% endif %}
 
 {% include 'enemy_template_spells.html' %}
 

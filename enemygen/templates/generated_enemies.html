@@ -9,8 +9,17 @@ body, table{
     font-size: 12px;
 }
 
+.party_name{
+    font-weight: bold;
+    font-size: 16px;
+    font-family: sans-serif;
+    text-decoration: underline;
+}
+
 .template_name{
     font-weight: bold;
+    width: 100%;
+    text-align: right;
 }
 
 div.row_container{
@@ -54,11 +63,11 @@ div.enemy_container{
     color: white;
 }
 .evenrow{
+    background: #CCC;
     line-height: 15px;
 }
 
 .oddrow{
-    background: #CCC;
     line-height: 15px;
 }
 
@@ -66,7 +75,11 @@ div.enemy_container{
     font-weight: bold;
 }
 
-table .item_list{
+.spirit_name{
+    text-decoration: underline;
+}
+
+.item_list{
     font-style: italic;
 }
 
@@ -93,7 +106,7 @@ a:hover{
 
 div#pdf_export{
     position: absolute;
-    top: 5px;
+    top: 3px;
     left: 700px;
     z-index: 3;
 }
@@ -107,9 +120,11 @@ div#pdf_export{
 </style>
 </head>
 <body>
+{% if party %}
+<span class="party_name"><a href="{% url 'party' party.id %}">{{ party.name }}</a></span>
+{% endif %}
 {% if party.notes %}
-    <p>Notes:</p>
-    <p>{{ party.notes }}</p>
+    <p><b>Notes:</b> {{ party.notes }}</p>
 {% endif %}
 
 {% if generated_html %}
@@ -124,9 +139,83 @@ div#pdf_export{
 
 <div class="row_container">
 {% for enemy in enemies %}
+
+{% if enemy.is_spirit %}
+
+<div class="enemy_container"> <!-- Spirit begins -->
+<a href="{% url 'enemy_template' enemy.et.id %}">
+    <b>{{ enemy.name }} (Intensity {{ enemy.attributes.spirit_intensity }})</b>
+</a>
+<table class="enemy_table">
+    <tr>
+        <td colspan="3">
+        </td>
+    </tr>
+    <tr><td valign="top">
+        <table class="inner_enemy_table" id="characteristics">
+            <tr class="toprow"><th>Chars</th></tr>
+            {% for stat in enemy.get_stats %}
+                <tr class="{% if forloop.counter|divisibleby:2 %}evenrow{% else %}oddrow{% endif %}"><td>
+                    {{ stat.name }}:&nbsp;{{ stat.value }}
+                </td></tr>
+            {% endfor %}
+            <tr class="evenrow"><td>&nbsp;</td></tr>
+        </table>
+    </td><td valign="top">
+        <table class="inner_enemy_table" id="attributes">
+            <tr class="toprow"> <th colspan="2">Attributes</th></tr>
+            <tr class="oddrow"> <td>Action Points</td>  <td>{{ enemy.attributes.action_points }}</td></tr>
+            <tr class="evenrow"><td>Spirit Damage</td>  <td>{{ enemy.attributes.spirit_damage }}</td></tr>
+            <tr class="oddrow"> <td>Magic Points</td>   <td>{{ enemy.attributes.magic_points }}</td></tr>
+            <tr class="evenrow"> <td>Strike Rank</td>    <td>{{ enemy.attributes.strike_rank }}</td></tr>
+        </table>
+    </td></tr>
+</table>
+    
+<span class="title">Skills:</span><span class="item_list">
+    {% for skill in enemy.skills %}
+        {{ skill.name }} {{skill.value}}%{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</span><br>
+
+{% if enemy.folk_spells %}
+    <span class="title">Folk magic spells:</span><span class="item_list">
+        {% for spell in enemy.folk_spells %}
+            {{ spell.name }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </span><br>
+{% endif %}
+
+{% if enemy.sorcery_spells %}
+    <span class="title">Maximum shaping: </span><span class="item_list">{{ enemy.attributes.max_shaping }}</span><br>
+    <span class="title">Sorcery spells:</span><span class="item_list">
+        {% for spell in enemy.sorcery_spells %}
+            {{ spell.name }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </span><br>
+{% endif %}
+
+{% if enemy.theism_spells %}
+    <span class="title">Devotional pool: </span><span class="item_list">{{ enemy.attributes.devotional_pool }}</span> / 
+    <span class="title">Maximum intensity: </span><span class="item_list">{{ enemy.attributes.max_intensity }}</span><br>
+    <span class="title">Theism spells/Miracles:</span><span class="item_list">
+        {% for spell in enemy.theism_spells %}
+            {{ spell.name }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </span><br>
+{% endif %}
+
+{% if enemy.notes %}
+<span class="title">Notes:</span>
+<span class="item_list">{{ enemy.notes }}</span>
+{% endif %}
+
+</div>
+
+{% else %} <!-- Normal enemy begins -->
 <div class="enemy_container">
 <table class="enemy_table">
-    <tr><td colspan="3"><span class="template_name"><a href="{% url 'enemy_template' enemy.et.id %}">{{ enemy.name }}</a></span></td></tr>
+    <tr><td colspan="3"><a href="{% url 'enemy_template' enemy.et.id %}"><div class="template_name">{{ enemy.name }}</div></a></td></tr>
     <tr><td valign="top">
         <table class="inner_enemy_table" id="characteristics">
             <tr class="toprow"><th>Chars</th></tr>
@@ -144,8 +233,8 @@ div#pdf_export{
             <tr class="oddrow"> <td>Magic Points</td>   <td>{{ enemy.attributes.magic_points }}</td></tr>
             <tr class="evenrow"><td>Movement</td>       <td>{{ enemy.attributes.movement }}</td></tr>
             <tr class="oddrow"> <td>Strike Rank</td>    <td>{{ enemy.attributes.strike_rank }}</td></tr>
-            <tr class="evenrow"><td>&nbsp;</td>         <td>{{ enemy.attributes. }}</td></tr>
-            <tr class="oddrow"> <td>&nbsp;</td>         <td>{{ enemy.attributes. }}</td></tr>
+            <tr class="evenrow"><td>Cult rank</td>      <td>{{ enemy.cult_rank }}</td></tr>
+            <tr class="oddrow"> <td>&nbsp;</td>         <td>&nbsp;</td></tr>
         </table>
     {% if enemy.hit_locations %}
     </td><td valign="top">
@@ -176,6 +265,7 @@ div#pdf_export{
 {% endif %}
 
 {% if enemy.sorcery_spells %}
+    <span class="title">Maximum shaping: </span><span class="item_list">{{ enemy.attributes.max_shaping }}</span><br>
     <span class="title">Sorcery spells:</span><span class="item_list">
         {% for spell in enemy.sorcery_spells %}
             {{ spell.name }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}
@@ -184,11 +274,29 @@ div#pdf_export{
 {% endif %}
 
 {% if enemy.theism_spells %}
+    <span class="title">Devotional pool: </span><span class="item_list">{{ enemy.attributes.devotional_pool }}</span> / 
+    <span class="title">Maximum intensity: </span><span class="item_list">{{ enemy.attributes.max_intensity }}</span><br>
     <span class="title">Theism spells/Miracles:</span><span class="item_list">
         {% for spell in enemy.theism_spells %}
             {{ spell.name }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}
         {% endfor %}
     </span><br>
+{% endif %}
+
+{% if enemy.spirits %}
+    <span class="title">Spirits: </span><br>
+    {% for spirit in enemy.spirits %}
+    <span class="spirit_name"><a href="{% url 'enemy_template' spirit.et.id %}">{{ spirit.name }}</a></span>:
+    <span class="item_list">
+        Intensity {{ spirit.attributes.spirit_intensity }}, Action Points {{ spirit.attributes.action_points }}, Spirit Damage {{ spirit.attributes.spirit_damage }};
+        {% for stat in spirit.get_stats %}{{ stat.name }} {{ stat.value }}{% if not forloop.last %}, {% endif %}{% endfor %};
+        {% for skill in spirit.skills %}{{ skill.name }} {{ skill.value }}%{% if not forloop.last %}, {% endif %}{% endfor %}{% if spirit.folk_spells %};{% endif %}
+        {% if spirit.folk_spells %}<u>Folk Spells</u>: {% for spell in spirit.folk_spells %}{{ spell }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if spirit.theism_spells %};{% endif %}
+        {% if spirit.theism_spells %}<u>Theism Spells</u>: {% for spell in spirit.theism_spells %}{{ spell }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if spirit.sorcery_spells %};{% endif %}
+        {% if spirit.sorcery_spells %}<u>Sorcery Spells</u>: {% for spell in spirit.sorcery_spells %}{{ spell }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+    </span>{% if not forloop.last %}<br>{% endif %}
+    {% endfor %}
+    <br>
 {% endif %}
 
 <span class="title">Combat Styles:</span>
@@ -218,6 +326,7 @@ div#pdf_export{
 {% endif %}
 
 </div>
+{% endif %} <!-- Normal enemy if ends -->
 {% if not forloop.first and not forloop.last and forloop.counter|divisibleby:"2" %}</div><div class="row_container">{% endif %}
 {% endfor %}
 </div>

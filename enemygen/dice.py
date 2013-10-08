@@ -61,11 +61,11 @@ def _die_to_tuple(die):
     die = die.replace('-', '')
     die = die.replace('+', '')
     try:    # Check if the first character is a number, e.g. 3D6
-        multiplier = int(die[0])
-        die = die[1:]
+        multiplier, die = die.split('D')
+        if multiplier == '': multiplier = 1
+        multiplier = int(multiplier)
     except ValueError:
         pass
-    die = die.replace('D', '')
     die = int(die)
     if negative:
         output = (-1*die, -1, multiplier)

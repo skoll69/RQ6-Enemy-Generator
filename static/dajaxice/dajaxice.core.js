@@ -25,6 +25,10 @@ var Dajaxice = {
         return Dajaxice.call('enemygen.add_custom_spell', 'POST', callback_function, argv, custom_settings);
     },
 
+    add_spirit: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('enemygen.add_spirit', 'POST', callback_function, argv, custom_settings);
+    },
+
     add_custom_skill: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.add_custom_skill', 'POST', callback_function, argv, custom_settings);
     },

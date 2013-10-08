@@ -26,7 +26,6 @@ def get_context(request):
     context = {}
     context['setting_id'] = get_setting_id(request)
     context['settings'] = Setting.objects.all().order_by('name')
-    context['races'] = Race.objects.all()
     context['generated'] = _get_generated_amount()
     context['request'] = request
     return context
@@ -42,8 +41,6 @@ def get_enemy_templates(setting_id, user):
     # Add the unpublished templates of the logged-in user
     if user.is_authenticated():
         templates.extend(list(EnemyTemplate.objects.filter(setting__in=settings, published=False, owner=user)))
-    if user.is_authenticated() and is_superuser(user):
-        templates.extend(list(EnemyTemplate.objects.filter(setting__in=settings, published=False).exclude(owner=user)))
     return templates
     
 def _get_settings(setting_id):
@@ -60,11 +57,14 @@ def get_enemies(request):
     for key, amount in request.POST.items():
         if not 'enemy_template_id_' in key: continue
         enemy_template_id = int(key.replace('enemy_template_id_', ''))
-        et = EnemyTemplate.objects.get(id=enemy_template_id)
+        try:
+            et = EnemyTemplate.objects.get(id=enemy_template_id)
+        except EnemyTemplate.DoesNotExist:
+            continue
         try:
             amount = int(amount)
         except ValueError:
-            amount = 0
+            continue
         if amount > 40: amount = 40
         index.append((et, amount))
     index.sort(key=lambda tup: tup[0].rank, reverse=True)
@@ -135,6 +135,9 @@ def combat_styles(et_id):
                 cs_out['customs'].append(cw)
         output.append(cs_out)
     return output
+    
+def spirit_options():
+    return EnemyTemplate.objects.filter(race__discorporate=True, published=True)
     
 def is_race_admin(user):
     return bool(user.groups.filter(name='race_admin').count())

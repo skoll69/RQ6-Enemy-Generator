@@ -15,7 +15,7 @@ from models import EnemyTemplate, _Enemy, Ruleset, StatAbstract, Race, SpellAbst
 from models import EnemyStat, EnemySkill, Setting, SkillAbstract, EnemySpell
 from models import CombatStyle, Weapon
 
-from enemygen_lib import _select_random_item, ValidationError, to_bool
+from enemygen_lib import _select_random_item, ValidationError, to_bool, replace_die_set
 
 class TestDice(TestCase):
     def test_1_die_to_tuple(self):
@@ -25,6 +25,7 @@ class TestDice(TestCase):
         self.assertEquals(_die_to_tuple('-D6'), (-6,-1,1))
         
         self.assertEquals(_die_to_tuple('2D6'), (1,6,2))
+        self.assertEquals(_die_to_tuple('12D6'), (1,6,12))
         self.assertEquals(_die_to_tuple('+3D8'), (1,8,3))
         self.assertEquals(_die_to_tuple('-2D6'), (-6,-1,2))
         
@@ -63,15 +64,21 @@ class TestDice(TestCase):
         self.assertTrue(12 <= Dice('10 + 2D2').roll() <= 14)
         self.assertTrue(12 <= Dice('10 + 2D2').roll() <= 14)
         
+        self.assertTrue(12 <= Dice('12D6').roll() <= 72)
+        self.assertTrue(12 <= Dice('12D6').roll() <= 72)
+        self.assertTrue(12 <= Dice('12D6').roll() <= 72)
+        self.assertTrue(12 <= Dice('12D6').roll() <= 72)
+        
     def test_4_max_roll(self):
         self.assertEquals(Dice('5').max_roll(), 5)
         self.assertEquals(Dice('D100').max_roll(), 100)
         self.assertEquals(Dice('5D100').max_roll(), 500)
         self.assertEquals(Dice('5D100+13').max_roll(), 513)
         self.assertEquals(Dice('5D100-D100').max_roll(), 499)
+        self.assertEquals(Dice('12D6').max_roll(), 72)
         
 class TestEnemyTemplate(TestCase):
-    fixtures = ('enemygen.json',)
+    fixtures = ('enemygen_testdata.json',)
     def test_01_create(self):
         user = User(username='username'); user.save()
         ruleset = Ruleset.objects.get(id=1)
@@ -83,7 +90,7 @@ class TestEnemyTemplate(TestCase):
         self.assertEquals(et.name, 'Template Name')
         self.assertTrue(isinstance(et.stats[0], EnemyStat))
         self.assertEquals(et.stats[0].name, 'STR')
-        self.assertEquals(et.stats[0].die_set, '3D6')
+        self.assertEquals(et.stats[0].die_set, '3d6')
         self.assertTrue(isinstance(et.skills[0], EnemySkill))
         self.assertEquals(et.skills[0].name, 'Athletics')
         self.assertEquals(et.skills[0].die_set, 'STR+DEX')
@@ -102,8 +109,8 @@ class TestEnemyTemplate(TestCase):
         
     def test_13_generate_2(self):
         et = get_enemy_template()
-        self.assertEquals(et.skills[7].name, 'Endurance')
-        skill = et.skills[7]
+        self.assertEquals(et.skills[9].name, 'Evade')
+        skill = et.skills[9]
         skill.die_set = 'STR+DEX+50'
         skill.save()
         self.assertEquals(et.stats[0].name, 'STR')
@@ -118,8 +125,8 @@ class TestEnemyTemplate(TestCase):
         enemy = et.generate()
         self.assertTrue(4 <= enemy.stats['STR'] <= 10)
         self.assertTrue(11 <= enemy.stats['DEX'] <= 13)
-        self.assertEquals(enemy.skills[2]['name'], 'Endurance')
-        self.assertEquals(enemy.skills[2]['value'], enemy.stats['DEX'] + enemy.stats['STR'] + 50)
+        self.assertEquals(enemy.skills[3]['name'], 'Evade')
+        self.assertEquals(enemy.skills[3]['value'], enemy.stats['DEX'] + enemy.stats['STR'] + 50)
         
     def test_14_generate_check_spells(self):
         et = get_enemy_template()
@@ -135,7 +142,6 @@ class TestEnemyTemplate(TestCase):
         self.assertTrue(enemy.folk_spells[1].name in ('Alarm', 'Avert'))
         
     def test_15_generate_check_attributes(self):
-        #et = EnemyTemplate.objects.get(id=1)
         et = get_enemy_template()
         self.assertEquals(et.ruleset.name, 'RuneQuest 6')
         enemy = et.generate()
@@ -149,18 +155,19 @@ class TestEnemyTemplate(TestCase):
                        
         damage_modifier = enemy.attributes['damage_modifier']
         str_siz = enemy.stats['STR'] + enemy.stats['SIZ']
-        self.assertTrue((damage_modifier == '-1D8' and str_siz <= 5) or
-                        (damage_modifier == '-1D4' and 11 <= str_siz <= 15) or
-                        (damage_modifier == '-1D2' and 16 <= str_siz <= 20) or
+        self.assertTrue((damage_modifier == '-1d8' and str_siz <= 5) or
+                        (damage_modifier == '-1d4' and 11 <= str_siz <= 15) or
+                        (damage_modifier == '-1d2' and 16 <= str_siz <= 20) or
                         (damage_modifier == '+0' and 21 <= str_siz <= 25) or
-                        (damage_modifier == '+1D2' and 26 <= str_siz <= 30) or
-                        (damage_modifier == '+1D4' and 31 <= str_siz <= 35) or
-                        (damage_modifier == '+1D6' and 36 <= str_siz <= 40)
+                        (damage_modifier == '+1d2' and 26 <= str_siz <= 30) or
+                        (damage_modifier == '+1d4' and 31 <= str_siz <= 35) or
+                        (damage_modifier == '+1d6' and 36 <= str_siz <= 40)
                        )
                        
         self.assertEquals(enemy.attributes['magic_points'], enemy.stats['POW'])
         
-        sr = '+' + str((enemy.stats['INT'] + enemy.stats['DEX']) / 2)
+        sr = (enemy.stats['INT'] + enemy.stats['DEX']) / 2
+        sr = '%s(%s-0)' % (sr, sr)
         self.assertEquals(enemy.attributes['strike_rank'], sr)
         
     def notest_16_generate_check_weapon_styles(self):
@@ -175,7 +182,7 @@ class TestEnemyTemplate(TestCase):
         self.assertEquals(enemy.combat_styles[0]['weapons'][0].name, 'Broadsword')
         
 class Test_Enemy(TestCase):
-    fixtures = ('enemygen.json',)
+    fixtures = ('enemygen_testdata.json',)
     
     def no_test_1_die_set_with_stat_values(self):
         et = get_enemy_template()
@@ -195,6 +202,8 @@ class Test_Enemy(TestCase):
     def test_calculate_damage_modifier(self):
         class EM:
             name = 'name'
+            get_cult_rank = 1
+            notes = ''
         enemy_mock = EM()
         enemy = _Enemy(enemy_mock)
         enemy.stats = {}
@@ -203,47 +212,47 @@ class Test_Enemy(TestCase):
         enemy.stats['STR'] = 2
         enemy.stats['SIZ'] = 2
         enemy._calculate_damage_modifier()
-        self.assertEquals(enemy.attributes['damage_modifier'], '-1D8')
+        self.assertEquals(enemy.attributes['damage_modifier'], '-1d8')
         
         enemy.stats['STR'] = 3
         enemy.stats['SIZ'] = 2
         enemy._calculate_damage_modifier()
-        self.assertEquals(enemy.attributes['damage_modifier'], '-1D8')
+        self.assertEquals(enemy.attributes['damage_modifier'], '-1d8')
     
         enemy.stats['STR'] = 12
         enemy.stats['SIZ'] = 14
         enemy._calculate_damage_modifier()
-        self.assertEquals(enemy.attributes['damage_modifier'], '+1D2')
+        self.assertEquals(enemy.attributes['damage_modifier'], '+1d2')
     
         enemy.stats['STR'] = 20
         enemy.stats['SIZ'] = 11
         enemy._calculate_damage_modifier()
-        self.assertEquals(enemy.attributes['damage_modifier'], '+1D4')
+        self.assertEquals(enemy.attributes['damage_modifier'], '+1d4')
     
         enemy.stats['STR'] = 20
         enemy.stats['SIZ'] = 15
         enemy._calculate_damage_modifier()
-        self.assertEquals(enemy.attributes['damage_modifier'], '+1D4')
+        self.assertEquals(enemy.attributes['damage_modifier'], '+1d4')
     
         enemy.stats['STR'] = 40
         enemy.stats['SIZ'] = 11
         enemy._calculate_damage_modifier()
-        self.assertEquals(enemy.attributes['damage_modifier'], '+1D12')
+        self.assertEquals(enemy.attributes['damage_modifier'], '+1d12')
     
         enemy.stats['STR'] = 40
         enemy.stats['SIZ'] = 20
         enemy._calculate_damage_modifier()
-        self.assertEquals(enemy.attributes['damage_modifier'], '+1D12')
+        self.assertEquals(enemy.attributes['damage_modifier'], '+1d12')
     
         enemy.stats['STR'] = 40
         enemy.stats['SIZ'] = 21
         enemy._calculate_damage_modifier()
-        self.assertEquals(enemy.attributes['damage_modifier'], '+2D6')
+        self.assertEquals(enemy.attributes['damage_modifier'], '+2d6')
     
         enemy.stats['STR'] = 65
         enemy.stats['SIZ'] = 65
         enemy._calculate_damage_modifier()
-        self.assertEquals(enemy.attributes['damage_modifier'], '+2D10+1D4')
+        self.assertEquals(enemy.attributes['damage_modifier'], '+2d10+1d4')
         
     def test_hit_locations(self):
         et = get_enemy_template()
@@ -251,7 +260,7 @@ class Test_Enemy(TestCase):
         
         self.assertTrue(isinstance(enemy.hit_locations, list))
         self.assertEquals(enemy.hit_locations[0]['name'], 'Right leg')
-        self.assertEquals(enemy.hit_locations[0]['range'], '01-03')
+        self.assertEquals(enemy.hit_locations[0]['range'], '01&#8209;03')
         
         HITPOINTS = {1: (1,3,2,1,1), 6: (2,4,3,1,2), 11: (3,5,4,2,3),
                      31: (7,9,8,6,7), 41: (9,11,10,8,9)}
@@ -288,20 +297,22 @@ class Test_Enemy(TestCase):
         self.assertEquals(enemy.hit_locations[6]['hp'], 9) #Head
         
 class TestEnemySkill(TestCase):
-    fixtures = ('enemygen.json',)
+    fixtures = ('enemygen_testdata.json',)
     
     def test_1_roll(self):
         skill = SkillAbstract.objects.get(id=1)
         et = get_enemy_template()
-        es = EnemySkill(skill=skill, enemy_template=et, die_set='STR+DEX+2D4')
+        es = EnemySkill.objects.get(skill=skill, enemy_template=et)
+        es.die_set = 'STR+DEX+2D4'
         es.save()
         replace_with = {'STR': 10, 'DEX': 20}
-        self.assertEquals(es._replaced_die_set(replace_with), '10+20+2D4')
+        self.assertEquals(replace_die_set(es.die_set, replace_with), '10+20+2D4')
         
     def test_2_roll(self):
         skill = SkillAbstract.objects.get(id=1)
         et = get_enemy_template()
-        es = EnemySkill(skill=skill, enemy_template=et, die_set='10+2D4')
+        es = EnemySkill.objects.get(skill=skill, enemy_template=et)
+        es.die_set = '10+2D4'
         es.save()
         
         self.assertTrue(12 <= es.roll() <= 18)
@@ -311,7 +322,8 @@ class TestEnemySkill(TestCase):
         self.assertTrue(12 <= es.roll() <= 18)
         self.assertTrue(12 <= es.roll() <= 18)
         
-        es = EnemySkill(skill=skill, enemy_template=et, die_set='STR+DEX+10+2D4')
+        es = EnemySkill.objects.get(skill=skill, enemy_template=et)
+        es.die_set = 'STR+DEX+10+2D4'
         es.save()
         replace_with = {'STR': 10, 'DEX': 20}
         self.assertTrue(42 <= es.roll(replace_with) <= 48)
@@ -330,7 +342,7 @@ class TestEnemySkill(TestCase):
         self.assertRaises(ValueError, es.set_value, 'invalid')
         
 class TestMisc(TestCase):
-    fixtures = ('enemygen.json',)
+    fixtures = ('enemygen_testdata.json',)
     
     def test_jalla(self):
         pass

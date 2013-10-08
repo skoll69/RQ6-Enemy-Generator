@@ -7,6 +7,7 @@ from dice import Dice
 
 import ordereddict
 import random
+import math
 
 class Printer:
     def __unicode__(self):
@@ -63,6 +64,7 @@ class Race(models.Model, Printer):
     movement = models.CharField(max_length=50, default=6)
     special = models.TextField(blank=True)
     published = models.BooleanField(default=False)
+    discorporate = models.BooleanField(default=False)
     
     class Meta:
         ordering = ['name',]
@@ -96,14 +98,15 @@ class Race(models.Model, Printer):
             self.published = published
             self.save()
             return
-        # Add validation
-        covered = []
-        for hl in self.hit_locations:
-            covered.extend(range(hl.range_start, hl.range_end+1))
+        # Validate
         ok = True
-        for x in range(1, 21): #Iterate through 1-20
-            if x not in covered:
-                ok = False
+        if not self.discorporate:
+            covered = []
+            for hl in self.hit_locations:
+                covered.extend(range(hl.range_start, hl.range_end+1))
+            for x in range(1, 21): #Iterate through 1-20
+                if x not in covered:
+                    ok = False
         if ok:
             self.published = published
             self.save()
@@ -170,6 +173,7 @@ class EnemyTemplate(models.Model, Printer):
     folk_spell_amount = models.CharField(max_length=30, null=True, blank=True, default='0')
     theism_spell_amount = models.CharField(max_length=30, null=True, blank=True, default='0')
     sorcery_spell_amount = models.CharField(max_length=30, null=True, blank=True, default='0')
+    spirit_amount = models.CharField(max_length=30, null=True, blank=True, default='0')
     generated = models.IntegerField(default=0)
     used = models.IntegerField(default=0)
     published = models.BooleanField(default=False)
@@ -177,12 +181,17 @@ class EnemyTemplate(models.Model, Printer):
     rank = models.SmallIntegerField(max_length=30, default=2, choices=rank_choices)
     movement = models.CharField(max_length=50, default=6)
     notes = models.TextField(null=True, blank=True)
+    cult_choices = ((0, 'None'), (1, 'Common'), (2, 'Dedicated'), (3, 'Proven'), (4, 'Overseer'), (5, 'Leader'))
+    cult_rank = models.SmallIntegerField(default=0, choices=cult_choices)
     
+    class Meta:
+        ordering = ['name',]
+        
     @classmethod
     def create(cls, owner, ruleset, setting, race, name="Enemy Template"):
         enemy_template = cls(name=name, owner=owner, ruleset=ruleset, setting=setting, race=race)
-        enemy_template.movement = race.movement
         enemy_template.notes = race.special
+        enemy_template.movement = race.movement
         enemy_template.save()
         if name == 'Enemy Template':
             enemy_template.name = '%s Template %s' % (race.name, enemy_template.id)
@@ -190,20 +199,79 @@ class EnemyTemplate(models.Model, Printer):
         for stat in race.stats:
             es = EnemyStat(stat=stat.stat, enemy_template=enemy_template, die_set=stat.default_value)
             es.save()
-        for skill in ruleset.skills.all():
-            es = EnemySkill(skill=skill, enemy_template=enemy_template, die_set=skill.default_value, include=skill.include)
-            es.save()
-        for hit_location in race.hit_locations:
-            EnemyHitLocation.create(hit_location, enemy_template)
-        cs = CombatStyle(name="Primary Combat Style", enemy_template=enemy_template)
-        cs.save()
+        if enemy_template.is_spirit:
+            enemy_template._create_spirit_template()
+        else:
+            enemy_template._create_normal_template()
         return enemy_template
+    
+    def _create_normal_template(self):
+        spirit_skills = ('Spectral Combat', 'Discorporate')
+        for skill in self.ruleset.skills.all().exclude(name__in = spirit_skills):
+            es = EnemySkill(skill=skill, enemy_template=self, die_set=skill.default_value, include=skill.include)
+            es.save()
+        for hit_location in self.race.hit_locations:
+            EnemyHitLocation.create(hit_location, self)
+        cs = CombatStyle(name="Primary Combat Style", enemy_template=self)
+        cs.save()
         
+    def _create_spirit_template(self, ):
+        spell_names = ('Discorporate', 'Spectral Combat', 'Stealth', 'Willpower', 'Folk Magic', 'Devotion',
+                       'Exhort', 'Invocation', 'Shaping')
+        for skill in self.ruleset.skills.filter(name__in=spell_names):
+            es = EnemySkill(skill=skill, enemy_template=self, die_set=skill.default_value, include=skill.include)
+            es.save()
+        es = EnemySkill.objects.get(skill__name='Stealth', enemy_template=self)
+        es.die_set = 'INT+CHA+50'
+        es.save()
+        es = EnemySkill.objects.get(skill__name='Willpower', enemy_template=self)
+        es.die_set = 'POW+POW+50'
+        es.save()
+        
+    @property
+    def get_cult_rank(self):
+        theist_ranks = ('None', 'Lay Member', 'Initiate', 'Acolyte', 'Priest', 'High priest')
+        if self.is_theist:
+            return theist_ranks[self.cult_rank]
+        else:
+            return self.get_cult_rank_display()
+    
+    @property
+    def is_theist(self):
+        try:
+            return EnemySkill.objects.get(skill__name='Devotion', enemy_template=self).include
+        except EnemySkill.DoesNotExist:
+            return False
+    
+    @property
+    def is_folk_magician(self):
+        try:
+            return EnemySkill.objects.get(skill__name='Folk Magic', enemy_template=self).include
+        except EnemySkill.DoesNotExist:
+            return False
+    
+    @property
+    def is_sorcerer(self):
+        try:
+            return EnemySkill.objects.get(skill__name='Shaping', enemy_template=self).include
+        except EnemySkill.DoesNotExist:
+            return False
+    
+    @property
+    def is_animist(self):
+        try:
+            return EnemySkill.objects.get(skill__name='Binding', enemy_template=self).include
+        except EnemySkill.DoesNotExist:
+            return False
+    
     def generate(self, suffix=None, increment=False):
         if increment:
             self.generated += 1
             self.save()
-        return _Enemy(self).generate(suffix)
+        if self.is_spirit:
+            return _Spirit(self).generate(suffix)
+        else:
+            return _Enemy(self).generate(suffix)
 
     def increment_used(self):
         ''' Increments the used-count by one. '''
@@ -225,6 +293,10 @@ class EnemyTemplate(models.Model, Printer):
     @property
     def included_standard_skills(self):
         return EnemySkill.objects.filter(enemy_template=self, skill__standard=True, include=True)
+        
+    @property
+    def is_spirit(self):
+        return self.race.discorporate
         
     @property
     def raw_skills(self):
@@ -270,6 +342,10 @@ class EnemyTemplate(models.Model, Printer):
         output.extend(list(EnemySpell.objects.filter(enemy_template=self, spell__type="sorcery")))
         output.extend(list(CustomSpell.objects.filter(enemy_template=self, type="sorcery")))
         return output
+        
+    @property
+    def spirits(self):
+        return EnemySpirit.objects.filter(enemy_template=self)
 
     @property
     def hit_locations(self):
@@ -287,7 +363,9 @@ class EnemyTemplate(models.Model, Printer):
         new.folk_spell_amount = self.folk_spell_amount
         new.theism_spell_amount = self.theism_spell_amount
         new.sorcery_spell_amount = self.sorcery_spell_amount
+        new.spirit_amount = self.spirit_amount
         new.notes = self.notes
+        new.cult_rank = self.cult_rank
         new.save()
         for stat in self.stats:
             es = EnemyStat(stat=stat.stat, enemy_template=new, die_set=stat.die_set); es.save()
@@ -307,6 +385,9 @@ class EnemyTemplate(models.Model, Printer):
         for spell in CustomSpell.objects.filter(enemy_template=self):
             s = CustomSpell(enemy_template=new, name=spell.name, probability=spell.probability, type=spell.type)
             s.save()
+        for spirit in EnemySpirit.objects.filter(enemy_template=self):
+            es = EnemySpirit(enemy_template=new, spirit=spirit.spirit, probability=spirit.probability)
+            es.save()
         return new
 
     def apply_skill_bonus(self, bonus):
@@ -750,7 +831,6 @@ class EnemySpell(models.Model, Printer):
         ordering = ['spell',]
         unique_together = ('spell', 'enemy_template')
     
-    
     @property
     def name(self):
         return self.spell.name
@@ -791,6 +871,27 @@ class CustomSpell(models.Model, Printer):
     class Meta:
         ordering = ['name',]
 
+class EnemySpirit(models.Model, Printer):
+    ''' Links spirits (EnemyTemplates) to animists '''
+    enemy_template = models.ForeignKey(EnemyTemplate, related_name='animist')   # The animist
+    spirit = models.ForeignKey(EnemyTemplate, related_name='spirit')
+    probability = models.SmallIntegerField(default=0)
+    
+    class Meta:
+        ordering = ['spirit',]
+        
+    @property
+    def name(self):
+        return self.spirit.name
+        
+    @classmethod
+    def create(cls, spirit_id, et_id):
+        et = EnemyTemplate.objects.get(id=et_id)
+        spirit = EnemyTemplate.objects.get(id=spirit_id)
+        es = EnemySpirit(enemy_template=et, spirit=spirit, probability=1)
+        es.save()
+        return es
+
 class _Enemy:
     ''' Enemy instance created based on an EnemyTemplate. This is the stuff that gets printed
         for the user when Generate is clicked.
@@ -798,27 +899,29 @@ class _Enemy:
     def __init__(self, enemy_template):
         self.name = ''
         self.et = enemy_template
+        self.cult_rank = self.et.get_cult_rank
         self.stats = ordereddict.OrderedDict()
         self.stats_list = []
         self.skills = []
+        self.skills_dict = {}   # Used during enemy generation
         self.folk_spells = []
         self.theism_spells = []
         self.sorcery_spells = []
+        self.spirits = []
         self.hit_locations = []
         self.template = enemy_template.name
         self.attributes = {}
         self.combat_styles = []
         self.notes = enemy_template.notes
+        self.is_theist = False
+        self.is_sorcerer = False
 
     def generate(self, suffix=None):
-        self.name = self.et.name
-        if suffix:
-            self.name += ' %s' % suffix
-        for stat in self.et.stats:
-            self.stats[stat.name] = stat.roll()
-            self.stats_list.append({'name': stat.name, 'value': self.stats[stat.name]})
+        self._generate_name(suffix)
+        self._add_stats()
         self._add_skills()
         self._add_spells()
+        self._add_spirits()
         self._add_hit_locations()
         self._calculate_attributes()
         self._add_combat_styles()
@@ -827,11 +930,23 @@ class _Enemy:
     @property
     def get_stats(self):
         return self.stats_list
+
+    def _generate_name(self, suffix):
+        self.name = self.et.name
+        if suffix:
+            self.name += ' %s' % suffix
         
+    def _add_stats(self):
+        for stat in self.et.stats:
+            self.stats[stat.name] = stat.roll()
+            self.stats_list.append({'name': stat.name, 'value': self.stats[stat.name]})
+    
     def _add_skills(self):
         for skill in self.et.skills:
             if skill.include:
-                self.skills.append({'name': skill.name, 'value': skill.roll(self.stats)})
+                value = skill.roll(self.stats)
+                self.skills.append({'name': skill.name, 'value': value})
+                self.skills_dict[skill.name] = value
     
     def _add_combat_styles(self):
         for cs in self.et.combat_styles:
@@ -874,6 +989,12 @@ class _Enemy:
         amount = min(Dice(self.et.sorcery_spell_amount).roll(), len(self.et.sorcery_spells))
         self.sorcery_spells = self._get_items(self.et.sorcery_spells, amount)
         
+    def _add_spirits(self):
+        amount = min(Dice(self.et.spirit_amount).roll(), len(self.et.spirits.filter(probability__gt=0)))
+        spirit_templates = self._get_items(self.et.spirits.filter(probability__gt=0), amount)
+        for st in spirit_templates:
+            self.spirits.append(st.spirit.generate())
+        
     def _get_items(self, item_list, amount):
         ''' Randomly selects the given amount of spells from the given list 
             Input: item_list: List of items where to pick from. The items need to have the attribute
@@ -897,6 +1018,18 @@ class _Enemy:
         self.attributes['magic_points'] = self.stats['POW']
         self.attributes['strike_rank'] = '%s(%s-%s)' % (sr, sr_natural, self._sr_penalty())
         self.attributes['movement'] = self.et.movement
+        if 'Devotion' in self.skills_dict:
+            self.is_theist = True
+            self.attributes['devotional_pool'] = self._get_devotional_pool()
+            self.attributes['max_intensity'] = int(math.ceil(self.skills_dict['Devotion'] / 10.0))
+        if 'Shaping' in self.skills_dict:
+            self.is_sorcerer = True
+            self.attributes['max_shaping'] = int(math.ceil(self.skills_dict['Shaping'] / 10.0))
+            
+    def _get_devotional_pool(self):
+        mult_options = [0, 0, 0.25, 0.5, 0.75, 1]
+        devpool_multiplier = mult_options[self.et.cult_rank]
+        return int(math.ceil(self.stats['POW'] * devpool_multiplier))
         
     def _sr_penalty(self):
         enc = 0
@@ -914,6 +1047,7 @@ class _Enemy:
         elif dex_int <= 24: self.attributes['action_points'] = 2
         elif dex_int <= 36: self.attributes['action_points'] = 3
         elif dex_int <= 48: self.attributes['action_points'] = 4
+        else: self.attributes['action_points'] = 5
         
     def _calculate_damage_modifier(self):
         if self.stats['STR'] == 0 or self.stats['SIZ'] == 0:
@@ -931,6 +1065,53 @@ class _Enemy:
         else:
             index = ((str_siz - 1 - 50) / 10) + 10
         self.attributes['damage_modifier'] = DICE_STEPS[index]
+    
+class _Spirit(_Enemy):
+    ''' Spirit type of Enemy '''
+    def generate(self, suffix=None):
+        self.is_spirit = self.et.is_spirit
+        self._generate_name(suffix)
+        self._add_stats()
+        self._add_skills()
+        self._add_spells()
+        self._calculate_attributes()
+        return self
+
+    def _calculate_attributes(self):
+        sr = (self.stats['INT'] + self.stats['CHA']) / 2
+        self._calculate_action_points()
+        self._calculate_spirit_damage()
+        self.attributes['magic_points'] = self.stats['POW']
+        self.attributes['strike_rank'] = '%s' % (sr)
+        self.attributes['movement'] = self.et.movement
+        if 'Devotion' in self.skills_dict:
+            self.is_theist = True
+            self.attributes['devotional_pool'] = self._get_devotional_pool()
+            self.attributes['max_intensity'] = int(math.ceil(self.skills_dict['Devotion'] / 10.0))
+        if 'Shaping' in self.skills_dict:
+            self.is_sorcerer = True
+            self.attributes['max_shaping'] = int(math.ceil(self.skills_dict['Shaping'] / 10.0))
+        self.attributes['spirit_intensity'] = (self.stats['POW'] - 1) / 6
         
+    def _calculate_action_points(self):
+        pow_int = self.stats['POW'] + self.stats['INT']
+        if pow_int <= 12: self.attributes['action_points'] = 1
+        elif pow_int <= 24: self.attributes['action_points'] = 2
+        elif pow_int <= 36: self.attributes['action_points'] = 3
+        elif pow_int <= 48: self.attributes['action_points'] = 4
+        else: self.attributes['action_points'] = 5
+        
+    def _calculate_spirit_damage(self):
+        damage_table = ['0', '1d2', '1d4', '1d6', '1d8', '1d10', '2d6', '1d8+1d6', '2d8', '1d10+1d8', '2d10',
+                        '2d10+1d2', '2d10+1d4', '2d10+1d6', '2d10+1d8', '3d10', '3d10+1d2', '3d10+1d4']
+        skill = self.skills_dict.get('Spectral combat', 0)
+        index = _divide_round_up(skill, 20)
+        try:
+            spirit_damage = damage_table[index]
+        except IndexError:
+            spirit_damage = '3d10+1d6'
+        self.attributes['spirit_damage'] = spirit_damage
+    
 def _divide_round_up(n, d):
     return (n + (d - 1))/d
+    

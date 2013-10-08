@@ -60,6 +60,12 @@ function add_custom_spell(event){
     Dajaxice.enemygen.add_custom_spell(refresh_page, {'type': type, 'et_id': et_id})
 }
 
+function add_spirit(event){
+    var spirit_id = $('#spirit_options').val();
+    var et_id = $(event.target).attr('et_id');
+    Dajaxice.enemygen.add_spirit(refresh_page, {'spirit_id': spirit_id, 'et_id': et_id})
+}
+
 function add_custom_weapon(event){
     var type = $(event.target).attr('type');
     var cs_id = $(event.target).attr('cs_id');
@@ -114,6 +120,10 @@ $(document).ready(function(){
         add_custom_spell(event);
     })
 
+    $('#add_spirit').click(function(event){
+        add_spirit(event);
+    })
+
     $('.add_custom_skill').click(function(event){
         add_custom_skill(event);
     })
@@ -132,6 +142,19 @@ $(document).ready(function(){
     
     $('#apply_notes_to_templates').click(function(event){
         apply_notes_to_templates(event);
+    })
+    
+    $('#pro_skill_include_24').change(function(event){  // Shaping
+        $('#sorcery_spells_container').toggle();
+    })
+    $('#pro_skill_include_22').change(function(event){  // Devotion
+        $('#theism_spells_container').toggle();
+    })
+    $('#pro_skill_include_20').change(function(event){  // Folk magician
+        $('#folk_spells_container').toggle();
+    })
+    $('#pro_skill_include_27').change(function(event){  // Animist
+        $('#spirits_container').toggle();
     })
     
 });

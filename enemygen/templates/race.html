@@ -10,6 +10,11 @@
     <th>Movement</th>
     <td><input id="race_movement" class="data" type="text" size="8" item_id="{{ race.id }}" item_type="race_movement" value="{{race.movement}}" /></td>
 </tr><tr>
+    <!--
+    <th>Discorporate</th>
+    <td><input id="race_discorporate_{{ race.id }}" class="data" type="checkbox" item_id="{{ race.id }}" item_type="race_discorporate" {% if race.discorporate %}checked="checked"{% endif %} /></td>
+</tr><tr>
+    -->
     <th>Published</th>
     <td><input id="race_pub" class="data" type="checkbox" item_id="{{ race.id }}" item_type="race_published" {% if race.published %}checked="checked"{% endif %} /></td>
 </tr><tr>

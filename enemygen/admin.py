@@ -2,14 +2,22 @@ from django.contrib import admin
 from enemygen.models import EnemyTemplate, Setting, Ruleset, Race, HitLocation
 from enemygen.models import SkillAbstract, SpellAbstract, StatAbstract, Weapon
 from enemygen.models import EnemySkill, EnemySpell, EnemyStat, EnemyHitLocation, RaceStat
-from enemygen.models import CombatStyle, CustomSpell, CustomWeapon, Party
+from enemygen.models import CombatStyle, CustomSpell, CustomWeapon, Party, TemplateToParty
+from enemygen.models import EnemySpirit
 
 class EnemyTemplateAdmin(admin.ModelAdmin):
-    list_display = ('name', 'ruleset', 'setting', 'race', 'rank', 'generated', 'published', 'owner')
+    list_display = ('name', 'setting', 'race', 'rank', 'generated', 'published', 'owner')
+    list_filter = ('setting', 'owner')
+
+class RaceAdmin(admin.ModelAdmin):
+    list_display = ('name', 'owner', 'published')
 
 class StatAbstractAdmin(admin.ModelAdmin):
     list_display = ('name',)
 
+class CombatStyleAdmin(admin.ModelAdmin):
+    list_display = ('name', 'enemy_template', 'one_h_amount', 'two_h_amount', 'ranged_amount', 'shield_amount')
+    
 class SkillAbstractAdmin(admin.ModelAdmin):
     list_display = ('name', 'default_value', 'standard')
     list_filter = ('standard',)
@@ -53,11 +61,13 @@ class HitLocationAdmin(admin.ModelAdmin):
 
 admin.site.register(EnemyTemplate, EnemyTemplateAdmin)
 admin.site.register(Setting)
-admin.site.register(CombatStyle)
+admin.site.register(CombatStyle, CombatStyleAdmin)
 admin.site.register(Ruleset)
-admin.site.register(Race)
+admin.site.register(EnemySpirit)
+admin.site.register(Race, RaceAdmin)
 admin.site.register(CustomSpell)
 admin.site.register(CustomWeapon)
+admin.site.register(TemplateToParty)
 admin.site.register(Party, PartyAdmin)
 admin.site.register(RaceStat, RaceStatAdmin)
 admin.site.register(HitLocation, HitLocationAdmin)

@@ -13,16 +13,18 @@
         <td></td>
     </tr></thead>
     {% for p in parties %}
-        <form action="{% url 'generate_party' %}" method="post" target="_blank">
-        <input type="hidden" name="party_id" value="{{ p.id }}">
-        {% csrf_token %}
         <tr>
             <td><a class="edit_item" href="{% url 'party' p.id %}">{{ p.name }}</a></td>
             <td>{{ p.owner }}</td>
             {% if setting_id = 0 %}<td>{{ p.setting.name }}</td>{% endif %}
-            <td><input type="submit" class="party_submit" value="Generate"></td>
+            <td>
+                <form action="{% url 'generate_party' %}" method="post" target="_blank">
+                    <input type="hidden" name="party_id" value="{{ p.id }}">
+                    {% csrf_token %}
+                    <input type="submit" class="party_submit" value="Generate">
+                </form>
+            </td>
         </tr>
-        </form>
     {% endfor %}
 </table>
 </div>
@@ -31,7 +33,7 @@
 
 <script>
 function party_list_height(){
-    list_container_height = $(window).height() - 385
+    list_container_height = $(window).height() - 295
     if (list_container_height > $('#party_list').height()){
         list_container_height = $('#party_list').height()
     }

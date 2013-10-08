@@ -1,3 +1,6 @@
+{% load url from future %}
+
+<div id="folk_spells_container" {% if not et.is_folk_magician %}style="display: none;"{% endif %}>
 <h3>Folk spells</h3>
 Amount:
 <input id="et_folk_spells_{{ et.id }}" class="data" size="3" type="text" item_id="{{ et.id }}" item_type="et_folk_spell_amount" value="{{ et.folk_spell_amount }}" /><br>
@@ -23,7 +26,9 @@ Amount:
 {% endfor %}
 </tr></table>
 <button class="add_custom_spell" et_id="{{ et.id }}" type="folk">Add custom spell</button>
+</div>
 
+<div id="theism_spells_container" {% if not et.is_theist %}style="display: none;"{% endif %}>
 <h3>Theism spells</h3>
 Amount: 
 <input id="et_theism_spells_{{ et.id }}" class="data" size="3" type="text" item_id="{{ et.id }}" item_type="et_theism_spell_amount" value="{{ et.theism_spell_amount }}" /><br>
@@ -50,7 +55,9 @@ Amount:
 {% endfor %}
 </tr></table>
 <button class="add_custom_spell" et_id="{{ et.id }}" type="theism">Add custom spell</button>
+</div>
 
+<div id="sorcery_spells_container" {% if not et.is_sorcerer %}style="display: none;"{% endif %}>
 <h3>Sorcery spells</h3>
 Amount: 
 <input id="et_sorcery_spells_{{ et.id }}" class="data" size="3" type="text" item_id="{{ et.id }}" item_type="et_sorcery_spell_amount" value="{{ et.sorcery_spell_amount }}" /><br>
@@ -77,3 +84,29 @@ Amount:
 {% endfor %}
 </tr></table>
 <button class="add_custom_spell" et_id="{{ et.id }}" type="sorcery">Add custom spell</button>
+</div>
+
+<div id="spirits_container" {% if not et.is_animist %}style="display: none;"{% endif %}>
+<h3>Spirits</h3>
+Amount: 
+<input id="et_animism_spirits_{{ et.id }}" class="data" size="3" type="text" item_id="{{ et.id }}" item_type="et_spirit_amount" value="{{ et.spirit_amount }}" /><br>
+<table>
+<tr><th>Spirit</th><th>Prob.</th><th></th></tr>
+{% for spirit in et.spirits %}
+<tr>
+    <td><a href="{% url 'enemy_template' spirit.spirit.id %}">{{ spirit.name }}</a></td>
+    <td><input id="spirit_{{spirit.id}}" class="data number" type="number" min="0" max="100" item_id="{{spirit.id}}" parent_id="{{et.id}}" item_type="et_spirit_prob" value="{{ spirit.probability }}" /></td>
+    <td><img src="/rq_static/minus.png" width="23" height="23" class="del_item" item_id="{{ spirit.id }}" item_type="et_spirit" /></td>
+</tr>
+{% endfor %}
+
+</table>
+<select id="spirit_options" name="spirit_options">
+    <option value="0">Select spirit</option>
+    {% for spirit in spirit_options %}
+        <option value="{{ spirit.id }}">{{ spirit.name }}</option>
+    {% endfor %}
+</select>
+
+<button id="add_spirit" et_id="{{ et.id }}">Add spirit</button>
+</div>

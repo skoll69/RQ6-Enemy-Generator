@@ -26,13 +26,7 @@
 <h3>{{ et.name }}</h3>
 <table><tr>
     <th>Rank</th>
-    <td>
-        {% if et.rank == 1 %}Rubble{% endif %}
-        {% if et.rank == 2 %}Novice{% endif %}
-        {% if et.rank == 3 %}Skilled{% endif %}
-        {% if et.rank == 4 %}Veteran{% endif %}
-        {% if et.rank == 5 %}Master{% endif %}
-    </td>
+    <td>{{ et.get_rank_display }}</td>
 </tr><tr>
     <th>Setting</th>
     <td>
@@ -42,6 +36,9 @@
 </tr><tr>
     <th>Race</th>
     <td><a href="{% url 'race' et.race.id %}">{{ et.race.name }}</a></td>
+</tr><tr>
+    <th>Cult rank</th>
+    <td>{{ et.get_cult_rank_display }}</td>
 </tr><tr>
     <th>Notes</th>
     <td>{{ et.notes }}</td>
@@ -103,6 +100,7 @@
 </tr></table>
 {% endif %}
 
+{% if not et.is_spirit %}
 <h3>Combat styles</h3>
 <table class="read_only"><tr>
 {% for cs in et.combat_styles %}
@@ -151,8 +149,9 @@
 {% endfor %}
 <br>
 </td></tr></table>
+{% endif %} <!-- et.spirit if ends -->
 
-{% if et.folk_spell_amount %}
+{% if et.folk_spells %}
 <h3>Folk spells</h3>
 Amount: {{ et.folk_spell_amount }}
 <table><tr>
@@ -165,9 +164,9 @@ Amount: {{ et.folk_spell_amount }}
 </tr></table>
 {% endif %}
 
+{% if et.theism_spells %}
 <h3>Theism spells</h3>
 Amount: {{ et.theism_spell_amount }}
-{% if et.theism_spells %}
 <table>
 <tr><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th></tr>
 <tr>
@@ -179,9 +178,10 @@ Amount: {{ et.theism_spell_amount }}
 </tr></table>
 {% endif %}
 
+
+{% if et.sorcery_spells %}
 <h3>Sorcery spells</h3>
 Amount: {{ et.sorcery_spell_amount }}
-{% if et.sorcery_spells %}
 <table>
 <tr><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.</th></tr>
 <tr>

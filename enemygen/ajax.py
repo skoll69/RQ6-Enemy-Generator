@@ -3,7 +3,7 @@ from dajaxice.decorators import dajaxice_register
 from enemygen.models import EnemyStat, EnemySkill, EnemyTemplate, Ruleset, StatAbstract
 from enemygen.models import SpellAbstract, SkillAbstract, EnemySpell, EnemyHitLocation
 from enemygen.models import CombatStyle, Weapon, Setting, CustomSpell, EnemyWeapon, CustomWeapon
-from enemygen.models import Race, RaceStat, HitLocation, CustomSkill, Party, TemplateToParty
+from enemygen.models import Race, RaceStat, HitLocation, CustomSkill, Party, TemplateToParty, EnemySpirit
 
 import logging
 from enemygen.enemygen_lib import to_bool, int_or_zero
@@ -32,6 +32,14 @@ def add_custom_spell(request, et_id, type):
 def add_custom_skill(request, et_id):
     try:
         CustomSkill.create(et_id)
+        return simplejson.dumps({'success': True})
+    except Exception as e:
+        return simplejson.dumps({'error': str(e)})
+    
+@dajaxice_register
+def add_spirit(request, spirit_id, et_id):
+    try:
+        es = EnemySpirit.create(spirit_id, et_id)
         return simplejson.dumps({'success': True})
     except Exception as e:
         return simplejson.dumps({'error': str(e)})
@@ -68,6 +76,10 @@ def del_item(request, item_id, item_type):
             ttp = TemplateToParty.objects.get(id=id)
             ttp.delete()
             return simplejson.dumps({'success': True})
+        elif item_type == 'et_spirit':
+            es = EnemySpirit.objects.get(id=id)
+            es.delete()
+            return simplejson.dumps({'success': True})
     except Exception as e:
         return simplejson.dumps({'error': str(e)})
     
@@ -80,11 +92,30 @@ def submit(request, value, id, object, parent_id=None, extra={}):
         success = True
         message = ''
         original_value = None
-        #Attributes
-        if object == 'et_published':
+        
+        # Basics
+        if object == 'et_name':
+            et = EnemyTemplate.objects.get(id=id, owner=request.user)
+            et.name = value
+            et.save()
+        elif object == 'et_rank':
+            et = EnemyTemplate.objects.get(id=id, owner=request.user)
+            et.rank = int(value)
+            et.save()
+        elif object == 'et_cult_rank':
+            et = EnemyTemplate.objects.get(id=id, owner=request.user)
+            et.cult_rank = int(value)
+            et.save()
+        elif object == 'et_setting':
+            et = EnemyTemplate.objects.get(id=id, owner=request.user)
+            et.setting = Setting.objects.get(id=int(value))
+            et.save()
+        elif object == 'et_published':
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
             et.published = to_bool(value)
             et.save()
+
+        #Attributes
         elif object == 'et_stat_value':
             es = EnemyStat.objects.get(id=id)
             original_value = es.die_set
@@ -164,14 +195,6 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             cs = CustomSpell.objects.get(id=id)
             cs.name = value
             cs.save()
-        elif object == 'et_name':
-            et = EnemyTemplate.objects.get(id=id, owner=request.user)
-            et.name = value
-            et.save()
-        elif object == 'et_rank':
-            et = EnemyTemplate.objects.get(id=id, owner=request.user)
-            et.rank = int(value)
-            et.save()
         elif object == 'et_spell_detail':
             sa = SpellAbstract.objects.get(id=id)
             et = EnemyTemplate.objects.get(id=parent_id, owner=request.user)
@@ -182,14 +205,6 @@ def submit(request, value, id, object, parent_id=None, extra={}):
                 es.set_probability(1)
             es.detail = value
             es.save()
-        elif object == 'ruleset_name':
-            ruleset = Ruleset.objects.get(id=id)
-            ruleset.name = value
-            ruleset.save()
-        elif object == 'et_setting':
-            et = EnemyTemplate.objects.get(id=id, owner=request.user)
-            et.setting = Setting.objects.get(id=int(value))
-            et.save()
         elif object == 'et_folk_spell_amount':
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
             et.folk_spell_amount = value
@@ -202,6 +217,18 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
             et.sorcery_spell_amount = value
             et.save()
+        elif object == 'et_spirit_amount':
+            et = EnemyTemplate.objects.get(id=id, owner=request.user)
+            et.spirit_amount = value
+            et.save()
+        elif object == 'et_spirit_prob':
+            es = EnemySpirit.objects.get(id=id)
+            try:
+                es.probability = int(value)
+                es.save()
+            except ValueError:
+                success = False
+                message = 'Probability must be a number.'
             
         #Weapons and Combat Styles
         elif object == 'et_combat_style_name':
@@ -361,6 +388,10 @@ def submit(request, value, id, object, parent_id=None, extra={}):
         elif object == 'race_notes':
             race = Race.objects.get(id=id, owner=request.user)
             race.special = value
+            race.save()
+        elif object == 'race_discorporate':
+            race = Race.objects.get(id=id, owner=request.user)
+            race.discorporate = to_bool(value)
             race.save()
             
         # Party

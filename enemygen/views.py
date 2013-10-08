@@ -8,7 +8,7 @@ from enemygen.models import EnemyTemplate, Setting, Ruleset, EnemyTemplate, Race
 from enemygen.views_lib import get_setting, get_ruleset, get_context, get_enemies, spell_list
 from enemygen.views_lib import get_enemy_templates, combat_styles, is_race_admin, get_statistics
 from enemygen.views_lib import generate_pdf, get_setting_id, get_party_templates, save_as_html
-from enemygen.views_lib import get_party_enemies
+from enemygen.views_lib import get_party_enemies, spirit_options
 
 def index(request):
     setting_id = get_setting_id(request)
@@ -51,6 +51,7 @@ def select_setting_ruleset(request):
 def edit_index(request):
     context = get_context(request)
     context['enemy_templates'] = EnemyTemplate.objects.filter(owner=request.user)
+    context['races'] = Race.objects.filter(published=True)
     context['edit_races'] = Race.objects.filter(owner=request.user)
     context['edit_parties'] = Party.objects.filter(owner=request.user)
     context['race_admin'] = is_race_admin(request.user)
@@ -60,7 +61,7 @@ def enemy_template(request, enemy_template_id):
     context = get_context(request)
     template = 'enemy_template.html'
     context['et'] = EnemyTemplate.objects.get(id=enemy_template_id)
-    if context['et'].owner != request.user and request.user.username != 'admin':
+    if context['et'].owner != request.user:
         template = 'enemy_template_read_only.html'
     context['weapons'] = {}
     context['weapons']['1h'] = Weapon.objects.filter(type='1h-melee')
@@ -71,6 +72,7 @@ def enemy_template(request, enemy_template_id):
     context['folk_spells'] = spell_list('folk', enemy_template_id)
     context['sorcery_spells'] = spell_list('sorcery', enemy_template_id)
     context['combat_styles'] = combat_styles(enemy_template_id)
+    context['spirit_options'] = spirit_options()
     return render(request, template, context)
     
 def race(request, race_id):
@@ -117,9 +119,11 @@ def pdf_export(request):
         pdf_path = generate_pdf(request.GET.get('generated_html'))
         file_name = pdf_path.split('/')[-1:][0]
         file_name = '_'.join(file_name.split('_')[:-1]) # Remove the last unique identifier from file name
-        fsock = open(pdf_path)
-        response = HttpResponse(fsock, mimetype=('application/pdf', None))
-        response['Content-Disposition'] = 'attachment; filename=%s' % file_name
+        file_name = file_name.replace(',', '')
+        data = open(pdf_path).read()
+        response = HttpResponse(data, mimetype='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % file_name
+        response['Content-Length'] = len(data)
         return response
 
 @login_required
