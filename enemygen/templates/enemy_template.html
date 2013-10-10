@@ -4,10 +4,90 @@
 {% block title %}RQ: {{ et.name }}{% endblock %}
 
 {% block content %}
+
+<style>
+div#new_tag_container{
+    position: relative;
+    height: 18px;
+    width: 200px;
+    background: white;
+    border: 1px solid #ABADB3;
+    padding-top: 2px;
+    padding-left: 1px;
+    left: 2px;
+    #overflow: hidden;
+}
+
+div#et_newtag{
+    width: 100%;
+}
+</style>
+
+<script>
+$(document).ready(function(){
+    var cly = completely(document.getElementById('et_newtag'), {
+        fontSize: '12px',
+    	fontFamily : 'Arial',
+        color: 'black',
+    });
+    cly.input.style.border= '1px solid #ABADB3';
+    cly.input.style.width= '200px';
+    cly.wrapper.style.width= '200px';
+    cly.input.style.padding='1px';
+    cly.options = [{% for t in all_et_tags %}'{{t}}',{% endfor %}];
+    cly.onEnter = function(){
+        var new_value = cly.getText();
+        var item_id = {{ et.id }};
+        var item_type = 'et_newtag';
+        var input_object = null;
+        submit(item_id, item_type, input_object, new_value);
+        $('#tag_container').append('<div class="tag">'+new_value+'         \
+        <img class="del_tag" src="/rq_static/images/del_tag.png" \
+                et_id="{{ et.id }}" value="'+new_value+'"                           \
+                onmouseover="this.src=\'/rq_static/images/del_tag_hover.png\'"      \
+                onmouseout="this.src=\'/rq_static/images/del_tag.png\'"             \
+                onmouseup="this.src=\'/rq_static/images/del_tag.png\'"              \
+                onmousedown="this.src=\'/rq_static/images/del_tag_active.png\'" />  \
+              </div>');
+        $('.del_tag').click(function(event){
+            deltag(event);
+        })
+        cly.setText('');
+    };
+    cly.onChange = function(){
+        if (cly.getText() != ''){
+            cly.repaint();
+        } else {
+            cly.hideDropDown();
+        }
+    }
+    
+});
+</script>
+
 <h3>Enemy details</h3>
 <table><tr>
     <th>Template name</th>
     <td><input id="et_{{ et.id }}" class="data" type="text" size="40" item_id="{{ et.id }}" item_type="et_name" value="{{ et.name }}" /></td>
+</tr><tr>
+    <th>Tags</th>
+    <td><div id="tag_container">
+        {% for tag in et.get_tags %}
+            <div class="tag">{{ tag }}
+            <img class="del_tag" src="/rq_static/images/del_tag.png"
+                 et_id="{{ et.id }}" value="{{ tag.name }}"
+                 onmouseover="this.src='/rq_static/images/del_tag_hover.png'"
+                 onmouseout="this.src='/rq_static/images/del_tag.png'"
+                 onmouseup="this.src='/rq_static/images/del_tag.png'"
+                 onmousedown="this.src='/rq_static/images/del_tag_active.png'" />
+            </div>
+        {% endfor %}
+        </div>
+        <div d="new_tag_container">
+            <div id="et_newtag" class="data" type="text" item_id="{{ et.id }}" item_type="et_newtag"></div>
+        </div>
+    </td>
+</tr><tr>
 </tr><tr>
     <th>Rank</th>
     <td>

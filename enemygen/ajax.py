@@ -426,6 +426,12 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
             et.notes = value
             et.save()
+        elif object == 'et_newtag':
+            et = EnemyTemplate.objects.get(id=id, owner=request.user)
+            et.tags.add(value.capitalize())
+        elif object == 'et_deltag':
+            et = EnemyTemplate.objects.get(id=id, owner=request.user)
+            et.tags.remove(value.capitalize())
             
         return simplejson.dumps({'success': success, 'message': message, 'original_value': original_value})
     except Exception as e:

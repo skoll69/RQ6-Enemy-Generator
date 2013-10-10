@@ -200,4 +200,5 @@ def generate_pdf(html_path):
     os.system('wkhtmltopdf.sh --enable-forms "%s" "%s" > /projects/rq_tools/pdf.log 2>&1' % (html_path, pdf_path))
     return pdf_path
     
-    
+def all_et_tags():
+    return sorted(list(EnemyTemplate.tags.all()), key=lambda x: x.name)

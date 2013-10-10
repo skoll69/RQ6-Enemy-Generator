@@ -5,6 +5,8 @@ from enemygen_lib import _select_random_item, ValidationError, replace_die_set
 
 from dice import Dice
 
+from taggit.managers import TaggableManager
+
 import ordereddict
 import random
 import math
@@ -183,6 +185,7 @@ class EnemyTemplate(models.Model, Printer):
     notes = models.TextField(null=True, blank=True)
     cult_choices = ((0, 'None'), (1, 'Common'), (2, 'Dedicated'), (3, 'Proven'), (4, 'Overseer'), (5, 'Leader'))
     cult_rank = models.SmallIntegerField(default=0, choices=cult_choices)
+    tags = TaggableManager(blank=True)
     
     class Meta:
         ordering = ['name',]
@@ -278,6 +281,9 @@ class EnemyTemplate(models.Model, Printer):
         self.used += 1
         self.save()
         
+    def get_tags(self):
+        return sorted(list(self.tags.names()))
+    
     @property
     def stats(self):
         return EnemyStat.objects.filter(enemy_template=self)
@@ -1058,14 +1064,18 @@ class _Enemy:
                       '+2d10', '+2d10+1d2', '+2d10+1d4', '+2d10+1d6', '+2d10+1d8',
                       '+3d10', '+3d10+1d2', '+3d10+1d4', '+3d10+1d6', '+3d10+1d8',
                       '+4d10', '+4d10+1d2', '+4d10+1d4', '+4d10+1d6', '+4d10+1d8',
+                      '+5d10', '+5d10+1d2', '+5d10+1d4', '+5d10+1d6', '+5d10+1d8',
                       )
         str_siz = self.stats['STR'] + self.stats['SIZ']
         if str_siz <= 50:
             index = (str_siz-1) / 5
         else:
             index = ((str_siz - 1 - 50) / 10) + 10
-        self.attributes['damage_modifier'] = DICE_STEPS[index]
-    
+        try:
+            self.attributes['damage_modifier'] = DICE_STEPS[index]
+        except IndexError:
+            self.attributes['damage_modifier'] = '+6d10'
+   
 class _Spirit(_Enemy):
     ''' Spirit type of Enemy '''
     def generate(self, suffix=None):

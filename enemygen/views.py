@@ -8,7 +8,7 @@ from enemygen.models import EnemyTemplate, Setting, Ruleset, EnemyTemplate, Race
 from enemygen.views_lib import get_setting, get_ruleset, get_context, get_enemies, spell_list
 from enemygen.views_lib import get_enemy_templates, combat_styles, is_race_admin, get_statistics
 from enemygen.views_lib import generate_pdf, get_setting_id, get_party_templates, save_as_html
-from enemygen.views_lib import get_party_enemies, spirit_options
+from enemygen.views_lib import get_party_enemies, spirit_options, all_et_tags
 
 def index(request):
     setting_id = get_setting_id(request)
@@ -73,6 +73,7 @@ def enemy_template(request, enemy_template_id):
     context['sorcery_spells'] = spell_list('sorcery', enemy_template_id)
     context['combat_styles'] = combat_styles(enemy_template_id)
     context['spirit_options'] = spirit_options()
+    context['all_et_tags'] = all_et_tags()
     return render(request, template, context)
     
 def race(request, race_id):

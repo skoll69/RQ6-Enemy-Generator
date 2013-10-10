@@ -115,6 +115,16 @@ h4{
     color: white;
 }
 
+#footer{
+    color: #AAA;
+    font-size: 10px;
+    text-align: center;
+}
+
+/* Basic stuff ends */
+
+/* Index starts */
+
 #enemy_template_list_container{
     height: 200px;
     overflow: auto;
@@ -126,7 +136,7 @@ table#enemy_template_list{
 }
 
 table#enemy_template_list td, table#enemy_template_list th {
-    padding-right: 20px;
+    padding-right: 6px;
 }
 
 table.index_list th {
@@ -134,6 +144,48 @@ table.index_list th {
     padding-right: 10px;
 }
 
+div#index_tag_container{
+    max-width: 400px;
+}
+
+div.small_tag {
+    display: inline-block;
+    font-size: 10px;
+    border: 1px solid #ABADB3;
+    border-radius: 3px;
+    margin-right: 1px;
+    background-color: #DEE9F4;
+    color: black;
+    cursor: default;
+}
+/* Index ends */
+
+/* Enemy Template details start */
+
+div#tag_container{
+    width: 550px;
+    padding-bottom: 4px;
+    padding-left: 2px;
+}
+
+div.tag {
+    font-size: 12px;
+    display: inline-block;
+    border: 1px solid #ABADB3;
+    border-radius: 3px;
+    margin-right: 1px;
+    padding-left: 1px;
+    padding-bottom: 1px;
+    background-color: #DEE9F4;
+    color: black;
+    cursor: default;
+}
+
+img.del_tag {
+    position: relative;
+    top: 2px;
+    padding-right: 0px;
+}
 
 table.index_list th:hover {
     background: #A57230;
@@ -144,12 +196,6 @@ table.index_list th:hover {
 
 th{
     text-align: left;
-}
-
-#footer{
-    color: #AAA;
-    font-size: 10px;
-    text-align: center;
 }
 
 span.weapons{

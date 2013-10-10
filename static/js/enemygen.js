@@ -83,6 +83,24 @@ function del_item(event){
     Dajaxice.enemygen.del_item(refresh_page, {'item_id': item_id, 'item_type': item_type})
 }
 
+function deltag_submit(id, type, input_object, value, parent_id){
+    (function(value, id, type, input_object){
+        Dajaxice.enemygen.submit(function(result) {deltag_callback(result, input_object)}, {'value': value, 'id': id, 'object': type, 'parent_id': null});
+    })(value, id, type, input_object);
+}
+
+function deltag_callback(result, object){
+    if (result.success){
+        $(object).parent().hide();
+    }
+}
+
+function deltag(event){
+    var et_id = $(event.target).attr('et_id');
+    var tag = $(event.target).attr('value');
+    deltag_submit(et_id, 'et_deltag', event.target, tag)
+}
+
 function apply_notes_to_templates(event){
     var race_id = $(event.target).attr('item_id');
     var notes = $('#race_notes').html();
@@ -138,6 +156,10 @@ $(document).ready(function(){
     
     $('.del_item').click(function(event){
         del_item(event);
+    })
+    
+    $('.del_tag').click(function(event){
+        deltag(event);
     })
     
     $('#apply_notes_to_templates').click(function(event){
