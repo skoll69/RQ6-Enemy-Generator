@@ -3,6 +3,19 @@
 
 {% block content %}
 <div><p>Type to search: <input id="searchinput" /></p></div>
+<div id="et_filter_container">
+    Filter:
+    <form action="{% url 'set_filter' %}" method="post" style="display: inline-block;">
+    <input type="hidden" name="coming_from" value="{{request.path}}">
+    {% csrf_token %}
+    <select name="filter" onchange="this.form.submit()">
+            <option value="None" {% if filter == 'None' %}selected="selected"{% endif %}>None</option>
+        {% for tag in all_et_tags %}
+            <option value="{{ tag.name }}" {% if tag.name == filter %}selected="selected"{% endif %}>{{ tag }}</option>
+        {% endfor %}
+    </select>
+    </form>
+</div>
 
 <form action="{% url 'generate_enemies' %}" method="post" target="_blank">
 {% csrf_token %}

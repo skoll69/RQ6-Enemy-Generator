@@ -2,7 +2,7 @@ from django.utils import simplejson
 from dajaxice.decorators import dajaxice_register
 from enemygen.models import EnemyStat, EnemySkill, EnemyTemplate, Ruleset, StatAbstract
 from enemygen.models import SpellAbstract, SkillAbstract, EnemySpell, EnemyHitLocation
-from enemygen.models import CombatStyle, Weapon, Setting, CustomSpell, EnemyWeapon, CustomWeapon
+from enemygen.models import CombatStyle, Weapon, CustomSpell, EnemyWeapon, CustomWeapon
 from enemygen.models import Race, RaceStat, HitLocation, CustomSkill, Party, TemplateToParty, EnemySpirit
 
 import logging
@@ -106,10 +106,10 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
             et.cult_rank = int(value)
             et.save()
-        elif object == 'et_setting':
-            et = EnemyTemplate.objects.get(id=id, owner=request.user)
-            et.setting = Setting.objects.get(id=int(value))
-            et.save()
+        #elif object == 'et_setting':
+        #    et = EnemyTemplate.objects.get(id=id, owner=request.user)
+        #    et.setting = Setting.objects.get(id=int(value))
+        #    et.save()
         elif object == 'et_published':
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
             et.published = to_bool(value)
@@ -412,10 +412,10 @@ def submit(request, value, id, object, parent_id=None, extra={}):
                 success = False
                 message = 'Something is wrong with the template'
                 original_value = p.published
-        elif object == 'party_setting':
-            p = Party.objects.get(id=id, owner=request.user)
-            p.setting = Setting.objects.get(id=int(value))
-            p.save()
+        #elif object == 'party_setting':
+        #    p = Party.objects.get(id=id, owner=request.user)
+        #    p.setting = Setting.objects.get(id=int(value))
+        #    p.save()
         elif object == 'party_notes':
             party = Party.objects.get(id=id, owner=request.user)
             party.notes = value

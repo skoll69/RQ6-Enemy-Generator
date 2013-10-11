@@ -1,4 +1,4 @@
-from enemygen.models import Ruleset, EnemyTemplate, Race, Weapon
+from enemygen.models import Setting, Ruleset, EnemyTemplate, Race, Weapon
 from enemygen.models import SpellAbstract, EnemySpell, CustomSpell
 from enemygen.models import Weapon, CombatStyle, EnemyWeapon, CustomWeapon, Party
 
@@ -8,36 +8,47 @@ from django.template.loader import render_to_string
 from tempfile import NamedTemporaryFile
 import os
 
-def get_filter(request):
-    return request.session.get('filter', None)
+def get_setting_id(request):
+    return int(request.session.get('setting_id', 0))
+
+def get_setting(request):
+    setting_id = int(request.session.get('setting_id', 0))
+    if setting_id:
+        settings = Setting.objects.get(id=setting_id)
+    else:
+        settings = Setting.objects.all()[0]
+    return settings
     
 def get_ruleset(request):
     return Ruleset.objects.get(id=request.session.get('ruleset_id', 1))
 
 def get_context(request):
     context = {}
-    context['filter'] = get_filter(request)
+    context['setting_id'] = get_setting_id(request)
+    context['settings'] = Setting.objects.all().order_by('name')
     context['generated'] = _get_generated_amount()
     context['request'] = request
-    context['all_et_tags'] = sorted(list(EnemyTemplate.tags.all()), key=lambda x: x.name)
     return context
 
-def get_party_templates():
-    parties = list(Party.objects.filter(published=True))
+def get_party_templates(setting_id):
+    settings = _get_settings(setting_id)
+    parties = list(Party.objects.filter(setting__in=settings, published=True))
     return parties
     
-def get_enemy_templates(filter, user):
-    if filter and filter != 'None':
-        templates = list(EnemyTemplate.objects.filter(tags__name__in=[filter,], published=True).order_by('rank'))
-    else:
-        templates = list(EnemyTemplate.objects.filter(published=True).order_by('rank'))
+def get_enemy_templates(setting_id, user):
+    settings = _get_settings(setting_id)
+    templates = list(EnemyTemplate.objects.filter(setting__in=settings, published=True).order_by('rank'))
     # Add the unpublished templates of the logged-in user
     if user.is_authenticated():
-        if filter:
-            templates.extend(list(EnemyTemplate.objects.filter(tags__name__in=[filter,], published=False, owner=user)))
-        else:
-            templates.extend(list(EnemyTemplate.objects.filter(published=False, owner=user)))
+        templates.extend(list(EnemyTemplate.objects.filter(setting__in=settings, published=False, owner=user)))
     return templates
+    
+def _get_settings(setting_id):
+    if setting_id == 0:
+        settings = Setting.objects.all()
+    else:
+        settings = Setting.objects.filter(id=setting_id)
+    return settings
     
 def get_enemies(request):
     enemies = []
@@ -188,4 +199,6 @@ def generate_pdf(html_path):
     #os.system('wkhtmltopdf.sh --enable-forms "%s" "%s" > /dev/null' % (html_path, pdf_path))
     os.system('wkhtmltopdf.sh --enable-forms "%s" "%s" > /projects/rq_tools/pdf.log 2>&1' % (html_path, pdf_path))
     return pdf_path
-  
+    
+def all_et_tags():
+    return sorted(list(EnemyTemplate.tags.all()), key=lambda x: x.name)

@@ -15,10 +15,6 @@ class Printer:
     def __unicode__(self):
         return self.name
         
-class Setting(models.Model, Printer):
-    name = models.CharField(max_length=30)
-    owner = models.ForeignKey(User)
-    
 class Ruleset(models.Model, Printer):
     name = models.CharField(max_length=30)
     owner = models.ForeignKey(User)
@@ -169,7 +165,7 @@ class HitLocation(models.Model, Printer):
 class EnemyTemplate(models.Model, Printer):
     name = models.CharField(max_length=50)
     owner = models.ForeignKey(User)
-    setting = models.ForeignKey(Setting)
+    #setting = models.ForeignKey(Setting)
     ruleset = models.ForeignKey(Ruleset)
     race = models.ForeignKey(Race)
     folk_spell_amount = models.CharField(max_length=30, null=True, blank=True, default='0')
@@ -191,8 +187,8 @@ class EnemyTemplate(models.Model, Printer):
         ordering = ['name',]
         
     @classmethod
-    def create(cls, owner, ruleset, setting, race, name="Enemy Template"):
-        enemy_template = cls(name=name, owner=owner, ruleset=ruleset, setting=setting, race=race)
+    def create(cls, owner, ruleset, race, name="Enemy Template"):
+        enemy_template = cls(name=name, owner=owner, ruleset=ruleset, race=race)
         enemy_template.notes = race.special
         enemy_template.movement = race.movement
         enemy_template.save()
@@ -363,7 +359,7 @@ class EnemyTemplate(models.Model, Printer):
         
     def clone(self, owner):
         name = "Copy of %s" % self.name
-        new = EnemyTemplate(owner=owner, ruleset=self.ruleset, setting=self.setting, race=self.race, name=name)
+        new = EnemyTemplate(owner=owner, ruleset=self.ruleset, race=self.race, name=name)
         new.movement = self.movement
         new.rank = self.rank
         new.folk_spell_amount = self.folk_spell_amount
@@ -422,7 +418,7 @@ class EnemyTemplate(models.Model, Printer):
 class Party(models.Model, Printer):
     name = models.CharField(max_length=50)
     owner = models.ForeignKey(User)
-    setting = models.ForeignKey(Setting)
+    #setting = models.ForeignKey(Setting)
     published = models.BooleanField(default=False)
     notes = models.TextField(null=True, blank=True, default='')
     
@@ -430,8 +426,8 @@ class Party(models.Model, Printer):
         ordering = ['name',]
         
     @classmethod
-    def create(cls, owner, setting):
-        p = cls(name='New Party', owner=owner, setting=setting)
+    def create(cls, owner):
+        p = cls(name='New Party', owner=owner)
         p.save()
         return p
         

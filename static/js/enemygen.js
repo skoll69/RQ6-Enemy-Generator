@@ -6,8 +6,6 @@ function submit(id, type, input_object, value, parent_id){
 }
 
 function submit_callback(result, input_object){
-    //console.log(result.error)
-    //console.log(result.message);
     if (result.success){
         $('#commit_result').html('Save successful');
         animate_background(input_object, true);
@@ -18,6 +16,8 @@ function submit_callback(result, input_object){
             $(input_object).val(result.original_value);
             animate_background(input_object, false);
         }
+        console.log(result.error)
+        console.log(result.message);
     }
 }
 
@@ -83,7 +83,7 @@ function del_item(event){
     Dajaxice.enemygen.del_item(refresh_page, {'item_id': item_id, 'item_type': item_type})
 }
 
-function deltag_submit(id, type, input_object, value, parent_id){
+function deltag_submit(id, type, input_object, value){
     (function(value, id, type, input_object){
         Dajaxice.enemygen.submit(function(result) {deltag_callback(result, input_object)}, {'value': value, 'id': id, 'object': type, 'parent_id': null});
     })(value, id, type, input_object);
@@ -118,6 +118,10 @@ function apply_notes_to_templates_callback(result){
     } else {
         console.log(result);
     }
+}
+
+function capitalize(string){
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 $(document).ready(function(){

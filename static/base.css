@@ -124,6 +124,11 @@ h4{
 /* Basic stuff ends */
 
 /* Index starts */
+div#et_filter_container{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
 
 #enemy_template_list_container{
     height: 200px;

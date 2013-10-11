@@ -4,21 +4,22 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.template import RequestContext
 
-from enemygen.models import EnemyTemplate, Ruleset, EnemyTemplate, Race, Weapon, Party
-from enemygen.views_lib import get_ruleset, get_context, get_enemies, spell_list
+from enemygen.models import EnemyTemplate, Setting, Ruleset, EnemyTemplate, Race, Weapon, Party
+from enemygen.views_lib import get_setting, get_ruleset, get_context, get_enemies, spell_list
 from enemygen.views_lib import get_enemy_templates, combat_styles, is_race_admin, get_statistics
-from enemygen.views_lib import generate_pdf, get_filter, get_party_templates, save_as_html
-from enemygen.views_lib import get_party_enemies, spirit_options
+from enemygen.views_lib import generate_pdf, get_setting_id, get_party_templates, save_as_html
+from enemygen.views_lib import get_party_enemies, spirit_options, all_et_tags
 
 def index(request):
-    filter = get_filter(request)
+    setting_id = get_setting_id(request)
     context = get_context(request)
-    context['templates'] = get_enemy_templates(filter, request.user)
+    context['templates'] = get_enemy_templates(setting_id, request.user)
     return render(request, 'index.html', context)
     
 def party_index(request):
+    setting_id = get_setting_id(request)
     context = get_context(request)
-    context['parties'] = get_party_templates()
+    context['parties'] = get_party_templates(setting_id)
     return render(request, 'party_index.html', context)
     
 def generate_enemies(request):
@@ -65,6 +66,7 @@ def enemy_template(request, enemy_template_id):
     context['sorcery_spells'] = spell_list('sorcery', enemy_template_id)
     context['combat_styles'] = combat_styles(enemy_template_id)
     context['spirit_options'] = spirit_options()
+    context['all_et_tags'] = all_et_tags()
     return render(request, template, context)
     
 def race(request, race_id):
@@ -96,6 +98,7 @@ def instructions(request):
 def disclaimer(request):
     context = get_context(request)
     return render(request, 'disclaimer.html', context)
+
     
 @login_required
 def ruleset(request, ruleset_id):
@@ -120,8 +123,8 @@ def set_filter(request):
 # Action views
 def select_setting_ruleset(request):
     if request.POST:
-        #setting_id = int(request.POST.get('setting_id', 1))
-        #request.session['setting_id'] = setting_id
+        setting_id = int(request.POST.get('setting_id', 1))
+        request.session['setting_id'] = setting_id
         return redirect(request.POST['coming_from'])
     return redirect(index)
 
@@ -147,12 +150,13 @@ def add_template_to_party(request):
     
 @login_required
 def create_enemy_template(request):
+    setting = get_setting(request)
     ruleset = get_ruleset(request)
     race_id = int(request.POST.get('race_id'))
     if race_id == 0:
         return redirect(edit_index)
     race = Race.objects.get(id=race_id)
-    et = EnemyTemplate.create(owner=request.user, ruleset=ruleset, race=race)
+    et = EnemyTemplate.create(owner=request.user, setting=setting, ruleset=ruleset, race=race)
     return redirect(enemy_template, et.id)
 
 @login_required
@@ -162,7 +166,8 @@ def create_race(request):
 
 @login_required
 def create_party(request):
-    p = Party.create(request.user)
+    setting = get_setting(request)
+    p = Party.create(request.user, setting)
     return redirect(party, p.id)
 
 @login_required

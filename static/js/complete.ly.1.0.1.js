@@ -135,11 +135,12 @@ function completely(container, config) {
                 if (rows.length===0) {
                     return; // nothing to show.
                 }
-                if (rows.length===1 && token === rows[0].__hint) {
-                    return; // do not show the dropDown if it has only one element which matches what we have just displayed.
-                }
+                // Commented out by Erkki Lepre. We want to show the dropdown even if there's only one row.
+                //if (rows.length===1 && token === rows[0].__hint) {
+                //    return; // do not show the dropDown if it has only one element which matches what we have just displayed.
+                //}
                 
-                if (rows.length<2) return; 
+                //if (rows.length<2) return; 
                 p.highlight(0);
                 
                 if (distanceToTop > distanceToBottom*3) {        // Heuristic (only when the distance to the to top is 4 times more than distance to the bottom
@@ -238,8 +239,6 @@ function completely(container, config) {
         },
         hideDropDown : function() {
         	dropDownController.hide();
-            //txtHint.value = txtInput.value; // ensure that no hint is left.
-            //txtInput.focus();
         },
         repaint : function() {
             var text = txtInput.value;

@@ -15,6 +15,8 @@ urlpatterns = patterns('',
     url(r'^instructions/$', views.instructions, name='instructions'),
     url(r'^statistics/$', views.statistics, name='statistics'),
     url(r'^disclaimer/$', views.disclaimer, name='disclaimer'),
+    url(r'^account/$', views.account, name='account'),
+    url(r'^set_filter/$', views.set_filter, name='set_filter'),
 
     url(r'^pdf_export/$', views.pdf_export, name='pdf_export'),
     url(r'^delete_template/(?P<template_id>\d+)/$', views.delete_template, name='delete_template'),
