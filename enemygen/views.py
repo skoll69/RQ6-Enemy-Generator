@@ -1,12 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
 
-from enemygen.models import EnemyTemplate, Ruleset, EnemyTemplate, Race, Weapon, Party
-from enemygen.views_lib import get_ruleset, get_context, get_enemies, spell_list
-from enemygen.views_lib import get_enemy_templates, combat_styles, is_race_admin, get_statistics
+from enemygen.models import EnemyTemplate, Ruleset, EnemyTemplate, Race, Party, ChangeLog, AdditionalFeatureList
+from enemygen.views_lib import get_ruleset, get_context, get_et_context, get_enemies
+from enemygen.views_lib import get_enemy_templates, is_race_admin, get_statistics
 from enemygen.views_lib import generate_pdf, get_filter, get_party_templates, save_as_html
 from enemygen.views_lib import get_party_enemies, spirit_options
 
@@ -52,19 +52,10 @@ def edit_index(request):
 def enemy_template(request, enemy_template_id):
     context = get_context(request)
     template = 'enemy_template.html'
-    context['et'] = EnemyTemplate.objects.get(id=enemy_template_id)
-    if context['et'].owner != request.user:
+    et = get_object_or_404(EnemyTemplate, id=enemy_template_id)
+    if et.owner != request.user:
         template = 'enemy_template_read_only.html'
-    context['weapons'] = {}
-    context['weapons']['1h'] = Weapon.objects.filter(type='1h-melee')
-    context['weapons']['2h'] = Weapon.objects.filter(type='2h-melee')
-    context['weapons']['ranged'] = Weapon.objects.filter(type='ranged')
-    context['weapons']['shields'] = Weapon.objects.filter(type='shield')
-    context['theism_spells'] = spell_list('theism', enemy_template_id)
-    context['folk_spells'] = spell_list('folk', enemy_template_id)
-    context['sorcery_spells'] = spell_list('sorcery', enemy_template_id)
-    context['combat_styles'] = combat_styles(enemy_template_id)
-    context['spirit_options'] = spirit_options()
+    context.update(get_et_context(et))
     return render(request, template, context)
     
 def race(request, race_id):
@@ -80,6 +71,7 @@ def party(request, party_id):
     context = get_context(request)
     context['party'] = Party.objects.get(id=party_id)
     context['templates'] = EnemyTemplate.objects.filter(published=True).order_by('name')
+    context['all_party_tags'] = sorted(list(Party.tags.all()), key=lambda x: x.name)
     if context['party'].owner != request.user:
         template = 'party_read_only.html'
     return render(request, template, context)
@@ -93,9 +85,14 @@ def instructions(request):
     context = get_context(request)
     return render(request, 'instructions.html', context)
 
-def disclaimer(request):
+def about(request):
     context = get_context(request)
-    return render(request, 'disclaimer.html', context)
+    return render(request, 'about.html', context)
+    
+def whats_new(request):
+    context = get_context(request)
+    context['whats_new'] = ChangeLog.objects.all().reverse()
+    return render(request, 'whats_new.html', context)
     
 @login_required
 def ruleset(request, ruleset_id):
@@ -114,6 +111,11 @@ def set_filter(request):
         return redirect(request.POST['coming_from'])
     return redirect(index)
 
+def feature_items(request, feature_id):
+    context = get_context(request)
+    context['feature'] = get_object_or_404(AdditionalFeatureList, id=feature_id)
+    return render(request, 'feature_items.html', context)
+    
     
 
 ###############################################################

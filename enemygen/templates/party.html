@@ -4,6 +4,49 @@
 {% block title %}RQ: {{party.name}}{% endblock %}
 
 {% block content %}
+<script>
+$(document).ready(function(){
+    var cly = completely(document.getElementById('party_newtag'), {
+        fontSize: '12px',
+    	fontFamily : 'Arial',
+        color: 'black',
+    });
+    cly.input.style.border= '1px solid #ABADB3';
+    cly.input.style.width= '200px';
+    cly.wrapper.style.width= '200px';
+    cly.input.style.padding='1px';
+    cly.options = [{% for t in all_party_tags %}'{{t}}',{% endfor %}];
+    cly.onEnter = function(){
+        var new_value = cly.getText();
+        var item_id = {{ party.id }};
+        var item_type = 'party_newtag';
+        var input_object = null;
+        submit(item_id, item_type, input_object, new_value);
+        $('#tag_container').append('<div class="tag">'+new_value+'         \
+        <img class="del_party_tag" src="/rq_static/images/del_tag.png" \
+                party_id="{{ party.id }}" value="'+new_value+'"                           \
+                onmouseover="this.src=\'/rq_static/images/del_tag_hover.png\'"      \
+                onmouseout="this.src=\'/rq_static/images/del_tag.png\'"             \
+                onmouseup="this.src=\'/rq_static/images/del_tag.png\'"              \
+                onmousedown="this.src=\'/rq_static/images/del_tag_active.png\'" />  \
+              </div>');
+        $('.del_party_tag').click(function(event){
+            del_party_tag(event);
+        })
+        cly.setText('');
+    };
+    cly.onChange = function(){
+        text = capitalize(cly.getText())
+        cly.setText(text)
+        if (text != ''){
+            cly.repaint();
+        } else {
+            cly.hideDropDown();
+        }
+    }
+    
+});
+</script>
 
 <form action="{% url 'delete_party' party.id %}" method="post">
 {% csrf_token %}
@@ -21,30 +64,32 @@
 </div>
 
 <h2>Party</h2>
-<table>
-    <tr>
-        <th>Name</th>
-        <td><input id="party_name" item_type="party_name" item_id="{{ party.id }}" class="data" type="text" size="60" value="{{party.name}}"></td>
-    </tr>
-    <tr>
-        <th>Published</th>
-        <td><input id="party_pub" class="data" type="checkbox" item_id="{{ party.id }}" item_type="party_published" {% if party.published %}checked="checked"{% endif %} /></td>
-    </tr>
-    <tr>
-        <th>Setting</th>
-        <td>
-            <select id="party_setting_{{ party.id }}" class="data" item_id="{{ party.id }}" item_type="party_setting">
-                <option value="2" {% if party.setting.id == 2 %}selected="selected"{% endif %}>Generic fantasy</option>
-                <option value="1" {% if party.setting.id == 1 %}selected="selected"{% endif %}>Glorantha</option>
-                <option value="3" {% if party.setting.id == 3 %}selected="selected"{% endif %}>Monster Island</option>
-            </select>
-        </td>
-    </tr>
-    <tr>
-        <th>Notes</th>
-        <td><textarea id="party_notes" class="data" cols="60" rows="3" item_id="{{ party.id }}" item_type="party_notes">{{ party.notes }}</textarea></td>
-    </tr>
-</table>
+<table><tr>
+    <th>Name</th>
+    <td><input id="party_name" item_type="party_name" item_id="{{ party.id }}" class="data" type="text" size="60" value="{{party.name}}"></td>
+</tr><tr>
+    <th>Tags</th>
+    <td><div id="tag_container">
+        {% for tag in party.get_tags %}
+            <div class="tag">{{ tag }}
+            <img class="del_party_tag" src="/rq_static/images/del_tag.png"
+                 party_id="{{ party.id }}" value="{{ tag }}"
+                 onmouseover="this.src='/rq_static/images/del_tag_hover.png'"
+                 onmouseout="this.src='/rq_static/images/del_tag.png'"
+                 onmouseup="this.src='/rq_static/images/del_tag.png'"
+                 onmousedown="this.src='/rq_static/images/del_tag_active.png'" />
+            </div>
+        {% endfor %}
+        </div>
+        <div id="party_newtag" class="data" type="text" item_id="{{ party.id }}" item_type="party_newtag"></div>
+    </td>
+</tr><tr>
+    <th>Published</th>
+    <td><input id="party_pub" class="data" type="checkbox" item_id="{{ party.id }}" item_type="party_published" {% if party.published %}checked="checked"{% endif %} /></td>
+</tr><tr>
+    <th>Notes</th>
+    <td><textarea id="party_notes" class="data" cols="60" rows="3" item_id="{{ party.id }}" item_type="party_notes">{{ party.notes }}</textarea></td>
+</tr></table>
 
 <h3>Templates</h3>
 <table>

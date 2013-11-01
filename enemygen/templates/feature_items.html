@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block content %}
+
+<h3>{{feature}}</h3>
+<ul>
+{% for item in feature.items %}
+<li>{{item}}</li>
+{% endfor %}
+</ul>
+{% endblock %}

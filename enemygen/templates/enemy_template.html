@@ -5,24 +5,6 @@
 
 {% block content %}
 
-<style>
-div#new_tag_container{
-    position: relative;
-    height: 18px;
-    width: 200px;
-    background: white;
-    border: 1px solid #ABADB3;
-    padding-top: 2px;
-    padding-left: 1px;
-    left: 2px;
-    #overflow: hidden;
-}
-
-div#et_newtag{
-    width: 100%;
-}
-</style>
-
 <script>
 $(document).ready(function(){
     var cly = completely(document.getElementById('et_newtag'), {
@@ -67,6 +49,29 @@ $(document).ready(function(){
 });
 </script>
 
+<div> <!-- Buttons -->
+    <form action="{% url 'delete_template' et.id %}" method="post">
+    {% csrf_token %}
+    <div id="delete_template"><input type="submit" value="Delete template" /></div>
+    </form>
+
+    <div id="clone_template_container">
+    <form action="{% url 'clone_template' et.id %}" method="post">
+    {% csrf_token %}
+    <input id="clone_template" type="submit" value="Clone" />
+    </form>
+    </div>
+
+    <div id="generate_enemy_container">
+    <form action="{% url 'generate_enemies' %}" method="post" target="generated">
+    {% csrf_token %}
+    <input name="enemy_template_id_{{et.id}}" type="hidden" value="4">
+    <input name="dont_increment" type="hidden" value="1">
+    <input style="width: 140px;" type="submit" value="Generate" />
+    </form>
+    </div>
+</div>
+
 <h3>Enemy details</h3>
 <table><tr>
     <th>Template name</th>
@@ -85,11 +90,8 @@ $(document).ready(function(){
             </div>
         {% endfor %}
         </div>
-        <div d="new_tag_container">
-            <div id="et_newtag" class="data" type="text" item_id="{{ et.id }}" item_type="et_newtag"></div>
-        </div>
+        <div id="et_newtag" class="data" type="text" item_id="{{ et.id }}" item_type="et_newtag"></div>
     </td>
-</tr><tr>
 </tr><tr>
     <th>Rank</th>
     <td>
@@ -101,17 +103,6 @@ $(document).ready(function(){
             <option value="5" {% if et.rank == 5 %}selected="selected"{% endif %}>Master</option>
         </select>
     </td>
-<!--
-</tr><tr>
-    <th>Setting</th>
-    <td>
-        <select id="et_setting_{{ et.id }}" class="data" item_id="{{ et.id }}" item_type="et_setting">
-            <option value="2" {% if et.setting.id == 2 %}selected="selected"{% endif %}>Generic fantasy</option>
-            <option value="1" {% if et.setting.id == 1 %}selected="selected"{% endif %}>Glorantha</option>
-            <option value="3" {% if et.setting.id == 3 %}selected="selected"{% endif %}>Monster Island</option>
-        </select>
-    </td>
--->
 </tr><tr>
     <th>Race</th>
     <td><a class="edit_item" href="{% url 'race' et.race.id %}">{{ et.race.name }}</a></td>
@@ -143,27 +134,6 @@ $(document).ready(function(){
     <th>Notes</th>
     <td><textarea id="et_notes_{{ et.id }}" class="data" cols="60" rows="3" item_id="{{ et.id }}" item_type="et_notes">{{ et.notes }}</textarea></td>
 </tr></table>
-
-<form action="{% url 'delete_template' et.id %}" method="post">
-{% csrf_token %}
-<div id="delete_template"><input type="submit" value="Delete template" /></div>
-</form>
-
-<div id="clone_template_container">
-<form action="{% url 'clone_template' et.id %}" method="post">
-{% csrf_token %}
-<input id="clone_template" type="submit" value="Clone" />
-</form>
-</div>
-
-<div id="generate_enemy_container">
-<form action="{% url 'generate_enemies' %}" method="post" target="generated">
-{% csrf_token %}
-<input name="enemy_template_id_{{et.id}}" type="hidden" value="4">
-<input name="dont_increment" type="hidden" value="1">
-<input style="width: 140px;" type="submit" value="Generate" />
-</form>
-</div>
 
 <table id="stats_and_hp"><tr><td valign="top">
 <table>
@@ -201,6 +171,30 @@ $(document).ready(function(){
 </tr>
 </table>
 </td></tr></table>
+
+<div> <!-- Additional Features -->
+    {% if et.additional_features %}
+        <h3>Additional features</h3>
+        <table>
+<tr><th>Feature</th><th>Probability</th><th></th><th></th></tr>
+{% for f in et.additional_features %}
+    <tr>
+        <td>{{ f.name }}</td>
+        <td><input id="et_feature_{{f.id}}" class="data" type="text" size="30" item_id="{{f.id}}" item_type="et_feature_prob" value="{{ f.probability }}" />%</td>
+        <td><img src="/rq_static/minus.png" width="23" height="23" class="del_item" item_id="{{ f.id }}" item_type="et_additional_feature" /></td>
+        <td><a href="{% url 'feature_items' f.feature_list.id %}">View items</a></td>
+    </tr>
+{% endfor %}
+        </table>
+    {% endif %}
+</div>
+<select id="additional_feature_options">
+        <option value="0">Select feature</option>
+    {% for feature_list in additional_feature_lists %}
+        <option value="{{ feature_list.id }}">{{ feature_list.name }}</option>
+    {% endfor %}
+</select>
+<button class="add_additional_feature" et_id="{{ et.id }}">Add additional feature</button>
 
 {% include 'enemy_template_skills.html' %}
 

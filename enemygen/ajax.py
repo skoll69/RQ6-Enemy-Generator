@@ -4,6 +4,7 @@ from enemygen.models import EnemyStat, EnemySkill, EnemyTemplate, Ruleset, StatA
 from enemygen.models import SpellAbstract, SkillAbstract, EnemySpell, EnemyHitLocation
 from enemygen.models import CombatStyle, Weapon, CustomSpell, EnemyWeapon, CustomWeapon
 from enemygen.models import Race, RaceStat, HitLocation, CustomSkill, Party, TemplateToParty, EnemySpirit
+from enemygen.models import EnemyAdditionalFeatureList
 
 import logging
 from enemygen.enemygen_lib import to_bool, int_or_zero
@@ -19,6 +20,15 @@ def apply_notes_to_templates(request, race_id, notes):
         return simplejson.dumps({'success': True})
     except Exception as e:
         return simplejson.dumps({'error': str(e), 'notes': et.notes})
+    
+@dajaxice_register
+def add_additional_feature(request, et_id, feature_list_id):
+    try:
+        et = EnemyTemplate.objects.get(id=et_id, owner=request.user)
+        et.add_additional_feature(feature_list_id)
+        return simplejson.dumps({'success': True})
+    except Exception as e:
+        return simplejson.dumps({'error': str(e)})
     
 @dajaxice_register
 def add_custom_spell(request, et_id, type):
@@ -79,6 +89,10 @@ def del_item(request, item_id, item_type):
         elif item_type == 'et_spirit':
             es = EnemySpirit.objects.get(id=id)
             es.delete()
+            return simplejson.dumps({'success': True})
+        elif item_type == 'et_additional_feature':
+            item = EnemyAdditionalFeatureList.objects.get(id=id)
+            item.delete()
             return simplejson.dumps({'success': True})
     except Exception as e:
         return simplejson.dumps({'error': str(e)})
@@ -312,6 +326,10 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             cw = CustomWeapon.objects.get(id=id)
             cw.reach = value
             cw.save()
+        elif object == 'et_custom_weapon_range':
+            cw = CustomWeapon.objects.get(id=id)
+            cw.range = value
+            cw.save()
         elif object == 'et_custom_weapon_type':
             cw = CustomWeapon.objects.get(id=id)
             cw.type = value
@@ -400,7 +418,7 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             p.name = value
             p.save()
         elif object == 'party_template_amount':
-            p = Party.objects.get(id=int(parent_id), owner=request.user)
+            p = Party.objects.get(id=parent_id, owner=request.user)
             t = EnemyTemplate.objects.get(id=id)
             p.set_amount(t, value)
             message = str(p) + ' ' + str(t)
@@ -412,14 +430,16 @@ def submit(request, value, id, object, parent_id=None, extra={}):
                 success = False
                 message = 'Something is wrong with the template'
                 original_value = p.published
-        #elif object == 'party_setting':
-        #    p = Party.objects.get(id=id, owner=request.user)
-        #    p.setting = Setting.objects.get(id=int(value))
-        #    p.save()
         elif object == 'party_notes':
             party = Party.objects.get(id=id, owner=request.user)
             party.notes = value
             party.save()
+        elif object == 'party_newtag':
+            p = Party.objects.get(id=id, owner=request.user)
+            p.tags.add(value.capitalize())
+        elif object == 'party_deltag':
+            p = Party.objects.get(id=id, owner=request.user)
+            p.tags.remove(value.capitalize())
 
         # Misc
         elif object == 'et_notes':
@@ -432,6 +452,15 @@ def submit(request, value, id, object, parent_id=None, extra={}):
         elif object == 'et_deltag':
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
             et.tags.remove(value.capitalize())
+        elif object == 'et_feature_prob':
+            afl = EnemyAdditionalFeatureList.objects.get(id=id, enemy_template__owner=request.user)
+            try:
+                afl.set_probability(value)
+            except:
+                original_value = afl.probability
+                success = False
+            #afl.probability = value.upper()
+            #afl.save()
             
         return simplejson.dumps({'success': success, 'message': message, 'original_value': original_value})
     except Exception as e:

@@ -1,10 +1,11 @@
 from django.contrib import admin
+from django import forms
 from enemygen.models import EnemyTemplate, Ruleset, Race, HitLocation
-#from enemygen.models import Setting
 from enemygen.models import SkillAbstract, SpellAbstract, StatAbstract, Weapon
 from enemygen.models import EnemySkill, EnemySpell, EnemyStat, EnemyHitLocation, RaceStat
 from enemygen.models import CombatStyle, CustomSpell, CustomWeapon, Party, TemplateToParty
-from enemygen.models import EnemySpirit
+from enemygen.models import EnemySpirit, ChangeLog
+from enemygen.models import EnemyAdditionalFeatureList, AdditionalFeatureList, AdditionalFeatureItem
 
 class EnemyTemplateAdmin(admin.ModelAdmin):
     list_display = ('name', 'race', 'rank', 'generated', 'published', 'owner')
@@ -13,9 +14,28 @@ class EnemyTemplateAdmin(admin.ModelAdmin):
 class RaceAdmin(admin.ModelAdmin):
     list_display = ('name', 'owner', 'published')
 
+class ChangeLogForm(forms.ModelForm):
+    class Meta:
+        model = ChangeLog
+        widgets = {'description': forms.Textarea}
+    
+class ChangeLogAdmin(admin.ModelAdmin):
+    list_display = ('publish_date', 'name')
+    form = ChangeLogForm
+    
 class StatAbstractAdmin(admin.ModelAdmin):
     list_display = ('name',)
-
+    
+class AdditionalFeatureItemForm(forms.ModelForm):
+    class Meta:
+        model = AdditionalFeatureItem
+        widgets = {'name': forms.Textarea}
+    
+class AdditionalFeatureItemAdmin(admin.ModelAdmin):
+    list_display = ('name', 'feature_list')
+    form = AdditionalFeatureItemForm
+    list_filter = ('feature_list',)
+    
 class CombatStyleAdmin(admin.ModelAdmin):
     list_display = ('name', 'enemy_template', 'one_h_amount', 'two_h_amount', 'ranged_amount', 'shield_amount')
     
@@ -61,7 +81,7 @@ class HitLocationAdmin(admin.ModelAdmin):
     ordering = ('race', 'range_start',)
 
 admin.site.register(EnemyTemplate, EnemyTemplateAdmin)
-#admin.site.register(Setting)
+admin.site.register(Weapon, WeaponAdmin)
 admin.site.register(CombatStyle, CombatStyleAdmin)
 admin.site.register(Ruleset)
 admin.site.register(EnemySpirit)
@@ -69,7 +89,11 @@ admin.site.register(Race, RaceAdmin)
 admin.site.register(CustomSpell)
 admin.site.register(CustomWeapon)
 admin.site.register(TemplateToParty)
+admin.site.register(AdditionalFeatureList)
+admin.site.register(AdditionalFeatureItem, AdditionalFeatureItemAdmin)
+admin.site.register(EnemyAdditionalFeatureList)
 admin.site.register(Party, PartyAdmin)
+admin.site.register(ChangeLog, ChangeLogAdmin)
 admin.site.register(RaceStat, RaceStatAdmin)
 admin.site.register(HitLocation, HitLocationAdmin)
 admin.site.register(SkillAbstract, SkillAbstractAdmin)

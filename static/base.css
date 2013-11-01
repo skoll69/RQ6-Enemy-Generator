@@ -192,6 +192,10 @@ img.del_tag {
     padding-right: 0px;
 }
 
+div#et_newtag{
+    width: 100%;
+}
+
 table.index_list th:hover {
     background: #A57230;
 }
@@ -330,6 +334,12 @@ table.read_only td{
 }
 
 /* Party details start */
+img.del_party_tag {
+    position: relative;
+    top: 2px;
+    padding-right: 0px;
+}
+
 div#delete_party_container{
     position: absolute;
     right: 10px;

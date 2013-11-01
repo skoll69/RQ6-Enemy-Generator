@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block content %}
+
+<h2>Index</h2>
+<p>
+<ul>
+<li><a href="#about">About</a>
+<li><a href="#fan_policy">Fan Policy Acknowledgement</a>
+<li><a href="#credits">Credits</a>
+<li><a href="#development">Development</a>
+</ul>
+</p>
+
+<a id="about"><h2>About</h2></a>
+<p>RuneQuest Encounter Generator is a tool for generating random NPC's and monsters for RuneQuest 6.</p>
+<p>One of the fundamental principles of the tool is, that the creation of the content - the NPC/monsters 
+specifications and templates - is created by the community. Anybody can create a new template, that
+other users can later use to generate NPC's/monsters.</p>
+
+<a id="fan_policy"><h2>Fan Policy Acknowledgement</h2></a>
+<p>
+This website uses trademarks and/or copyrights owned by Moon Design Publications LLC, which are used under 
+Moon Design Publications's Fan Material Policy. We are expressly prohibited from charging you to use or 
+access this content. This website is not published, endorsed, or specifically approved by Moon Design 
+Publishing. For more information about Moon Design Publications and Moon Design Publications products,
+please visit <a href="http://www.glorantha.com">glorantha.com</a>.
+</p>
+<p>
+RUNEQUEST is a trademark of Moon Design Publications LLC and The Design Mechanism in the USA
+and other countries and is used with permission of The Design Mechanism.
+</p>
+
+<a id="credits"><h2>Credits</h2></a>
+<p>Many of the chaotic features have been taken from Peter Maranci's Chaotic Feature list at 
+<a href="http://www.maranci.net/rq.htm">www.maranci.net/rq.htm</a></p>
+
+<a id="development"><h2>Development</h2></a>
+<p>RQ Encounter Generator has been developed on Python + Django. The source repository is in 
+<a href="https://github.com/skoll69/RQ6-Enemy-Generator">GitHub</a>. The development backlog 
+is in <a href="http://trello.com/b/qtZ31uxJ/rq-enemy-generator">Trello</a>.</p>
+</p>
+<p>If you have an idea for a new feature or encounter a bug, send me an email at
+<a href="mailto:erkki.lepre@iki.fi">erkki.lepre@iki.fi</a></p>
+
+
+
+{% endblock %}

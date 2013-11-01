@@ -25,14 +25,14 @@
 
 <h3>{{ et.name }}</h3>
 <table><tr>
+    <th>Tags</th>
+    <td><div id="tag_container">
+        {% for tag in et.get_tags %}<div class="tag">{{ tag }}</div>{% endfor %}
+        </div>
+    </td>
+</tr><tr>
     <th>Rank</th>
     <td>{{ et.get_rank_display }}</td>
-</tr><tr>
-    <th>Setting</th>
-    <td>
-        {% if et.setting.id == 1 %}Glorantha{% endif %}
-        {% if et.setting.id == 2 %}Generic fantasy{% endif %}
-    </td>
 </tr><tr>
     <th>Race</th>
     <td><a href="{% url 'race' et.race.id %}">{{ et.race.name }}</a></td>
@@ -68,6 +68,23 @@
 {% endfor %}
 </table>
 </td></tr></table>
+
+<div> <!-- Additional Features -->
+    {% if et.additional_features %}
+        <h3>Additional features</h3>
+        <table>
+<tr><th>Feature</th><th>Probability</th><th></th></tr>
+{% for f in et.additional_features %}
+    <tr>
+        <td>{{ f.name }}</td>
+        <td>{{ f.probability }}%</td>
+        <td><a href="{% url 'feature_items' f.feature_list.id %}">View items</a></td>
+    </tr>
+{% endfor %}
+        </table>
+    {% endif %}
+</div>
+
 
 <h3>Standard skills</h3>
 <table class="read_only"><tr>
@@ -179,7 +196,7 @@ Amount: {{ et.theism_spell_amount }}
 {% endif %}
 
 
-{% if et.sorcery_spells %}
+{% if et.sorcery_spells and et.sorcery_spell_amount != '0' %}
 <h3>Sorcery spells</h3>
 Amount: {{ et.sorcery_spell_amount }}
 <table>

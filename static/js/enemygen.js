@@ -54,6 +54,12 @@ function add_custom_skill(event){
     Dajaxice.enemygen.add_custom_skill(refresh_page, {'et_id': et_id})
 }
 
+function add_additional_feature(event){
+    var et_id = $(event.target).attr('et_id');
+    var feature_list_id = $('#additional_feature_options').val();
+    Dajaxice.enemygen.add_additional_feature(refresh_page, {'et_id': et_id, 'feature_list_id': feature_list_id})
+}
+
 function add_custom_spell(event){
     var type = $(event.target).attr('type');
     var et_id = $(event.target).attr('et_id');
@@ -101,6 +107,12 @@ function deltag(event){
     deltag_submit(et_id, 'et_deltag', event.target, tag)
 }
 
+function del_party_tag(event){
+    var party_id = $(event.target).attr('party_id');
+    var tag = $(event.target).attr('value');
+    deltag_submit(party_id, 'party_deltag', event.target, tag)
+}
+
 function apply_notes_to_templates(event){
     var race_id = $(event.target).attr('item_id');
     var notes = $('#race_notes').html();
@@ -146,6 +158,10 @@ $(document).ready(function(){
         add_spirit(event);
     })
 
+    $('.add_additional_feature').click(function(event){
+        add_additional_feature(event);
+    })
+
     $('.add_custom_skill').click(function(event){
         add_custom_skill(event);
     })
@@ -164,6 +180,10 @@ $(document).ready(function(){
     
     $('.del_tag').click(function(event){
         deltag(event);
+    })
+    
+    $('.del_party_tag').click(function(event){
+        del_party_tag(event);
     })
     
     $('#apply_notes_to_templates').click(function(event){

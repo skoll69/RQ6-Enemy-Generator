@@ -21,6 +21,10 @@ var Dajaxice = {
         return Dajaxice.call('enemygen.add_hit_location', 'POST', callback_function, argv, custom_settings);
     },
 
+    add_additional_feature: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('enemygen.add_additional_feature', 'POST', callback_function, argv, custom_settings);
+    },
+
     add_custom_spell: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.add_custom_spell', 'POST', callback_function, argv, custom_settings);
     },

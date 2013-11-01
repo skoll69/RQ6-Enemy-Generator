@@ -1,15 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
-
 from enemygen_lib import _select_random_item, ValidationError, replace_die_set
-
 from dice import Dice
-
 from taggit.managers import TaggableManager
-
-import ordereddict
-import random
-import math
+import ordereddict, random, math
 
 class Printer:
     def __unicode__(self):
@@ -51,7 +45,8 @@ class Weapon(models.Model, Printer):
     reach = models.CharField(max_length=2, choices=reach_choices)
     ap = models.SmallIntegerField(default=0)
     hp = models.SmallIntegerField(default=0)
-    damage_modifier = models.BooleanField(default=False)
+    damage_modifier = models.BooleanField(default=True)
+    range = models.CharField(max_length=15, null=True, blank=True)
         
     class Meta:
         ordering = ['name',]
@@ -165,7 +160,6 @@ class HitLocation(models.Model, Printer):
 class EnemyTemplate(models.Model, Printer):
     name = models.CharField(max_length=50)
     owner = models.ForeignKey(User)
-    #setting = models.ForeignKey(Setting)
     ruleset = models.ForeignKey(Ruleset)
     race = models.ForeignKey(Race)
     folk_spell_amount = models.CharField(max_length=30, null=True, blank=True, default='0')
@@ -357,6 +351,13 @@ class EnemyTemplate(models.Model, Printer):
     def combat_styles(self):
         return CombatStyle.objects.filter(enemy_template=self)
         
+    @property
+    def additional_features(self):
+        return EnemyAdditionalFeatureList.objects.filter(enemy_template=self)
+        
+    def add_additional_feature(self, feature_list_id):
+        EnemyAdditionalFeatureList.create(enemy_template=self, feature_list_id=feature_list_id)
+        
     def clone(self, owner):
         name = "Copy of %s" % self.name
         new = EnemyTemplate(owner=owner, ruleset=self.ruleset, race=self.race, name=name)
@@ -369,6 +370,8 @@ class EnemyTemplate(models.Model, Printer):
         new.notes = self.notes
         new.cult_rank = self.cult_rank
         new.save()
+        for tag in self.tags.all():
+            new.tags.add(tag)
         for stat in self.stats:
             es = EnemyStat(stat=stat.stat, enemy_template=new, die_set=stat.die_set); es.save()
         for hl in self.hit_locations:
@@ -418,9 +421,9 @@ class EnemyTemplate(models.Model, Printer):
 class Party(models.Model, Printer):
     name = models.CharField(max_length=50)
     owner = models.ForeignKey(User)
-    #setting = models.ForeignKey(Setting)
     published = models.BooleanField(default=False)
     notes = models.TextField(null=True, blank=True, default='')
+    tags = TaggableManager(blank=True)
     
     class Meta:
         ordering = ['name',]
@@ -459,6 +462,9 @@ class Party(models.Model, Printer):
             self.save()
         else:
             raise ValidationError
+            
+    def get_tags(self):
+        return sorted(list(self.tags.names()))
 
 class TemplateToParty(models.Model):
     template = models.ForeignKey(EnemyTemplate)
@@ -592,6 +598,10 @@ class EnemyWeapon(models.Model, Printer):
         return self.weapon.reach
         
     @property
+    def range(self):
+        return self.weapon.range
+        
+    @property
     def ap(self):
         return self.weapon.ap
         
@@ -646,6 +656,7 @@ class CustomWeapon(models.Model, Printer):
     ap = models.SmallIntegerField(default=0)
     hp = models.SmallIntegerField(default=0)
     damage_modifier = models.BooleanField(default=False)
+    range = models.CharField(max_length=15, default='-', null=True, blank=True)
 
     def set_probability(self, value):
         self.probability = value
@@ -805,7 +816,7 @@ class EnemyStat(models.Model, Printer):
         Dice(value).roll()  #Test that the value is valid
         self.die_set = value.lower()
         self.save()
-        
+
 class SpellAbstract(models.Model, Printer):
     ''' A Spell. '''
     name = models.CharField(max_length=30)
@@ -894,6 +905,76 @@ class EnemySpirit(models.Model, Printer):
         es.save()
         return es
 
+class AdditionalFeatureList(models.Model, Printer):
+    name = models.CharField(max_length=80)
+    
+    class Meta:
+        ordering = ['name',]
+    
+    @property
+    def items(self):
+        return AdditionalFeatureItem.objects.filter(feature_list=self)
+        
+    def get_random_item(self):
+        num_items = len(self.items)
+        index = random.randint(0, num_items-1)
+        return self.items[index]
+
+class AdditionalFeatureItem(models.Model, Printer):
+    name = models.CharField(max_length=1000)
+    feature_list = models.ForeignKey(AdditionalFeatureList)
+ 
+    class Meta:
+        ordering = ['name',]
+
+class EnemyAdditionalFeatureList(models.Model, Printer):
+    probability = models.CharField(max_length=30, default='POW+POW', null=True, blank=True)
+    feature_list = models.ForeignKey(AdditionalFeatureList)
+    enemy_template = models.ForeignKey(EnemyTemplate)
+
+    @classmethod
+    def create(cls, enemy_template, feature_list_id):
+        feature_list = AdditionalFeatureList.objects.get(id=feature_list_id)
+        afl = cls(enemy_template=enemy_template, feature_list=feature_list)
+        afl.save()
+        return afl
+    
+    @property
+    def items(self):
+        return self.feature_list.items
+        
+    @property
+    def name(self):
+        return self.feature_list.name
+        
+    def get_random_item(self):
+        return self.feature_list.get_random_item()
+        
+    def random_has_feature(self, replace={}):
+        ''' Determines randomly whether the enemy has the additional feature or not '''
+        prob = replace_die_set(self.probability, replace)
+        prob = Dice(prob).roll()
+        roll = random.randint(1, 100)
+        return roll <= prob
+        
+    def set_probability(self, value):
+        if not value:
+            value = '0'
+        replace = {'STR': 0, 'SIZ': 0, 'CON': 0, 'INT': 0, 'DEX': 0, 'POW': 0, 'CHA': 0}
+        temp_value = replace_die_set(value, replace)
+        Dice(temp_value).roll()
+        self.probability = value.upper()
+        self.save()
+        
+
+class ChangeLog(models.Model, Printer):
+    publish_date = models.DateField()
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=3000)
+    
+    class Meta:
+        ordering = ['publish_date',]
+        
 class _Enemy:
     ''' Enemy instance created based on an EnemyTemplate. This is the stuff that gets printed
         for the user when Generate is clicked.
@@ -914,6 +995,7 @@ class _Enemy:
         self.template = enemy_template.name
         self.attributes = {}
         self.combat_styles = []
+        self.additional_features = []
         self.notes = enemy_template.notes
         self.is_theist = False
         self.is_sorcerer = False
@@ -924,6 +1006,7 @@ class _Enemy:
         self._add_skills()
         self._add_spells()
         self._add_spirits()
+        self._add_additional_features()
         self._add_hit_locations()
         self._calculate_attributes()
         self._add_combat_styles()
@@ -996,6 +1079,12 @@ class _Enemy:
         spirit_templates = self._get_items(self.et.spirits.filter(probability__gt=0), amount)
         for st in spirit_templates:
             self.spirits.append(st.spirit.generate())
+        
+    def _add_additional_features(self):
+        for feature_list in self.et.additional_features:
+            if feature_list.random_has_feature(self.stats):
+                feature = feature_list.get_random_item()
+                self.additional_features.append(feature)
         
     def _get_items(self, item_list, amount):
         ''' Randomly selects the given amount of spells from the given list 
@@ -1080,6 +1169,7 @@ class _Spirit(_Enemy):
         self._add_stats()
         self._add_skills()
         self._add_spells()
+        self._add_additional_features()
         self._calculate_attributes()
         return self
 

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block content %}
+
+<h2>New features and content</h2>
+
+{% for item in whats_new %}
+<h4>{{ item.name }} ({{ item.publish_date }})</h4>
+<p>{{item.description}}</p>
+{% endfor %}
+
+{% endblock %}

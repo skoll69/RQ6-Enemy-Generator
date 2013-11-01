@@ -8,15 +8,13 @@
 <table id="party_list" class="index_list">
     <thead><tr>
         <th class="sort-alpha">Party</th>
-        <th class="sort-alpha">Creator</th>
-        {% if setting_id = 0 %}<th class="sort-alpha">Setting</th>{% endif %}
         <td></td>
+        <th class="sort-alpha">Creator</th>
+        <th class="sort-alpha">Tags</th>
     </tr></thead>
     {% for p in parties %}
         <tr>
             <td><a class="edit_item" href="{% url 'party' p.id %}">{{ p.name }}</a></td>
-            <td>{{ p.owner }}</td>
-            {% if setting_id = 0 %}<td>{{ p.setting.name }}</td>{% endif %}
             <td>
                 <form action="{% url 'generate_party' %}" method="post" target="_blank">
                     <input type="hidden" name="party_id" value="{{ p.id }}">
@@ -24,6 +22,10 @@
                     <input type="submit" class="party_submit" value="Generate">
                 </form>
             </td>
+            <td>{{ p.owner }}</td>
+            <td><div id="index_tag_container">
+                {% for tag in p.get_tags %}<div class="small_tag">{{tag}}</div>{% endfor %}
+            </div></td>
         </tr>
     {% endfor %}
 </table>
@@ -33,7 +35,7 @@
 
 <script>
 function party_list_height(){
-    list_container_height = $(window).height() - 295
+    list_container_height = $(window).height() - 249
     if (list_container_height > $('#party_list').height()){
         list_container_height = $('#party_list').height()
     }

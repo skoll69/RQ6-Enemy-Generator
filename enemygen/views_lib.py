@@ -1,6 +1,6 @@
 from enemygen.models import Ruleset, EnemyTemplate, Race, Weapon
 from enemygen.models import SpellAbstract, EnemySpell, CustomSpell
-from enemygen.models import Weapon, CombatStyle, EnemyWeapon, CustomWeapon, Party
+from enemygen.models import Weapon, CombatStyle, EnemyWeapon, CustomWeapon, Party, AdditionalFeatureList
 
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
@@ -21,6 +21,23 @@ def get_context(request):
     context['request'] = request
     context['all_et_tags'] = sorted(list(EnemyTemplate.tags.all()), key=lambda x: x.name)
     return context
+    
+def get_et_context(et):
+    context = {}
+    context['et'] = et
+    context['weapons'] = {}
+    context['weapons']['1h'] = Weapon.objects.filter(type='1h-melee')
+    context['weapons']['2h'] = Weapon.objects.filter(type='2h-melee')
+    context['weapons']['ranged'] = Weapon.objects.filter(type='ranged')
+    context['weapons']['shields'] = Weapon.objects.filter(type='shield')
+    context['theism_spells'] = spell_list('theism', et)
+    context['folk_spells'] = spell_list('folk', et)
+    context['sorcery_spells'] = spell_list('sorcery', et)
+    context['combat_styles'] = combat_styles(et)
+    context['spirit_options'] = spirit_options()
+    context['additional_feature_lists'] = AdditionalFeatureList.objects.all()
+    return context
+
 
 def get_party_templates():
     parties = list(Party.objects.filter(published=True))
@@ -80,12 +97,12 @@ def _get_generated_amount():
         n += et.generated
     return n
     
-def spell_list(type, et_id):
+def spell_list(type, et):
     ''' Returns the list of the given type of spells for the given EnemyTemplate '''
     output = []
     for spell in SpellAbstract.objects.filter(type=type):
         try:
-            es = EnemySpell.objects.get(spell=spell, enemy_template__id=et_id)
+            es = EnemySpell.objects.get(spell=spell, enemy_template=et)
             prob = es.probability
             detail_text = es.detail
         except EnemySpell.DoesNotExist:
@@ -94,18 +111,18 @@ def spell_list(type, et_id):
         sp = {'id': spell.id, 'name': spell.name, 'probability': prob, 'detail_text': detail_text}
         sp['detail'] = spell.detail
         output.append(sp)
-    for spell in CustomSpell.objects.filter(enemy_template__id=et_id, type=type):
+    for spell in CustomSpell.objects.filter(enemy_template=et, type=type):
         sp = {'id': spell.id, 'name': spell.name, 'probability': spell.probability, 'custom': True}
         output.append(sp)
     return output
     
-def combat_styles(et_id):
+def combat_styles(et):
     ''' Returns a list of combat styles, that contains a list of weapons. The weaponlist contains
         all weapons in the system. The weapons, that have been selected to the CombatStyle (by
         assigning a probability) have also their probability listed.
     '''
     output = []
-    for cs in CombatStyle.objects.filter(enemy_template__id=et_id):
+    for cs in CombatStyle.objects.filter(enemy_template=et):
         cs_out = {'id': cs.id, 'name': cs.name, 'die_set': cs.die_set,
                   'one_h_amount': cs.one_h_amount ,'two_h_amount': cs.two_h_amount,
                   'ranged_amount': cs.ranged_amount,'shield_amount': cs.shield_amount,
@@ -167,7 +184,7 @@ def save_as_html(context):
     rendered = render_to_string('generated_enemies.html', context)
     prefix = _get_html_prefix(context)
     file = NamedTemporaryFile(mode='w', prefix=prefix, suffix='.html', dir='/projects/rq_tools/temp/', delete=False)
-    file.write(rendered)
+    file.write(rendered.encode('utf-8'))
     file.close()
     return file.name
     
@@ -177,7 +194,8 @@ def _get_html_prefix(context):
         prefix = 'rq_%s_' % party.name.replace(' ', '_')
     else:
         try:
-            prefix = 'rq_%s_' % context['enemies'][0].name.replace(' ', '_').replace('_1', 's')
+            prefix = 'rq_%s_' % context['enemies'][0].name.replace(' ', '_').replace('_1', 's').replace('/', '_')
+            prefix = prefix.replace('"', '')
         except:
             prefix = 'rq_'
     return prefix

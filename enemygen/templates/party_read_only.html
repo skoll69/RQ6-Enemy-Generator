@@ -15,24 +15,22 @@
 </div>
 
 <h2>Party</h2>
-<table>
-    <tr>
-        <th>Name</th>
-        <td>{{ party.name }}</td>
-    </tr>
-    <tr>
-        <th>Setting</th>
-        <td>{{ party.setting.name }}</td>
-    </tr>
-    <tr>
-        <th>Owner</th>
-        <td>{{ party.owner.username }}</td>
-    </tr>
-    <tr>
-        <th>Notes</th>
-        <td>{{ party.notes }}</td>
-    </tr>
-</table>
+<table><tr>
+    <th>Name</th>
+    <td>{{ party.name }}</td>
+</tr><tr>
+    <th>Tags</th>
+    <td><div id="tag_container">
+        {% for tag in party.get_tags %}<div class="tag">{{ tag }}</div>{% endfor %}
+        </div>
+    </td>
+</tr><tr>
+    <th>Owner</th>
+    <td>{{ party.owner.username }}</td>
+</tr><tr>
+    <th>Notes</th>
+    <td>{{ party.notes }}</td>
+</tr></table>
 
 <h3>Templates</h3>
 <table>
