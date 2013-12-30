@@ -2,7 +2,24 @@
 {% load url from future %}
 
 {% block content %}
-<div><p>Type to search: <input id="searchinput" /></p></div>
+<div id="et_filter_container">
+    Filter:
+    <form action="{% url 'set_party_filter' %}" method="post" style="display: inline-block;">
+    <input type="hidden" name="coming_from" value="{{request.path}}">
+    {% csrf_token %}
+    <select name="party_filter" onchange="this.form.submit()">
+            <option value="None" {% if filter == 'None' %}selected="selected"{% endif %}>None</option>
+        {% for tag in all_party_tags %}
+            <option value="{{ tag.name }}" {% if tag.name == party_filter %}selected="selected"{% endif %}>{{ tag }}</option>
+        {% endfor %}
+    </select>
+    </form>
+</div>
+
+<form action="{% url 'generate_party' %}" method="post" target="_blank">
+    {% csrf_token %}
+    <div>Type to search: <input id="searchinput" /> | <input type="submit" name="lucky" value="Do you feel lucky?"></div>
+</form>
 
 <div id="party_list_container">
 <table id="party_list" class="index_list">
@@ -19,7 +36,7 @@
                 <form action="{% url 'generate_party' %}" method="post" target="_blank">
                     <input type="hidden" name="party_id" value="{{ p.id }}">
                     {% csrf_token %}
-                    <input type="submit" class="party_submit" value="Generate">
+                    <input type="submit" name="generate" class="party_submit" value="Generate">
                 </form>
             </td>
             <td>{{ p.owner }}</td>

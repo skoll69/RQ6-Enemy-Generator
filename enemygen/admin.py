@@ -4,8 +4,9 @@ from enemygen.models import EnemyTemplate, Ruleset, Race, HitLocation
 from enemygen.models import SkillAbstract, SpellAbstract, StatAbstract, Weapon
 from enemygen.models import EnemySkill, EnemySpell, EnemyStat, EnemyHitLocation, RaceStat
 from enemygen.models import CombatStyle, CustomSpell, CustomWeapon, Party, TemplateToParty
-from enemygen.models import EnemySpirit, ChangeLog
-from enemygen.models import EnemyAdditionalFeatureList, AdditionalFeatureList, AdditionalFeatureItem
+from enemygen.models import EnemySpirit, ChangeLog, EnemyNonrandomFeature
+from enemygen.models import AdditionalFeatureList, AdditionalFeatureItem
+from enemygen.models import EnemyAdditionalFeatureList, PartyAdditionalFeatureList
 
 class EnemyTemplateAdmin(admin.ModelAdmin):
     list_display = ('name', 'race', 'rank', 'generated', 'published', 'owner')
@@ -13,6 +14,10 @@ class EnemyTemplateAdmin(admin.ModelAdmin):
 
 class RaceAdmin(admin.ModelAdmin):
     list_display = ('name', 'owner', 'published')
+
+class AdditionalFeatureListAdmin(admin.ModelAdmin):
+    list_display = ('name', 'type')
+    list_filter = ('type',)
 
 class ChangeLogForm(forms.ModelForm):
     class Meta:
@@ -89,9 +94,11 @@ admin.site.register(Race, RaceAdmin)
 admin.site.register(CustomSpell)
 admin.site.register(CustomWeapon)
 admin.site.register(TemplateToParty)
-admin.site.register(AdditionalFeatureList)
+admin.site.register(EnemyNonrandomFeature)
+admin.site.register(AdditionalFeatureList, AdditionalFeatureListAdmin)
 admin.site.register(AdditionalFeatureItem, AdditionalFeatureItemAdmin)
 admin.site.register(EnemyAdditionalFeatureList)
+admin.site.register(PartyAdditionalFeatureList)
 admin.site.register(Party, PartyAdmin)
 admin.site.register(ChangeLog, ChangeLogAdmin)
 admin.site.register(RaceStat, RaceStatAdmin)

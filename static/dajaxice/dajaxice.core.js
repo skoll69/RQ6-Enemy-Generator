@@ -29,6 +29,10 @@ var Dajaxice = {
         return Dajaxice.call('enemygen.add_custom_spell', 'POST', callback_function, argv, custom_settings);
     },
 
+    add_template_to_party: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('enemygen.add_template_to_party', 'POST', callback_function, argv, custom_settings);
+    },
+
     add_spirit: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.add_spirit', 'POST', callback_function, argv, custom_settings);
     },
@@ -39,6 +43,14 @@ var Dajaxice = {
 
     add_custom_weapon: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.add_custom_weapon', 'POST', callback_function, argv, custom_settings);
+    },
+
+    add_nonrandom_feature: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('enemygen.add_nonrandom_feature', 'POST', callback_function, argv, custom_settings);
+    },
+
+    get_feature_list_items: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('enemygen.get_feature_list_items', 'GET', callback_function, argv, custom_settings);
     },
 
     submit: function(callback_function, argv, custom_settings){

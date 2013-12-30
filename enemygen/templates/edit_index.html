@@ -8,15 +8,16 @@
 
     <form action="{% url 'create_enemy_template'%}" method="post">
     {% csrf_token %}
-    <select name="race_id">
-    <option value="0">Select race for new template</option>
-    {% for race in races %}
-        <option value="{{ race.id }}">{{ race.name }}</option>
-    {% endfor %}
-    </select>
+    Select race for the new template:<br>
+    <select size="5" name="race_id">
+        {% for race in races %}
+            <option value="{{ race.id }}">{{ race.name }}</option>
+        {% endfor %}
+    </select><br>
     <input type="submit" value="Create new template">
     </form>
 
+    <h3>My Enemy Templates</h3>
     <div><p>Type to search: <input id="searchinput" /></p></div>
     
     {% if enemy_templates %}

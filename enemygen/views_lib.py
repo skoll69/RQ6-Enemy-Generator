@@ -7,9 +7,13 @@ from django.template.loader import render_to_string
 
 from tempfile import NamedTemporaryFile
 import os
+import random
 
 def get_filter(request):
     return request.session.get('filter', None)
+    
+def get_party_filter(request):
+    return request.session.get('party_filter', None)
     
 def get_ruleset(request):
     return Ruleset.objects.get(id=request.session.get('ruleset_id', 1))
@@ -17,9 +21,11 @@ def get_ruleset(request):
 def get_context(request):
     context = {}
     context['filter'] = get_filter(request)
+    context['party_filter'] = get_party_filter(request)
     context['generated'] = _get_generated_amount()
     context['request'] = request
     context['all_et_tags'] = sorted(list(EnemyTemplate.tags.all()), key=lambda x: x.name)
+    context['all_party_tags'] = sorted(list(Party.tags.all()), key=lambda x: x.name)
     return context
     
 def get_et_context(et):
@@ -33,15 +39,27 @@ def get_et_context(et):
     context['theism_spells'] = spell_list('theism', et)
     context['folk_spells'] = spell_list('folk', et)
     context['sorcery_spells'] = spell_list('sorcery', et)
+    context['mysticism_spells'] = spell_list('mysticism', et)
     context['combat_styles'] = combat_styles(et)
     context['spirit_options'] = spirit_options()
-    context['additional_feature_lists'] = AdditionalFeatureList.objects.all()
+    context['additional_feature_lists'] = AdditionalFeatureList.objects.filter(type='enemy_feature')
+    context['namelists'] = AdditionalFeatureList.objects.filter(type='name')
     return context
 
-
-def get_party_templates():
-    parties = list(Party.objects.filter(published=True))
+def get_party_templates(filter=None):
+    if filter and filter != 'None':
+        parties = list(Party.objects.filter(tags__name__in=[filter,], published=True))
+    else:
+        parties = list(Party.objects.filter(published=True))
     return parties
+    
+def get_party_context(party):
+    context = {}
+    context['party'] = party
+    context['templates'] = EnemyTemplate.objects.filter(published=True).order_by('name')
+    context['all_party_tags'] = sorted(list(Party.tags.all()), key=lambda x: x.name)
+    context['additional_feature_lists'] = AdditionalFeatureList.objects.filter(type='party_feature')
+    return context
     
 def get_enemy_templates(filter, user):
     if filter and filter != 'None':
@@ -81,7 +99,37 @@ def get_enemies(request):
             enemies.append(et.generate(i+1, increment))
     return enemies
     
-def get_party_enemies(party):
+def get_enemies_lucky(request):
+    ''' Returns a four instances of a randomly selected enemy based on the current filter '''
+    filter = get_filter(request)
+    if filter and filter != 'None':
+        templates = EnemyTemplate.objects.filter(tags__name__in=[filter,], published=True)
+    else:
+        templates = EnemyTemplate.objects.filter(published=True)
+    index = random.randint(0, len(templates)-1) 
+    enemies = []
+    for i in xrange(6):
+        enemies.append(templates[index].generate(i+1))
+    return enemies
+    
+def get_random_party(filter=None):
+    if filter and filter != 'None':
+        parties = Party.objects.filter(tags__name__in=[filter,], published=True)
+    else:
+        parties = Party.objects.filter(published=True)
+    index = random.randint(0, len(parties)-1)
+    return parties[index]
+    
+def get_generated_party(party):
+    context = {}
+    context['party'] = party
+    context['enemies'] = _get_party_enemies(party)
+    context['party_additional_features'] = party.get_random_additional_features()
+    nonrandom_feature = [item.feature for item in party.nonrandom_features]
+    context['party_additional_features'].extend(nonrandom_feature)
+    return context
+    
+def _get_party_enemies(party):
     enemies = []
     for ttp in party.template_specs:
         et = ttp.template
@@ -90,6 +138,7 @@ def get_party_enemies(party):
         for i in xrange(amount):
             enemies.append(et.generate(i+1))
     return enemies
+    
 
 def _get_generated_amount():
     n = 0

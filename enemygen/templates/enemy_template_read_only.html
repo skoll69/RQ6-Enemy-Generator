@@ -17,7 +17,7 @@
 <div id="generate_enemy_container">
 <form action="{% url 'generate_enemies' %}" method="post" target="generated">
 {% csrf_token %}
-<input name="enemy_template_id_{{et.id}}" type="hidden" value="4">
+<input name="enemy_template_id_{{et.id}}" type="hidden" value="6">
 <input name="dont_increment" type="hidden" value="1">
 <input style="width: 140px;" type="submit" value="Generate" />
 </form>
@@ -25,6 +25,9 @@
 
 <h3>{{ et.name }}</h3>
 <table><tr>
+    <th>Namelist</th>
+    <td>{% if et.namelist %}{{ et.namelist.name }} (<a href="{% url 'feature_items' et.namelist.id %}">View names</a>){% else %}None{% endif %}</td>
+</tr><tr>
     <th>Tags</th>
     <td><div id="tag_container">
         {% for tag in et.get_tags %}<div class="tag">{{ tag }}</div>{% endfor %}
@@ -85,6 +88,20 @@
     {% endif %}
 </div>
 
+<div> <!-- Non-random features -->
+    {% if et.nonrandom_features %}
+    <h3>Non-random features</h3>
+        <table>
+            <tr><th>List</th><th>Feature</th></tr>
+        {% for feature in et.nonrandom_features %}
+            <tr>
+                <td>{{ feature.feature.feature_list.name }}</td>
+                <td>{{ feature.feature.name }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+    {% endif %}
+</div>
 
 <h3>Standard skills</h3>
 <table class="read_only"><tr>
@@ -195,7 +212,6 @@ Amount: {{ et.theism_spell_amount }}
 </tr></table>
 {% endif %}
 
-
 {% if et.sorcery_spells and et.sorcery_spell_amount != '0' %}
 <h3>Sorcery spells</h3>
 Amount: {{ et.sorcery_spell_amount }}
@@ -208,6 +224,20 @@ Amount: {{ et.sorcery_spell_amount }}
     {% if not forloop.first and forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
 {% endfor %}
 </tr></table>
+{% endif %}
+
+{% if et.spirits and et.spirit_amount != '0' %}
+<h3>Spirits</h3>
+Amount: {{ et.spirit_amount }}
+<table>
+<tr><th>Spirit</th><th>Prob.</th></tr>
+{% for spirit in et.spirits %}
+<tr>
+    <td><a href="{% url 'enemy_template' spirit.spirit.id %}">{{ spirit.name }}</a></td>
+    <td>{{ spirit.probability }}</td>
+</tr>
+{% endfor %}
+</table>
 {% endif %}
 
 {% endblock %}

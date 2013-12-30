@@ -46,6 +46,16 @@ $(document).ready(function(){
         }
     }
     
+    
+    // namelist
+    $('#et_namelist').change(function(event){
+        $('#namelist_link').remove();
+        var namelist_id = parseInt($(event.target).val())
+        if (namelist_id > 0){
+            console.log(namelist_id);
+            $('#namelist_cell').append('<a id="namelist_link" href="http://ouropa.planeetta.com/rq_tools/enemygen/feature_items/'+ namelist_id +'/" target=_blank>View names</a>')
+        }
+    })
 });
 </script>
 
@@ -65,7 +75,7 @@ $(document).ready(function(){
     <div id="generate_enemy_container">
     <form action="{% url 'generate_enemies' %}" method="post" target="generated">
     {% csrf_token %}
-    <input name="enemy_template_id_{{et.id}}" type="hidden" value="4">
+    <input name="enemy_template_id_{{et.id}}" type="hidden" value="6">
     <input name="dont_increment" type="hidden" value="1">
     <input style="width: 140px;" type="submit" value="Generate" />
     </form>
@@ -76,6 +86,17 @@ $(document).ready(function(){
 <table><tr>
     <th>Template name</th>
     <td><input id="et_{{ et.id }}" class="data" type="text" size="40" item_id="{{ et.id }}" item_type="et_name" value="{{ et.name }}" /></td>
+</tr><tr>
+    <th>Random name list</th>
+    <td id="namelist_cell">
+        <select id="et_namelist" class="data" item_id="{{ et.id }}" item_type="et_namelist">
+            <option value="0" {% if et.namelist == 0 %}selected="selected"{% endif %}>None</option>
+            {% for namelist in namelists %}
+                <option value="{{namelist.id}}" {% if et.namelist.id == namelist.id %}selected="selected"{% endif %}>{{namelist.name}}</option>
+            {% endfor %}
+        </select>
+        {% if et.namelist %}<a id="namelist_link" href="{% url 'feature_items' et.namelist.id %}" target=_blank>View names</a>{% endif %}
+    </td>
 </tr><tr>
     <th>Tags</th>
     <td><div id="tag_container">
@@ -173,8 +194,8 @@ $(document).ready(function(){
 </td></tr></table>
 
 <div> <!-- Additional Features -->
+    <h3>Additional features</h3>
     {% if et.additional_features %}
-        <h3>Additional features</h3>
         <table>
 <tr><th>Feature</th><th>Probability</th><th></th><th></th></tr>
 {% for f in et.additional_features %}
@@ -187,14 +208,39 @@ $(document).ready(function(){
 {% endfor %}
         </table>
     {% endif %}
+    <select id="additional_feature_options">
+            <option value="0">Select feature</option>
+        {% for feature_list in additional_feature_lists %}
+            <option value="{{ feature_list.id }}">{{ feature_list.name }}</option>
+        {% endfor %}
+    </select>
+    <button class="add_additional_feature" object_type="et" parent_id="{{ et.id }}">Add</button>
 </div>
-<select id="additional_feature_options">
-        <option value="0">Select feature</option>
-    {% for feature_list in additional_feature_lists %}
-        <option value="{{ feature_list.id }}">{{ feature_list.name }}</option>
-    {% endfor %}
-</select>
-<button class="add_additional_feature" et_id="{{ et.id }}">Add additional feature</button>
+
+<div> <!-- Non-random features -->
+    <h3>Non-random features</h3>
+    {% if et.nonrandom_features %}
+        <table>
+            <tr><th>List</th><th>Feature</th><th></th></tr>
+        {% for feature in et.nonrandom_features %}
+            <tr>
+                <td>{{ feature.feature.feature_list.name }}</td>
+                <td>{{ feature.feature.name }}</td>
+                <td><img src="/rq_static/minus.png" width="23" height="23" class="del_item" item_id="{{ feature.id }}" item_type="et_nonrandom_feature" /></td>
+            </tr>
+        {% endfor %}
+        </table>
+    {% endif %}
+    <select id="nonrandom_feature_list_options" size="4" style="width: 220px">
+        {% for feature_list in additional_feature_lists %}
+            <option value="{{ feature_list.id }}">{{ feature_list.name }}</option>
+        {% endfor %}
+    </select>
+    <select id="nonrandom_feature_options" size="4" style="width: 550px">
+        <option>&lt;Select feature list first&gt;</option>
+    </select>
+    <button id="add_nonrandom_feature" et_id="{{ et.id }}">Add</button>
+</div>
 
 {% include 'enemy_template_skills.html' %}
 

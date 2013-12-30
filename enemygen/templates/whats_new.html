@@ -7,7 +7,7 @@
 
 {% for item in whats_new %}
 <h4>{{ item.name }} ({{ item.publish_date }})</h4>
-<p>{{item.description}}</p>
+<p>{{item.description|safe}}</p>
 {% endfor %}
 
 {% endblock %}

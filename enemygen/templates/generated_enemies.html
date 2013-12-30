@@ -1,4 +1,5 @@
 {% load url from future %}
+{% load markdown %}
 
 <html>
 <head>
@@ -123,8 +124,20 @@ div#pdf_export{
 {% if party %}
 <span class="party_name"><a href="{% url 'party' party.id %}">{{ party.name }}</a></span>
 {% endif %}
+
+<div> <!-- Additional Features -->
+{% if party_additional_features %}
+    <b><u>Party features:</u></b><br>
+    {% for feature in party_additional_features %}
+        <span class="title">{{ feature.feature_list.name }}:</span><span class="item_list">
+            {{ feature.name.strip|markdown }}
+        </span><br>
+    {% endfor %}
+{% endif %}
+</div>
+
 {% if party.notes %}
-    <p><b>Notes:</b> {{ party.notes }}</p>
+    <p><b>Notes:</b> {{ party.notes|markdown }}</p>
 {% endif %}
 
 {% if generated_html %}
@@ -209,7 +222,7 @@ div#pdf_export{
 {% if enemy.additional_features %}
     {% for feature in enemy.additional_features %}
         <span class="title">{{ feature.feature_list.name }}:</span><span class="item_list">
-            {{ feature.name }}
+            {{ feature.name|markdown }}
         </span><br>
     {% endfor %}
 {% endif %}
@@ -217,7 +230,7 @@ div#pdf_export{
 
 {% if enemy.notes %}
 <span class="title">Notes:</span>
-<span class="item_list">{{ enemy.notes }}</span>
+<span class="item_list">{{ enemy.notes|markdown }}</span>
 {% endif %}
 
 </div>
@@ -274,8 +287,10 @@ div#pdf_export{
     </span><br>
 {% endif %}
 
-{% if enemy.sorcery_spells %}
+{% if enemy.attributes.max_shaping %}
     <span class="title">Maximum shaping: </span><span class="item_list">{{ enemy.attributes.max_shaping }}</span><br>
+{% endif %}
+{% if enemy.sorcery_spells %}
     <span class="title">Sorcery spells:</span><span class="item_list">
         {% for spell in enemy.sorcery_spells %}
             {{ spell.name }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}
@@ -293,7 +308,21 @@ div#pdf_export{
     </span><br>
 {% endif %}
 
+{% if enemy.mysticism_spells %}
+    <span class="title">Maximum intensity: </span><span class="item_list">{{ enemy.attributes.max_intensity }}</span> / 
+    <span class="title">Max total intensity: </span><span class="item_list">{{ enemy.attributes.max_total_intensity }}</span><br>
+    <span class="title">Mystic talents:</span><span class="item_list">
+        {% for spell in enemy.mysticism_spells %}
+            {{ spell.name }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </span><br>
+{% endif %}
+
 <div> <!-- Spirits -->
+{% if enemy.is_animist %}
+    <span class="title">Max controllable spirits: </span><span class="item_list">{{ enemy.attributes.max_spirits }}</span> / 
+    <span class="title">Max spirit POW: </span><span class="item_list">{{ enemy.attributes.max_pow }}</span><br>
+{% endif %}
 {% if enemy.spirits %}
     <span class="title">Spirits: </span><br>
     {% for spirit in enemy.spirits %}
@@ -301,10 +330,11 @@ div#pdf_export{
     <span class="item_list">
         Intensity {{ spirit.attributes.spirit_intensity }}, Action Points {{ spirit.attributes.action_points }}, Spirit Damage {{ spirit.attributes.spirit_damage }};
         {% for stat in spirit.get_stats %}{{ stat.name }} {{ stat.value }}{% if not forloop.last %}, {% endif %}{% endfor %};
-        {% for skill in spirit.skills %}{{ skill.name }} {{ skill.value }}%{% if not forloop.last %}, {% endif %}{% endfor %}{% if spirit.folk_spells %};{% endif %}
+        {% for skill in spirit.skills %}{{ skill.name }} {{ skill.value }}%{% if not forloop.last %}, {% endif %}{% endfor %};
         {% if spirit.folk_spells %}<u>Folk Spells</u>: {% for spell in spirit.folk_spells %}{{ spell }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if spirit.theism_spells %};{% endif %}
-        {% if spirit.theism_spells %}<u>Theism Spells</u>: {% for spell in spirit.theism_spells %}{{ spell }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if spirit.sorcery_spells %};{% endif %}
-        {% if spirit.sorcery_spells %}<u>Sorcery Spells</u>: {% for spell in spirit.sorcery_spells %}{{ spell }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+        {% if spirit.theism_spells %}<u>Theism Spells</u>: {% for spell in spirit.theism_spells %}{{ spell }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if spirit.sorcery_spells %};{% endif %}
+        {% if spirit.sorcery_spells %}<u>Sorcery Spells</u>: {% for spell in spirit.sorcery_spells %}{{ spell }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %};{% endif %}
+        {% if spirit.additional_features %}{% for feature in spirit.additional_features %}{{ feature.feature_list.name }}: {{ feature.name|markdown }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
     </span>{% if not forloop.last %}<br>{% endif %}
     {% endfor %}
     <br>
@@ -315,7 +345,7 @@ div#pdf_export{
 {% if enemy.additional_features %}
     {% for feature in enemy.additional_features %}
         <span class="title">{{ feature.feature_list.name }}:</span><span class="item_list">
-            {{ feature.name }}
+            {{ feature.name|markdown }}
         </span><br>
     {% endfor %}
 {% endif %}
@@ -344,7 +374,7 @@ div#pdf_export{
 
 {% if enemy.notes %}
 <span class="title">Notes:</span>
-<span class="item_list">{{ enemy.notes }}</span>
+<span class="item_list">{{ enemy.notes|markdown }}</span>
 {% endif %}
 
 </div>

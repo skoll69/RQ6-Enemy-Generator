@@ -144,9 +144,19 @@ table#enemy_template_list td, table#enemy_template_list th {
     padding-right: 6px;
 }
 
-table.index_list th {
+table#enemy_template_list th {
     cursor: pointer;
-    padding-right: 10px;
+    height: 22px;
+    white-space:nowrap;    
+}
+
+table#selected_enemy_template_list{
+    border-spacing: 0px;
+    border-collapse: collapse;
+}
+
+table#selected_enemy_template_list td, table#selected_enemy_template_list th {
+    padding-right: 6px;
 }
 
 div#index_tag_container{
@@ -312,6 +322,8 @@ table.read_only td{
 
 .del_item{
     cursor: pointer;
+    position: relative;
+    top: 3px;
 }
 
 #apply_notes_to_templates_confirmation{
@@ -350,10 +362,20 @@ input[type="submit"]#delete_party{
     width: 140px;
 }
 
-div#generate_party_container{
+div#clone_party_container{
     position: absolute;
     right: 10px;
     top: 50px;
+}
+
+input[type="submit"]#clone_party{
+    width: 140px;
+}
+
+div#generate_party_container{
+    position: absolute;
+    right: 10px;
+    top: 90px;
 }
 
 /* Party details end */

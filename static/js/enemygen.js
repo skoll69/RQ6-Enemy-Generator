@@ -55,9 +55,10 @@ function add_custom_skill(event){
 }
 
 function add_additional_feature(event){
-    var et_id = $(event.target).attr('et_id');
+    var parent_id = $(event.target).attr('parent_id');
+    var type = $(event.target).attr('object_type');
     var feature_list_id = $('#additional_feature_options').val();
-    Dajaxice.enemygen.add_additional_feature(refresh_page, {'et_id': et_id, 'feature_list_id': feature_list_id})
+    Dajaxice.enemygen.add_additional_feature(refresh_page, {'parent_id': parent_id, 'feature_list_id': feature_list_id, 'type': type})
 }
 
 function add_custom_spell(event){
@@ -67,9 +68,15 @@ function add_custom_spell(event){
 }
 
 function add_spirit(event){
-    var spirit_id = $('#spirit_options').val();
+    var spirit_ids = $('#spirit_options').val();
     var et_id = $(event.target).attr('et_id');
-    Dajaxice.enemygen.add_spirit(refresh_page, {'spirit_id': spirit_id, 'et_id': et_id})
+    Dajaxice.enemygen.add_spirit(refresh_page, {'spirit_ids': spirit_ids, 'et_id': et_id})
+}
+
+function add_template_to_party(event){
+    var template_ids = $('#template_ids').val();
+    var party_id = $(event.target).attr('party_id');
+    Dajaxice.enemygen.add_template_to_party(refresh_page, {'template_ids': template_ids, 'party_id': party_id})
 }
 
 function add_custom_weapon(event){
@@ -81,6 +88,30 @@ function add_custom_weapon(event){
 function add_hit_location(event){
     var race_id = $(event.target).attr('race_id');
     Dajaxice.enemygen.add_hit_location(refresh_page, {'race_id': race_id})
+}
+
+function get_feature_list_items_callback(result){
+    var options = ""
+    for (var i=0; i<result.data.length; i++){
+        options += '<option title="'+result.data[i].name+'" value="'+ result.data[i].id +'">'+ result.data[i].name +'</option>'
+    }
+    $('#nonrandom_feature_options').html(options);
+}
+
+function get_feature_list_items(event){
+    var list_id = $(event.target).val();
+    Dajaxice.enemygen.get_feature_list_items(get_feature_list_items_callback, {'list_id': list_id})
+}
+
+function add_nonrandom_feature(event){
+    var et_id = $(event.target).attr('et_id');
+    var party_id = $(event.target).attr('party_id');
+    var feature_id = $('#nonrandom_feature_options').val()
+    if (et_id) {
+        Dajaxice.enemygen.add_nonrandom_feature(refresh_page, {'et_id': et_id, 'feature_id': feature_id})
+    } else if (party_id) {
+        Dajaxice.enemygen.add_nonrandom_feature(refresh_page, {'party_id': party_id, 'feature_id': feature_id})
+    }
 }
 
 function del_item(event){
@@ -137,7 +168,6 @@ function capitalize(string){
 }
 
 $(document).ready(function(){
-
 	$('.data:input[type=number], .data:input[type=text], select.data, textarea.data').blur(function(event){
 		bind_change_listeners(event);
 	});
@@ -156,6 +186,10 @@ $(document).ready(function(){
 
     $('#add_spirit').click(function(event){
         add_spirit(event);
+    })
+
+    $('#add_template_to_party').click(function(event){
+        add_template_to_party(event);
     })
 
     $('.add_additional_feature').click(function(event){
@@ -190,6 +224,14 @@ $(document).ready(function(){
         apply_notes_to_templates(event);
     })
     
+    $('#nonrandom_feature_list_options').change(function(event){
+        get_feature_list_items(event);
+    });
+    
+    $('#add_nonrandom_feature').click(function(event){
+        add_nonrandom_feature(event);
+    });
+    
     $('#pro_skill_include_24').change(function(event){  // Shaping
         $('#sorcery_spells_container').toggle();
     })
@@ -201,6 +243,9 @@ $(document).ready(function(){
     })
     $('#pro_skill_include_27').change(function(event){  // Animist
         $('#spirits_container').toggle();
+    })
+    $('#pro_skill_include_30').change(function(event){  // Mystic
+        $('#mysticism_spells_container').toggle();
     })
     
 });

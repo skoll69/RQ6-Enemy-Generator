@@ -53,6 +53,13 @@ $(document).ready(function(){
 <div id="delete_party_container"><input id="delete_party" type="submit" value="Delete party" /></div>
 </form>
 
+<div id="clone_party_container">
+<form action="{% url 'clone_party' party.id %}" method="post">
+{% csrf_token %}
+<input id="clone_party" type="submit" value="Clone" />
+</form>
+</div>
+
 <div id="generate_party_container">
 <form action="{% url 'generate_party' %}" method="post" target="_blank">
 {% csrf_token %}
@@ -103,16 +110,62 @@ $(document).ready(function(){
 {% endfor %}
 </table>
 
-<form action="{% url 'add_template_to_party' %}" method="POST">
-    {% csrf_token %}
-    <select name="template_id">
-        {% for template in templates %}
-            <option value="{{ template.id }}">{{ template.name }}</option>
+<select multiple="multiple" id="template_ids" name="template_id" size="5">
+    {% for template in templates %}
+        <option value="{{ template.id }}">{{ template.name }}</option>
+    {% endfor %}
+</select>
+<button id="add_template_to_party" party_id="{{ party.id }}">Add template(s)</button>
+
+<div> <!-- Additional Features -->
+    {% if party.additional_features %}
+        <h3>Additional features</h3>
+        <table>
+<tr><th>Feature</th><th>Probability</th><th></th><th></th></tr>
+{% for f in party.additional_features %}
+    <tr>
+        <td>{{ f.name }}</td>
+        <td><input id="party_feature_{{f.id}}" class="data" type="text" size="30" item_id="{{f.id}}" item_type="party_feature_prob" value="{{ f.probability }}" />%</td>
+        <td><img src="/rq_static/minus.png" width="23" height="23" class="del_item" item_id="{{ f.id }}" item_type="party_additional_feature" /></td>
+        <td><a href="{% url 'feature_items' f.feature_list.id %}">View items</a></td>
+    </tr>
+{% endfor %}
+        </table>
+    {% endif %}
+    <select id="additional_feature_options">
+            <option value="0">Select feature</option>
+        {% for feature_list in additional_feature_lists %}
+            <option value="{{ feature_list.id }}">{{ feature_list.name }}</option>
         {% endfor %}
     </select>
-    <input type="hidden" name="party_id" value="{{party.id}}">
-    <input type="submit" value="Add Template">
-</form>
+    <button class="add_additional_feature" object_type="party" parent_id="{{ party.id }}">Add additional feature</button>
+</div>
+
+<div> <!-- Non-random features -->
+    <h3>Non-random features</h3>
+    {% if party.nonrandom_features %}
+        <table>
+            <tr><th>List</th><th>Feature</th><th></th></tr>
+        {% for feature in party.nonrandom_features %}
+            <tr>
+                <td>{{ feature.feature.feature_list.name }}</td>
+                <td>{{ feature.feature.name }}</td>
+                <td><img src="/rq_static/minus.png" width="23" height="23" class="del_item" item_id="{{ feature.id }}" item_type="party_nonrandom_feature" /></td>
+            </tr>
+        {% endfor %}
+        </table>
+    {% endif %}
+    <select id="nonrandom_feature_list_options" size="4" style="width: 220px">
+        {% for feature_list in additional_feature_lists %}
+            <option value="{{ feature_list.id }}">{{ feature_list.name }}</option>
+        {% endfor %}
+    </select>
+    <select id="nonrandom_feature_options" size="4" style="width: 550px">
+        <option>&lt;Select feature list first&gt;</option>
+    </select>
+    <button id="add_nonrandom_feature" party_id="{{ party.id }}">Add</button>
+</div>
+
 
 
 {% endblock %}

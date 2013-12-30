@@ -5,6 +5,13 @@
 
 {% block content %}
 
+<div id="clone_party_container">
+<form action="{% url 'clone_party' party.id %}" method="post">
+{% csrf_token %}
+<input id="clone_party" type="submit" value="Clone" />
+</form>
+</div>
+
 <div id="generate_party_container">
 <form action="{% url 'generate_party' %}" method="post" target="_blank">
 {% csrf_token %}
@@ -42,5 +49,22 @@
     </tr>
 {% endfor %}
 </table>
+
+<div> <!-- Additional Features -->
+    {% if party.additional_features %}
+        <h3>Additional features</h3>
+        <table>
+<tr><th>Feature</th><th>Probability</th><th></th></tr>
+{% for f in party.additional_features %}
+    <tr>
+        <td>{{ f.name }}</td>
+        <td>{{ f.probability }}%</td>
+        <td><a href="{% url 'feature_items' f.feature_list.id %}">View items</a></td>
+    </tr>
+{% endfor %}
+        </table>
+    {% endif %}
+</div>
+
 
 {% endblock %}

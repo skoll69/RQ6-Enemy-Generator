@@ -5,10 +5,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
 
 from enemygen.models import EnemyTemplate, Ruleset, EnemyTemplate, Race, Party, ChangeLog, AdditionalFeatureList
-from enemygen.views_lib import get_ruleset, get_context, get_et_context, get_enemies
-from enemygen.views_lib import get_enemy_templates, is_race_admin, get_statistics
+from enemygen.views_lib import get_ruleset, get_context, get_et_context, get_enemies, get_generated_party
+from enemygen.views_lib import get_enemy_templates, is_race_admin, get_statistics, get_random_party
 from enemygen.views_lib import generate_pdf, get_filter, get_party_templates, save_as_html
-from enemygen.views_lib import get_party_enemies, spirit_options
+from enemygen.views_lib import spirit_options, get_party_context, get_enemies_lucky, get_party_filter
 
 def index(request):
     filter = get_filter(request)
@@ -17,25 +17,32 @@ def index(request):
     return render(request, 'index.html', context)
     
 def party_index(request):
+    filter = get_party_filter(request)
     context = get_context(request)
-    context['parties'] = get_party_templates()
+    context['parties'] = get_party_templates(filter)
     return render(request, 'party_index.html', context)
     
 def generate_enemies(request):
     if not request.POST:
         return redirect('index')
     context = get_context(request)
-    context['enemies'] = get_enemies(request)
+    if request.POST.get('lucky', None):
+        context['enemies'] = get_enemies_lucky(request)
+    else:
+        context['enemies'] = get_enemies(request)
     context['generated_html'] = save_as_html(context)
     return render(request, 'generated_enemies.html', context)
-
+    
 def generate_party(request):
     if not request.POST:
         return redirect('party_index')
     context = get_context(request)
-    party = Party.objects.get(id=int(request.POST['party_id']))
-    context['party'] = party
-    context['enemies'] = get_party_enemies(party)
+    if request.POST.get('lucky', None):
+        filter = get_party_filter(request)
+        party = get_random_party(filter)
+    else:
+        party = Party.objects.get(id=request.POST['party_id'])
+    context.update(get_generated_party(party))
     context['generated_html'] = save_as_html(context)
     return render(request, 'generated_enemies.html', context)
 
@@ -69,9 +76,8 @@ def race(request, race_id):
 def party(request, party_id):
     template = 'party.html'
     context = get_context(request)
-    context['party'] = Party.objects.get(id=party_id)
-    context['templates'] = EnemyTemplate.objects.filter(published=True).order_by('name')
-    context['all_party_tags'] = sorted(list(Party.tags.all()), key=lambda x: x.name)
+    party = Party.objects.get(id=party_id)
+    context.update(get_party_context(party))
     if context['party'].owner != request.user:
         template = 'party_read_only.html'
     return render(request, template, context)
@@ -104,13 +110,6 @@ def account(request):
     context = get_context(request)
     return render(request, 'account.html', context)
     
-def set_filter(request):
-    if request.POST:
-        filter = request.POST.get('filter', None)
-        request.session['filter'] = filter
-        return redirect(request.POST['coming_from'])
-    return redirect(index)
-
 def feature_items(request, feature_id):
     context = get_context(request)
     context['feature'] = get_object_or_404(AdditionalFeatureList, id=feature_id)
@@ -120,6 +119,20 @@ def feature_items(request, feature_id):
 
 ###############################################################
 # Action views
+def set_filter(request):
+    if request.POST:
+        filter = request.POST.get('filter', None)
+        request.session['filter'] = filter
+        return redirect(request.POST['coming_from'])
+    return redirect(index)
+
+def set_party_filter(request):
+    if request.POST:
+        filter = request.POST.get('party_filter', None)
+        request.session['party_filter'] = filter
+        return redirect(request.POST['coming_from'])
+    return redirect(index)
+
 def select_setting_ruleset(request):
     if request.POST:
         #setting_id = int(request.POST.get('setting_id', 1))
@@ -140,19 +153,11 @@ def pdf_export(request):
         return response
 
 @login_required
-def add_template_to_party(request):
-    if request.POST:
-        p = Party.objects.get(id=int(request.POST['party_id']))
-        t = EnemyTemplate.objects.get(id=int(request.POST['template_id']))
-        p.add(t)
-        return redirect(party, p.id)
-    
-@login_required
 def create_enemy_template(request):
-    ruleset = get_ruleset(request)
-    race_id = int(request.POST.get('race_id'))
-    if race_id == 0:
+    race_id = request.POST.get('race_id')
+    if race_id is None:
         return redirect(edit_index)
+    ruleset = get_ruleset(request)
     race = Race.objects.get(id=race_id)
     et = EnemyTemplate.create(owner=request.user, ruleset=ruleset, race=race)
     return redirect(enemy_template, et.id)
@@ -189,6 +194,12 @@ def clone_template(request, template_id):
     et = EnemyTemplate.objects.get(id=template_id)
     new = et.clone(request.user)
     return redirect(enemy_template, new.id)
+    
+@login_required
+def clone_party(request, party_id):
+    p = Party.objects.get(id=party_id)
+    new = p.clone(request.user)
+    return redirect(party, new.id)
     
 @login_required
 def clone_race(request, race_id):
