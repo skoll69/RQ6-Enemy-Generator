@@ -212,9 +212,9 @@ class EnemyTemplate(models.Model, Printer):
         cs.save()
         
     def _create_spirit_template(self, ):
-        spell_names = ('Discorporate', 'Spectral Combat', 'Stealth', 'Willpower', 'Folk Magic', 'Devotion',
-                       'Exhort', 'Invocation', 'Shaping')
-        for skill in self.ruleset.skills.filter(name__in=spell_names):
+        skill_names = ('Discorporate', 'Spectral Combat', 'Stealth', 'Willpower', 'Folk Magic', 'Devotion',
+                       'Exhort', 'Invocation', 'Shaping', 'Binding', 'Trance')
+        for skill in self.ruleset.skills.filter(name__in=skill_names):
             es = EnemySkill(skill=skill, enemy_template=self, die_set=skill.default_value, include=skill.include)
             es.save()
         es = EnemySkill.objects.get(skill__name='Stealth', enemy_template=self)
