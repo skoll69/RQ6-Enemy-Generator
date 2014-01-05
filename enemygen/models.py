@@ -125,7 +125,7 @@ class Race(models.Model, Printer):
         
 class HitLocation(models.Model, Printer):
     name = models.CharField(max_length=30)
-    armor = models.CharField(max_length=30, blank=True, default='0') # die_set
+    armor = models.CharField(max_length=30, default='0') # die_set
     range_start = models.SmallIntegerField()
     range_end = models.SmallIntegerField()
     race = models.ForeignKey(Race)
@@ -154,6 +154,7 @@ class HitLocation(models.Model, Printer):
         return hl
         
     def set_armor(self, value):
+        if not value: value = '0'
         Dice(value).roll()  #Test that the value is valid
         self.armor = value.lower()
         self.save()
@@ -1344,8 +1345,19 @@ class _Spirit(_Enemy):
         self._add_spells()
         self._add_additional_features()
         self._calculate_attributes()
+        if self.is_animist:
+            self._add_spirits()
         return self
 
+    def _add_stats(self):
+        for stat in self.et.stats:
+            self.stats[stat.name] = stat.roll()
+            self.stats_list.append({'name': stat.name, 'value': self.stats[stat.name]})
+        self.stats['CON'] = self.stats['POW']
+        self.stats['STR'] = self.stats['POW']
+        self.stats['SIZ'] = self.stats['POW']
+        self.stats['DEX'] = self.stats['INT']
+        
     def _calculate_attributes(self):
         sr = (self.stats['INT'] + self.stats['CHA']) / 2
         self._calculate_action_points()
@@ -1364,6 +1376,10 @@ class _Spirit(_Enemy):
             self.is_mystic = True
             self.attributes['max_intensity'] = int(math.ceil(self.skills_dict['Mysticism'] / 20.0))
             self.attributes['max_total_intensity'] = int(math.ceil(self.skills_dict['Meditation'] / 10.0))
+        if 'Binding' in self.skills_dict:
+            self.is_animist = True
+            self.attributes['max_pow'] = int(math.ceil(self.skills_dict['Binding'] / 10.0)) * 3
+            self.attributes['max_spirits'] = self._get_max_spirits()
         self.attributes['spirit_intensity'] = (self.stats['POW'] - 1) / 6
         
     def _calculate_action_points(self):
