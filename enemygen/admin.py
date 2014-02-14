@@ -81,7 +81,7 @@ class PartyAdmin(admin.ModelAdmin):
     ordering = ('name',)
 
 class HitLocationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'range', 'race', 'hp_modifier')
+    list_display = ('name', 'range', 'race', 'hp_modifier', 'armor')
     list_filter = ('race',)
     ordering = ('race', 'range_start',)
 

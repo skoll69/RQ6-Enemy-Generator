@@ -1285,7 +1285,7 @@ class _Enemy:
             
     def _get_max_spirits(self):
         ''' Calculates and returns the maximun number of spirits the animist can control. '''
-        mult_options = [0, 0, 0.25, 0.5, 0.75, 1]
+        mult_options = [0, 0.25, 0.5, 0.75, 1, 1]
         spirit_multiplier = mult_options[self.et.cult_rank]
         return int(math.ceil(self.stats['CHA'] * spirit_multiplier))
             
@@ -1316,7 +1316,7 @@ class _Enemy:
         
     def _calculate_damage_modifier(self, str, siz):
         if str == 0 or siz == 0:
-            self.attributes['damage_modifier'] = '0'
+            self.attributes['damage_modifier'] = '+0'
             return
         DICE_STEPS = ('-1d8', '-1d6', '-1d4', '-1d2', '+0', '+1d2', '+1d4', '+1d6', '+1d8', '+1d10', '+1d12',
                       '+2d6', '+1d8+1d6', '+2d8', '+1d10+1d8', 

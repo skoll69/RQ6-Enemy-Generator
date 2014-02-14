@@ -4,6 +4,7 @@ from enemygen.models import Weapon, CombatStyle, EnemyWeapon, CustomWeapon, Part
 
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
+from django.db.models import Q
 
 from tempfile import NamedTemporaryFile
 import os
@@ -56,7 +57,7 @@ def get_party_templates(filter=None):
 def get_party_context(party):
     context = {}
     context['party'] = party
-    context['templates'] = EnemyTemplate.objects.filter(published=True).order_by('name')
+    context['templates'] = EnemyTemplate.objects.filter(Q(published=True) | Q(owner=party.owner)).order_by('name')
     context['all_party_tags'] = sorted(list(Party.tags.all()), key=lambda x: x.name)
     context['additional_feature_lists'] = AdditionalFeatureList.objects.filter(type='party_feature')
     return context
@@ -231,7 +232,7 @@ def get_statistics():
 def save_as_html(context):
     ''' Renders the generated enemies to html and saves to disk, so that it can be converted to PDF later '''
     rendered = render_to_string('generated_enemies.html', context)
-    prefix = _get_html_prefix(context)
+    prefix = _get_html_prefix(context).encode('utf-8')
     file = NamedTemporaryFile(mode='w', prefix=prefix, suffix='.html', dir='/projects/rq_tools/temp/', delete=False)
     file.write(rendered.encode('utf-8'))
     file.close()

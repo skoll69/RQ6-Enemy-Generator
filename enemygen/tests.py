@@ -12,7 +12,7 @@ import ordereddict
 from dice import Dice, _die_to_tuple
 
 from models import EnemyTemplate, _Enemy, Ruleset, StatAbstract, Race, SpellAbstract
-from models import EnemyStat, EnemySkill, Setting, SkillAbstract, EnemySpell
+from models import EnemyStat, EnemySkill, SkillAbstract, EnemySpell
 from models import CombatStyle, Weapon
 
 from enemygen_lib import _select_random_item, ValidationError, to_bool, replace_die_set
