@@ -135,8 +135,6 @@ def set_party_filter(request):
 
 def select_setting_ruleset(request):
     if request.POST:
-        #setting_id = int(request.POST.get('setting_id', 1))
-        #request.session['setting_id'] = setting_id
         return redirect(request.POST['coming_from'])
     return redirect(index)
 
@@ -146,9 +144,9 @@ def pdf_export(request):
         file_name = pdf_path.split('/')[-1:][0]
         file_name = '_'.join(file_name.split('_')[:-1]) # Remove the last unique identifier from file name
         file_name = file_name.replace(',', '')
-        data = open(pdf_path).read()
+        data = open(pdf_path.encode('utf-8')).read()
         response = HttpResponse(data, mimetype='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="%s"' % file_name
+        response['Content-Disposition'] = 'attachment; filename="%s"' % file_name.encode('utf-8')
         response['Content-Length'] = len(data)
         return response
 

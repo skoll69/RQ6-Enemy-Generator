@@ -8,6 +8,7 @@ from enemygen.models import EnemyAdditionalFeatureList, PartyAdditionalFeatureLi
 from enemygen.models import EnemyNonrandomFeature, PartyNonrandomFeature
 
 import logging
+from bs4 import BeautifulSoup
 from enemygen.enemygen_lib import to_bool, int_or_zero
 
 @dajaxice_register
@@ -537,3 +538,14 @@ def submit(request, value, id, object, parent_id=None, extra={}):
     except Exception as e:
         logger.error(str(e))
         return simplejson.dumps({'error': str(e)})
+
+@dajaxice_register
+def change_enemy_name(request, html_file, enemy_id, new_name):
+    ''' Changes the name of the generated enemy, in the given html '''
+    with open(html_file.encode('utf-8'), 'r') as ff:
+        soup = BeautifulSoup(ff)
+    soup.find('div', {'id': enemy_id}).string = new_name
+    with open(html_file.encode('utf-8'), 'w') as ff:
+        ff.write(soup.prettify('utf-8', formatter='html'))
+    return simplejson.dumps({'html_file': html_file})
+    

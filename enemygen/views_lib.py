@@ -253,7 +253,7 @@ def _get_html_prefix(context):
 def generate_pdf(html_path):
     ''' Generates a PDF based on the given html file '''
     pdf_path = html_path.replace('.html', '.pdf')
-    #os.system('wkhtmltopdf.sh --enable-forms "%s" "%s" > /dev/null' % (html_path, pdf_path))
-    os.system('wkhtmltopdf.sh --enable-forms "%s" "%s" > /projects/rq_tools/pdf.log 2>&1' % (html_path, pdf_path))
+    #os.system('wkhtmltopdf.sh --enable-forms "%s" "%s" > /dev/null' % (html_path.encode('utf-8'), pdf_path.encode('utf-8')))
+    os.system('wkhtmltopdf.sh --enable-forms "%s" "%s" > /projects/rq_tools/pdf.log 2>&1' % (html_path.encode('utf-8'), pdf_path.encode('utf-8')))
     return pdf_path
   

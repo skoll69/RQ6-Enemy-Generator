@@ -139,7 +139,7 @@ class HitLocation(models.Model, Printer):
         if self.range_start == self.range_end:
             return '%02d' % self.range_start
         else:
-            return '%02d&#8209;%02d' % (self.range_start, self.range_end)
+            return '%02d-%02d' % (self.range_start, self.range_end)
             
     @classmethod
     def create(cls, race_id):

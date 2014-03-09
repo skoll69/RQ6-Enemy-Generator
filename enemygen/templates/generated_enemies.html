@@ -1,13 +1,20 @@
 {% load url from future %}
 {% load markdown %}
+{% load dajaxice_templatetags %}
 
 <html>
 <head>
 <title>RQ: {% if party %}{{ party.name }}{% else %}{{ enemies.0.name }}{% endif %}</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+{% dajaxice_js_import %}
 
 <style type="text/css">
 body, table{
     font-size: 12px;
+}
+
+.nowrap{
+    white-space: nowrap;
 }
 
 .party_name{
@@ -19,8 +26,9 @@ body, table{
 
 .template_name{
     font-weight: bold;
-    width: 100%;
+    width: 94%;
     text-align: right;
+    display: inline-block;
 }
 
 div.row_container{
@@ -107,7 +115,7 @@ a:hover{
 
 div#pdf_export{
     position: absolute;
-    top: 3px;
+    top: 1px;
     left: 700px;
     z-index: 3;
 }
@@ -115,6 +123,9 @@ div#pdf_export{
 @media print{
     div#pdf_export{
         display: none;
+    }
+    .template_link{
+        display: None;
     }
 }
 
@@ -288,7 +299,12 @@ div#pdf_export{
 {% else %} <!-- Normal enemy begins -->
 <div class="enemy_container">
 <table class="enemy_table">
-    <tr><td colspan="3"><a href="{% url 'enemy_template' enemy.et.id %}"><div class="template_name">{{ enemy.name }}</div></a></td></tr>
+    <tr><td colspan="3">
+        <div id="enemy_{{ forloop.counter }}" class="template_name" contenteditable>{{ enemy.name }}</div>
+        {% if generated_html %}
+        <a href="{% url 'enemy_template' enemy.et.id %}"><img class="template_link" src="/rq_static/images/link.png" height="12" width="12" /></a>
+        {% endif %}
+    </td></tr>
     <tr><td valign="top">
         <table class="inner_enemy_table" id="characteristics">
             <tr class="toprow"><th>Chars</th></tr>
@@ -315,7 +331,7 @@ div#pdf_export{
             <tr class="toprow"><th>1D20</th><th>Location</th><th>AP/HP</th></tr>
             {% for hl in enemy.hit_locations %}
                 <tr class="{% if forloop.counter|divisibleby:2 %}evenrow{% else %}oddrow{% endif %}">
-                    <td>{{ hl.range|safe }}</td><td>{{ hl.name }}</td><td align="right">{{ hl.ap }}/{{ hl.hp }}</td>
+                    <td class="nowrap">{{ hl.range|safe }}</td><td>{{ hl.name }}</td><td align="right">{{ hl.ap }}/{{ hl.hp }}</td>
                 </tr>
             {% endfor %}
         </table>
@@ -465,6 +481,23 @@ div#pdf_export{
 {% if not forloop.first and not forloop.last and forloop.counter|divisibleby:"2" %}</div><div class="row_container">{% endif %}
 {% endfor %}
 </div>
+
+
+<script>
+    function change_name_callback(result){
+        
+        console.log(result);
+    }
+    
+    $('.template_name').blur(function(){
+        var html_file = "{{ generated_html }}";
+        var data = {'new_name': $(this).html(), 'enemy_id': $(this).attr('id'), 'html_file': html_file}
+        Dajaxice.enemygen.change_enemy_name(function(result) {change_name_callback(result)}, data);
+        console.log(html_file);
+    });
+
+</script>
+
 
 </body>
 </html>
