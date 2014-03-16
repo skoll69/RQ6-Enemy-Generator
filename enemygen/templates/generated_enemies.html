@@ -27,8 +27,7 @@ body, table{
 .template_name{
     font-weight: bold;
     width: 94%;
-    text-align: right;
-    display: inline-block;
+    text-align: left;
 }
 
 div.row_container{
@@ -148,7 +147,7 @@ div#pdf_export{
 </div>
 
 {% if party.notes %}
-    <p><b>Notes:</b> {{ party.notes|markdown }}</p>
+    <p><b>Notes:</b> <span id="party_notes" class="editable" contenteditable>{{ party.notes|markdown }}</span></p>
 {% endif %}
 
 {% if generated_html %}
@@ -167,9 +166,10 @@ div#pdf_export{
 {% if enemy.is_spirit %}
 
 <div class="enemy_container"> <!-- Spirit begins -->
-<a href="{% url 'enemy_template' enemy.et.id %}">
-    <b>{{ enemy.name }} (Intensity {{ enemy.attributes.spirit_intensity }})</b>
-</a>
+    <span id="enemy_{{ forloop.counter }}" class="template_name editable" contenteditable>{{ enemy.name }}</span>
+    {% if generated_html %}
+    <a href="{% url 'enemy_template' enemy.et.id %}"><img class="template_link" src="/rq_static/images/link.png" height="12" width="12" /></a>
+    {% endif %}
 <table class="enemy_table">
     <tr>
         <td colspan="3">
@@ -291,7 +291,7 @@ div#pdf_export{
 
 {% if enemy.notes %}
 <span class="title">Notes:</span>
-<span class="item_list">{{ enemy.notes|markdown }}</span>
+<span id="notes_{{ forloop.counter }}" class="item_list editable" contenteditable>{{ enemy.notes|markdown }}</span>
 {% endif %}
 
 </div>
@@ -300,7 +300,7 @@ div#pdf_export{
 <div class="enemy_container">
 <table class="enemy_table">
     <tr><td colspan="3">
-        <div id="enemy_{{ forloop.counter }}" class="template_name" contenteditable>{{ enemy.name }}</div>
+        <span id="enemy_{{ forloop.counter }}" class="template_name editable" contenteditable>{{ enemy.name }}</span>
         {% if generated_html %}
         <a href="{% url 'enemy_template' enemy.et.id %}"><img class="template_link" src="/rq_static/images/link.png" height="12" width="12" /></a>
         {% endif %}
@@ -473,7 +473,7 @@ div#pdf_export{
 
 {% if enemy.notes %}
 <span class="title">Notes:</span>
-<span class="item_list">{{ enemy.notes|markdown }}</span>
+<span id="notes_{{ forloop.counter }}" class="item_list editable" contenteditable>{{ enemy.notes|markdown }}</span>
 {% endif %}
 
 </div>
@@ -484,16 +484,9 @@ div#pdf_export{
 
 
 <script>
-    function change_name_callback(result){
-        
-        console.log(result);
-    }
-    
-    $('.template_name').blur(function(){
-        var html_file = "{{ generated_html }}";
-        var data = {'new_name': $(this).html(), 'enemy_id': $(this).attr('id'), 'html_file': html_file}
-        Dajaxice.enemygen.change_enemy_name(function(result) {change_name_callback(result)}, data);
-        console.log(html_file);
+    $('.editable').blur(function(){
+        var data = {'value': $(this).html(), 'id': $(this).attr('id'), 'html_file': "{{ generated_html }}"}
+        Dajaxice.enemygen.change_template(function(result){}, data);
     });
 
 </script>

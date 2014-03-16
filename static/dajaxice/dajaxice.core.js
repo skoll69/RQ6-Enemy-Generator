@@ -25,8 +25,8 @@ var Dajaxice = {
         return Dajaxice.call('enemygen.add_additional_feature', 'POST', callback_function, argv, custom_settings);
     },
 
-    change_enemy_name: function(callback_function, argv, custom_settings){
-        return Dajaxice.call('enemygen.change_enemy_name', 'POST', callback_function, argv, custom_settings);
+    change_template: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('enemygen.change_template', 'POST', callback_function, argv, custom_settings);
     },
 
     add_custom_spell: function(callback_function, argv, custom_settings){

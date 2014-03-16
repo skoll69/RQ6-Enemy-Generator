@@ -540,11 +540,18 @@ def submit(request, value, id, object, parent_id=None, extra={}):
         return simplejson.dumps({'error': str(e)})
 
 @dajaxice_register
-def change_enemy_name(request, html_file, enemy_id, new_name):
-    ''' Changes the name of the generated enemy, in the given html '''
+def change_template(request, html_file, id, value):
+    ''' Changes the name of the generated enemy, in the given html
+        Input: html_file    - name of the html file to modify
+               id           - id of the html element to modify
+               value        - new value
+    '''
     with open(html_file.encode('utf-8'), 'r') as ff:
         soup = BeautifulSoup(ff)
-    soup.find('div', {'id': enemy_id}).string = new_name
+    span_tag = soup.find('span', {'id': id})
+    klasses = ' '.join(span_tag['class'])
+    new_tag = BeautifulSoup('<span id="%s" class="%s">%s</span>' % (id, klasses, value)).span
+    soup.find('span', {'id': id}).replaceWith(new_tag)
     with open(html_file.encode('utf-8'), 'w') as ff:
         ff.write(soup.prettify('utf-8', formatter='html'))
     return simplejson.dumps({'html_file': html_file})
