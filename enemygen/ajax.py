@@ -558,6 +558,9 @@ def change_template(request, html_file, id, value):
     
 @dajaxice_register
 def toggle_star(request, et_id):
-    EnemyTemplate.objects.get(id=et_id).toggle_star(request.user)
-    return simplejson.dumps({'success': True})
+    if request.user.is_authenticated():
+        EnemyTemplate.objects.get(id=et_id).toggle_star(request.user)
+        return simplejson.dumps({'success': True})
+    else:
+        return simplejson.dumps({'success': False})
     

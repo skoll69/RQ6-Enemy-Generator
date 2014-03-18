@@ -28,7 +28,7 @@
     {% if et.starred %}
         <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_filled.png" />
     {% else %}
-        <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_empty.png" />
+        <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_empty.png" {% if not user.is_authenticated %}title="Log in to Star favorites"{% endif %} />
     {% endif %}
 </h3>
 <table><tr>

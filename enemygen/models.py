@@ -456,19 +456,24 @@ class EnemyTemplate(models.Model, Printer):
             combat_style.save()
             
     def is_starred(self, user):
-        try:
-            Star.objects.get(user=user, template=self)
-            return True
-        except Star.DoesNotExist:
-            return False
+        if user.is_authenticated():
+            try:
+                Star.objects.get(user=user, template=self)
+                return True
+            except Star.DoesNotExist:
+                pass
+        return False
             
     def toggle_star(self, user):
         Star.create_or_delete(user, self)
         
     @classmethod
     def get_starred(cls, user):
-        stars = Star.objects.filter(user=user).order_by('template__rank', 'template__name')
-        return [star.template for star in stars]
+        if user.is_authenticated():
+            stars = Star.objects.filter(user=user).order_by('template__rank', 'template__name')
+            return [star.template for star in stars]
+        else:
+            return []
 
 class Party(models.Model, Printer):
     name = models.CharField(max_length=50)

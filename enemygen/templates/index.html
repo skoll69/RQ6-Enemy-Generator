@@ -23,6 +23,7 @@
     <div id="selected_enemy_template_list_container" style="display:none;">
         <table id="selected_enemy_template_list">
             <thead><tr>
+                <th></th>
                 <th class="sort-alpha">Enemy type</th>
                 <th>Amount</th>
                 <th class="sort-alpha">Race</th>
@@ -50,7 +51,7 @@
                     {% if et.starred %}
                         <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_filled.png" />
                     {% else %}
-                        <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_empty.png" />
+                        <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_empty.png" {% if not user.is_authenticated %}title="Log in to Star favorites"{% endif %} />
                     {% endif %}
                 </td>
                 <td><a class="edit_item" href="{% url 'enemy_template' et.id %}">{{ et.name }}</a> {% if not et.published %}<b>*</b>{% endif %}</td>
@@ -103,6 +104,7 @@ function set_column_width(){
         var c3w = $('table#enemy_template_list tr:first th').eq(3).width();
         var c4w = $('table#enemy_template_list tr:first th').eq(4).width();
         var c5w = $('table#enemy_template_list tr:first th').eq(5).width();
+        var c6w = $('table#enemy_template_list tr:first th').eq(6).width();
         
         $('table#selected_enemy_template_list td').eq(0).css('width', c0w)
         $('table#selected_enemy_template_list td').eq(1).css('width', c1w)
@@ -110,6 +112,7 @@ function set_column_width(){
         $('table#selected_enemy_template_list td').eq(3).css('width', c3w)
         $('table#selected_enemy_template_list td').eq(4).css('width', c4w)
         $('table#selected_enemy_template_list td').eq(5).css('width', c5w)
+        $('table#selected_enemy_template_list td').eq(6).css('width', c6w)
     } else {
         var c0w = $('table#selected_enemy_template_list tr:first td').eq(0).width();
         var c1w = $('table#selected_enemy_template_list tr:first td').eq(1).width();
@@ -117,6 +120,7 @@ function set_column_width(){
         var c3w = $('table#selected_enemy_template_list tr:first td').eq(3).width();
         var c4w = $('table#selected_enemy_template_list tr:first td').eq(4).width();
         var c5w = $('table#selected_enemy_template_list tr:first td').eq(5).width();
+        var c6w = $('table#selected_enemy_template_list tr:first td').eq(6).width();
         
         $('table#enemy_template_list th').eq(0).css('width', c0w)
         $('table#enemy_template_list td').eq(0).css('width', c0w)
@@ -130,6 +134,8 @@ function set_column_width(){
         $('table#enemy_template_list td').eq(4).css('width', c4w)
         $('table#enemy_template_list th').eq(5).css('width', c5w)
         $('table#enemy_template_list td').eq(5).css('width', c5w)
+        $('table#enemy_template_list th').eq(6).css('width', c6w)
+        $('table#enemy_template_list td').eq(6).css('width', c6w)
     }
 }
 

@@ -76,8 +76,9 @@ def get_enemy_templates(filter, user):
             templates.extend(list(EnemyTemplate.objects.filter(tags__name__in=[filter,], published=False, owner=user)))
         else:
             templates.extend(list(EnemyTemplate.objects.filter(published=False, owner=user)))
-    for et in templates:                    # We can't call is_starred with the user parameter in 
-        et.starred = et.is_starred(user)    # Django template
+    if user.is_authenticated():
+        for et in templates:                    # We can't call is_starred with the user parameter in 
+            et.starred = et.is_starred(user)    # Django template
     return templates
     
 def get_enemies(request):
