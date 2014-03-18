@@ -53,6 +53,10 @@ var Dajaxice = {
         return Dajaxice.call('enemygen.add_nonrandom_feature', 'POST', callback_function, argv, custom_settings);
     },
 
+    toggle_star: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('enemygen.toggle_star', 'POST', callback_function, argv, custom_settings);
+    },
+
     get_feature_list_items: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.get_feature_list_items', 'GET', callback_function, argv, custom_settings);
     },

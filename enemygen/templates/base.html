@@ -1,5 +1,4 @@
 {% load url from future %}
-{% load dajaxice_templatetags %}
 
 <!DOCTYPE HTML>
 <html>
@@ -7,14 +6,13 @@
     <title>{% block title %}RQ Encounter Generator{% endblock %}</title>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js"></script>
-    <script src="/rq_static/js/enemygen.js"></script>
     <script src="/rq_static/js/complete.ly.1.0.1.js"></script>
     <script src="/rq_static/js/tquery/core.js"></script>
+    <script src="/rq_static/js/enemygen.js?v=1"></script>
+    <script src="/rq_static/dajaxice/dajaxice.core.js?v=1"></script>
     <link rel="stylesheet" type="text/css" href="/rq_static/base.css">
     <link rel="stylesheet" type="text/css" href="/rq_static/print.css" media="print">
-    {% dajaxice_js_import %}
 </head>
-
 <body><div id="main_container">
 
 <div id="header">

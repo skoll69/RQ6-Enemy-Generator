@@ -556,3 +556,8 @@ def change_template(request, html_file, id, value):
         ff.write(soup.prettify('utf-8', formatter='html'))
     return simplejson.dumps({'html_file': html_file})
     
+@dajaxice_register
+def toggle_star(request, et_id):
+    EnemyTemplate.objects.get(id=et_id).toggle_star(request.user)
+    return simplejson.dumps({'success': True})
+    

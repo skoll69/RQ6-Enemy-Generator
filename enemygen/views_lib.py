@@ -63,8 +63,11 @@ def get_party_context(party):
     return context
     
 def get_enemy_templates(filter, user):
-    if filter and filter != 'None':
+    #if filter and filter != 'None':
+    if filter and filter not in ('None', 'Starred'):
         templates = list(EnemyTemplate.objects.filter(tags__name__in=[filter,], published=True).order_by('rank'))
+    elif filter == 'Starred':
+        templates = EnemyTemplate.get_starred(user)
     else:
         templates = list(EnemyTemplate.objects.filter(published=True).order_by('rank'))
     # Add the unpublished templates of the logged-in user
@@ -73,6 +76,8 @@ def get_enemy_templates(filter, user):
             templates.extend(list(EnemyTemplate.objects.filter(tags__name__in=[filter,], published=False, owner=user)))
         else:
             templates.extend(list(EnemyTemplate.objects.filter(published=False, owner=user)))
+    for et in templates:                    # We can't call is_starred with the user parameter in 
+        et.starred = et.is_starred(user)    # Django template
     return templates
     
 def get_enemies(request):

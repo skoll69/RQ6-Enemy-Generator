@@ -23,12 +23,20 @@
     {% if enemy_templates %}
     <table id="enemy_template_list">
     <thead><tr>
+        <th></th>
         <th class="sort-alpha">Template name</th>
         <th class="sort-alpha">Race</th>
         <th class="sort-alpha">Rank</th>
     </tr></thead>
     {% for et in enemy_templates %}
         <tr>
+            <td>
+                {% if et.starred %}
+                    <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_filled.png" />
+                {% else %}
+                    <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_empty.png" />
+                {% endif %}
+            </td>
             <td><a class="edit_item" href="{% url 'enemy_template' et.id %}">{{ et.name }}</a>{% if not et.published %} *{% endif %}</td>
             <td><a class="edit_item" href="{% url 'race' et.race.id %}">{{ et.race.name }}</a></td>
             <td>

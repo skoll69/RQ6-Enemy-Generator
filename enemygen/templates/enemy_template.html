@@ -82,7 +82,14 @@ $(document).ready(function(){
     </div>
 </div>
 
-<h3>Enemy details</h3>
+<h3>
+    Enemy details
+    {% if et.starred %}
+        <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_filled.png" />
+    {% else %}
+        <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_empty.png" />
+    {% endif %}
+</h3>
 <table><tr>
     <th>Template name</th>
     <td><input id="et_{{ et.id }}" class="data" type="text" size="40" item_id="{{ et.id }}" item_type="et_name" value="{{ et.name }}" /></td>

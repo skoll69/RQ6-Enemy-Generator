@@ -163,6 +163,22 @@ function apply_notes_to_templates_callback(result){
     }
 }
 
+function toggle_star_callback(result, target){
+    var target = $(target);
+    if (result.success){
+        if (target.attr('src') === '/rq_static/images/star_filled.png'){
+            target.attr('src', '/rq_static/images/star_empty.png');
+        } else {
+            target.attr('src', '/rq_static/images/star_filled.png');
+        }
+    }
+}
+
+function toggle_star(event){
+    var et_id = $(event.target).attr('et_id');
+    Dajaxice.enemygen.toggle_star(function(result){toggle_star_callback(result, event.target)}, {'et_id': et_id});
+}
+
 function capitalize(string){
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -246,6 +262,9 @@ $(document).ready(function(){
     })
     $('#pro_skill_include_30').change(function(event){  // Mystic
         $('#mysticism_spells_container').toggle();
+    })
+    $('img.star').click(function(event){
+        toggle_star(event);
     })
     
 });

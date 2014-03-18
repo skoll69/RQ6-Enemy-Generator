@@ -454,6 +454,21 @@ class EnemyTemplate(models.Model, Printer):
         for combat_style in self.combat_styles:
             combat_style.die_set = combat_style.die_set + bonus
             combat_style.save()
+            
+    def is_starred(self, user):
+        try:
+            Star.objects.get(user=user, template=self)
+            return True
+        except Star.DoesNotExist:
+            return False
+            
+    def toggle_star(self, user):
+        Star.create_or_delete(user, self)
+        
+    @classmethod
+    def get_starred(cls, user):
+        stars = Star.objects.filter(user=user).order_by('template__rank', 'template__name')
+        return [star.template for star in stars]
 
 class Party(models.Model, Printer):
     name = models.CharField(max_length=50)
@@ -1437,7 +1452,26 @@ class _Elemental(_Enemy):
             ap = hl.roll()
             enemy_hl = {'name': hl.name, 'range': hl.range, 'hp': hp, 'ap': ap, 'parent': hl}
             self.hit_locations.append(enemy_hl)
-        
+    
+class Star(models.Model):
+    ''' Functionality for starring templates (marking as favourite) '''
+    user = models.ForeignKey(User)
+    template = models.ForeignKey(EnemyTemplate)
+    
+    class Meta:
+        unique_together = ('user', 'template')
+    
+    @classmethod
+    def create_or_delete(cls, user, template):
+        ''' Creates a Star if it doesn't exist, or deletes it if it does '''
+        try:
+            star = Star.objects.get(user=user, template=template)
+            star.delete()
+        except Star.DoesNotExist:
+            star = Star(user=user, template=template)
+            star.save()
+    
+    
 def _divide_round_up(n, d):
     return (n + (d - 1))/d
     

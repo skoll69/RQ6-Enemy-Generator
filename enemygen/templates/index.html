@@ -9,6 +9,7 @@
     {% csrf_token %}
     <select name="filter" onchange="this.form.submit()">
             <option value="None" {% if filter == 'None' %}selected="selected"{% endif %}>None</option>
+            <option value="Starred" {% if filter == 'Starred' %}selected="selected"{% endif %}>Starred</option>
         {% for tag in all_et_tags %}
             <option value="{{ tag.name }}" {% if tag.name == filter %}selected="selected"{% endif %}>{{ tag }}</option>
         {% endfor %}
@@ -35,6 +36,7 @@
     <div id="enemy_template_list_container">
     <table id="enemy_template_list" class="index_list">
         <thead><tr>
+            <th></th>
             <th class="sort-alpha">Enemy type</th>
             <th>Amount</th>
             <th class="sort-alpha">Race</th>
@@ -44,6 +46,13 @@
         </tr></thead>
         {% for et in templates %}
             <tr>
+                <td>
+                    {% if et.starred %}
+                        <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_filled.png" />
+                    {% else %}
+                        <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_empty.png" />
+                    {% endif %}
+                </td>
                 <td><a class="edit_item" href="{% url 'enemy_template' et.id %}">{{ et.name }}</a> {% if not et.published %}<b>*</b>{% endif %}</td>
                 <td><input name="enemy_template_id_{{et.id}}" size="4" min="0" max="40" type="number" class="enemy_amount"></td>
                 <td><a class="edit_item" href="{% url 'race' et.race.id %}">{{ et.race.name }}</a></td>

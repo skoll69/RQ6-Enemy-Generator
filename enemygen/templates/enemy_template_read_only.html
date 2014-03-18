@@ -23,7 +23,14 @@
 </form>
 </div>
 
-<h3>{{ et.name }}</h3>
+<h3>
+    {{ et.name }}
+    {% if et.starred %}
+        <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_filled.png" />
+    {% else %}
+        <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_empty.png" />
+    {% endif %}
+</h3>
 <table><tr>
     <th>Namelist</th>
     <td>{% if et.namelist %}{{ et.namelist.name }} (<a href="{% url 'feature_items' et.namelist.id %}">View names</a>){% else %}None{% endif %}</td>

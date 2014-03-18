@@ -49,7 +49,10 @@ def generate_party(request):
 @login_required
 def edit_index(request):
     context = get_context(request)
-    context['enemy_templates'] = EnemyTemplate.objects.filter(owner=request.user)
+    templates = EnemyTemplate.objects.filter(owner=request.user)
+    for et in templates:
+        et.starred = et.is_starred(request.user)
+    context['enemy_templates'] = templates
     context['races'] = Race.objects.filter(published=True)
     context['edit_races'] = Race.objects.filter(owner=request.user)
     context['edit_parties'] = Party.objects.filter(owner=request.user)
@@ -60,6 +63,7 @@ def enemy_template(request, enemy_template_id):
     context = get_context(request)
     template = 'enemy_template.html'
     et = get_object_or_404(EnemyTemplate, id=enemy_template_id)
+    et.starred = et.is_starred(request.user)
     if et.owner != request.user:
         template = 'enemy_template_read_only.html'
     context.update(get_et_context(et))
