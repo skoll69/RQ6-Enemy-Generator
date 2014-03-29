@@ -3,10 +3,12 @@ from django.conf.urls import patterns, include, url
 from enemygen import views
 
 urlpatterns = patterns('',
-    url(r'^$', views.index, name='index'),
+    url(r'^$', views.home, name='home'),
+    url(r'^enemies/$', views.index, name='index'),
+    url(r'^parties/$', views.party_index, name='party_index'),
+    url(r'^party_index/$', views.party_index),  # Old one. Kept in case somebody has bookmarked it 
     url(r'^generate_enemies/$', views.generate_enemies, name='generate_enemies'),
     url(r'^generate_party/$', views.generate_party, name='generate_party'),
-    url(r'^party_index/$', views.party_index, name='party_index'),
     url(r'^select_setting_ruleset/$', views.select_setting_ruleset, name='select_setting_ruleset'),
     url(r'^edit_index/$', views.edit_index, name='edit_index'),
     url(r'^enemy_template/(?P<enemy_template_id>\d+)/$', views.enemy_template, name='enemy_template'),

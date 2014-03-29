@@ -377,7 +377,6 @@ div#generate_party_container{
     right: 10px;
     top: 90px;
 }
-
 /* Party details end */
 
 /* Edit index starts */
@@ -385,4 +384,46 @@ div.create_new_container{
     display: inline-block;
 }
 /* Edit index starts */
+
+/* Home page starts */
+div#search_container{
+    width: 100%;
+    text-align: center;
+}
+div#results_number{
+    font-size: 10px;
+    color: #CCC;
+    position: relative;
+    left: 190px;
+    width: 200px;
+}
+div#generate_button_container{
+    position: absolute;
+    right: 10px;
+    top: 8px;
+}
+input.disabled{
+    border-color: #ccc;
+    color: #ccc;
+    cursor: inherit;
+    background-color: #514331;
+}
+
+input.disabled[type="submit"]:hover, button:hover {
+    background-color:#514331;
+}
+
+input.disabled[type="submit"]:active, button:active {
+    left: 0px;
+    top: 0px;
+}
+
+div#searching{
+    display: none;
+    position: absolute;
+    top: 120px;
+    width: 100%;
+    text-align: center;
+}
+/* Home page ends */
 

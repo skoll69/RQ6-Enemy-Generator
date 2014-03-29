@@ -4,6 +4,7 @@ from enemygen_lib import _select_random_item, ValidationError, replace_die_set
 from dice import Dice
 from taggit.managers import TaggableManager
 import ordereddict, random, math
+from django.db.models import Q
 
 class Printer:
     def __unicode__(self):
@@ -474,6 +475,29 @@ class EnemyTemplate(models.Model, Printer):
             return [star.template for star in stars]
         else:
             return []
+            
+    @classmethod
+    def search(cls, string):
+        queryset = EnemyTemplate.objects.all()
+        for word in string.split(' '):
+            queryset = queryset.filter(Q(name__icontains=word) | 
+                                       Q(race__name__icontains=word) 
+                                       | Q(tags__name__icontains=word) 
+            )
+        return queryset.distinct()
+        
+    def summary_dict(self, user=None):
+        ''' Returns summary information about the EnemyTemplate in as a dict so that it can be jsoned '''
+        output = {}
+        output['name'] = self.name
+        output['race'] = self.race.name
+        output['rank'] = self.rank
+        output['owner'] = self.owner.username
+        output['tags'] = self.get_tags()
+        output['id'] = self.id
+        if user:
+            output['starred'] = self.is_starred(user)
+        return output
 
 class Party(models.Model, Printer):
     name = models.CharField(max_length=50)

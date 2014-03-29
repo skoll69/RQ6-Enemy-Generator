@@ -1,0 +1,32 @@
+{% load url from future %}
+
+<div id="enemy_template_list_container">
+<table id="enemy_template_list" class="index_list">
+    {% include 'enemy_list_table_head.html' %}
+    {% for et in templates %}
+        <tr>
+            <td>
+                {% if et.starred %}
+                    <img et_id="{{ et.id }}" class="star" height="22" width="22" src="/rq_static/images/star_filled.png" />
+                {% else %}
+                    <img et_id="{{ et.id }}" class="star" height="22" width="22" src="/rq_static/images/star_empty.png" {% if not user.is_authenticated %}title="Log in to Star favorites"{% endif %} />
+                {% endif %}
+            </td>
+            <td><a class="edit_item" href="{% url 'enemy_template' et.id %}">{{ et.name }}</a> {% if not et.published %}<b>*</b>{% endif %}</td>
+            <td><input id="enemy_template_id_{{et.id}}" name="enemy_template_id_{{et.id}}" size="4" min="0" max="40" type="number" class="enemy_amount"></td>
+            <td><a class="edit_item" href="{% url 'race' et.race.id %}">{{ et.race.name }}</a></td>
+            <td>
+                {% if et.rank = 1 %}1&nbsp;Rabble{% endif %}
+                {% if et.rank = 2 %}2&nbsp;Novice{% endif %}
+                {% if et.rank = 3 %}3&nbsp;Skilled{% endif %}
+                {% if et.rank = 4 %}4&nbsp;Veteran{% endif %}
+                {% if et.rank = 5 %}5&nbsp;Master{% endif %}
+            </td>
+            <td>{{ et.owner }}</td>
+            <td><div id="index_tag_container">
+                {% for tag in et.get_tags %}<div class="small_tag">{{tag}}</div>{% endfor %}
+            </div></td>
+        </tr>
+    {% endfor %}
+</table>
+</div>

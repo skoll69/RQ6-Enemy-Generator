@@ -85,7 +85,6 @@ def add_nonrandom_feature(request, feature_id, et_id=None, party_id=None):
         return simplejson.dumps({'success': True})
     return simplejson.dumps({'success': False})
 
-    
 @dajaxice_register
 def add_custom_weapon(request, cs_id, type):
     try:
@@ -563,4 +562,9 @@ def toggle_star(request, et_id):
         return simplejson.dumps({'success': True})
     else:
         return simplejson.dumps({'success': False})
+    
+@dajaxice_register(method='GET')
+def search(request, string):
+    templates = [et.summary_dict(request.user) for et in EnemyTemplate.search(string)]
+    return simplejson.dumps({'results': templates, 'success': True})
     

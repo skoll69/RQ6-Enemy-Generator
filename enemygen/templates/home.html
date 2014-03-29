@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block content %}
+<div id="search_container">
+    <input id="search" size="60" type="text" /> <button id="search_button">Search</button>
+</div>
+<div id="results_number">&nbsp;</div>
+<div id="search_results" style="display: none;">
+    <table id="search_results_table">
+        {% include 'enemy_list_table_head.html' %}
+    </table>
+</div>
+
+<form action="{% url 'generate_enemies' %}" method="post" target="_blank">
+    {% csrf_token %}
+    <div id="selected_enemy_template_list_container" style="display:none;">
+        <table id="selected_enemy_template_list">
+        {% include 'enemy_list_table_head.html' %}
+        </table>
+    <hr>
+    </div>
+    <div id="generate_button_container">
+        <input id="generate_button" disabled class="disabled" type="submit" name="generate" value="Generate">
+    </div>
+</form>
+
+{% if not templates %}
+    <div id="getting_started">
+        <h2>Getting started</h2>
+        <p>Use the Search functionality to find templates or browse the <a href="{% url 'index' %}">full template list</a>.</p>
+        <p>To generate enemies, enter amount and hit Generate.</p>
+        <p>You can also star your favorite templates to see them in this starting page.
+        {% if not user.authenticated %}
+            (Login required.)
+        {% endif %}
+        </p>
+    </div>
+{% endif %}
+<div id="searching">
+    <img src="/rq_static/images/loading.gif" height="80" width="80" />
+</div>
+{% include 'enemy_template_list.html' %}
+
+{% endblock %}

@@ -183,6 +183,145 @@ function capitalize(string){
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function search_callback(result){
+    $('div#results_number').html(result.results.length+' templates found.');
+    $('#search_results_table tbody').html('');
+    var table = $('#enemy_template_list');
+    $('div#searching').hide()
+    for (i in result.results){
+        var row = result.results[i];
+        if (row.starred) var star = '<td><img et_id="'+row.id+'" class="star" height="22" width="22" src="/rq_static/images/star_filled.png" /></td>';
+        else             var star = '<td><img et_id="'+row.id+'" class="star" height="22" width="22" src="/rq_static/images/star_empty.png" /></td>';
+        var name = '<td><a class="edit_item" href="/rq_tools/enemygen/enemy_template/'+row.id+'/">'+row.name+'</a></td>';
+        var input = '<td><input id="enemy_template_id_'+row.id+'" name="enemy_template_id_'+row.id+'" size="4" min="0" max="40" type="number" class="enemy_amount"></td>';
+        var race = '<td>'+row.race+'</td>';
+        switch(row.rank){
+            case 1: var rank = '<td>1&nbsp;Rabble</td>'; break;
+            case 2: var rank = '<td>2&nbsp;Novice</td>'; break;
+            case 3: var rank = '<td>3&nbsp;Skilled</td>'; break;
+            case 4: var rank = '<td>4&nbsp;Veteran</td>'; break;
+            case 5: var rank = '<td>5&nbsp;Master</td>'; break;
+        }
+        var creator = '<td>'+row.owner+'</td>';
+        var tags = '<td>';
+        for (i in row.tags){
+            tags += '<div class="small_tag">'+row.tags[i]+'</div>';
+        }
+        tags += '</td>';
+        var out = '<tr>'+star+name+input+race+rank+creator+tags+'</tr>';
+        table.append(out);
+    }
+    initialize_enemy_list();
+    $('input#search').select();
+}
+
+function search(){
+    var string = $('input#search').val();
+    Dajaxice.enemygen.search(function(result){search_callback(result)}, {'string': string});
+    $('#enemy_template_list tr:gt(0)').remove();
+    $('#getting_started').remove();
+    $('#enemy_template_list').show();
+    set_template_list_height();
+    $('div#searching').show();
+}
+
+////////////////////////////////////////
+// Index/Home page enemy lists
+function template_list_height(){
+    var upper_point = $('#enemy_template_list').offset().top;
+    var list_container_height = $(window).height() - upper_point - 22;
+    return list_container_height;
+}
+
+function set_column_width(){
+    // Set the columns in both table to be of the same width
+    if ($('table#enemy_template_list tr:first th').eq(1).width() > $('table#selected_enemy_template_list td').eq(1).width()){
+        var c0w = $('table#enemy_template_list tr:first th').eq(0).width();
+        var c1w = $('table#enemy_template_list tr:first th').eq(1).width();
+        var c2w = $('table#enemy_template_list tr:first th').eq(2).width();
+        var c3w = $('table#enemy_template_list tr:first th').eq(3).width();
+        var c4w = $('table#enemy_template_list tr:first th').eq(4).width();
+        var c5w = $('table#enemy_template_list tr:first th').eq(5).width();
+        var c6w = $('table#enemy_template_list tr:first th').eq(6).width();
+        
+        $('table#selected_enemy_template_list td').eq(0).css('width', c0w)
+        $('table#selected_enemy_template_list td').eq(1).css('width', c1w)
+        $('table#selected_enemy_template_list td').eq(2).css('width', c2w)
+        $('table#selected_enemy_template_list td').eq(3).css('width', c3w)
+        $('table#selected_enemy_template_list td').eq(4).css('width', c4w)
+        $('table#selected_enemy_template_list td').eq(5).css('width', c5w)
+        $('table#selected_enemy_template_list td').eq(6).css('width', c6w)
+    } else {
+        var c0w = $('table#selected_enemy_template_list tr:first th').eq(0).width();
+        var c1w = $('table#selected_enemy_template_list tr:first th').eq(1).width();
+        var c2w = $('table#selected_enemy_template_list tr:first th').eq(2).width();
+        var c3w = $('table#selected_enemy_template_list tr:first th').eq(3).width();
+        var c4w = $('table#selected_enemy_template_list tr:first th').eq(4).width();
+        var c5w = $('table#selected_enemy_template_list tr:first th').eq(5).width();
+        var c6w = $('table#selected_enemy_template_list tr:first th').eq(6).width();
+        
+        $('table#enemy_template_list th').eq(0).css('width', c0w)
+        $('table#enemy_template_list td').eq(0).css('width', c0w)
+        $('table#enemy_template_list th').eq(1).css('width', c1w)
+        $('table#enemy_template_list td').eq(1).css('width', c1w)
+        $('table#enemy_template_list th').eq(2).css('width', c2w)
+        $('table#enemy_template_list td').eq(2).css('width', c2w)
+        $('table#enemy_template_list th').eq(3).css('width', c3w)
+        $('table#enemy_template_list td').eq(3).css('width', c3w)
+        $('table#enemy_template_list th').eq(4).css('width', c4w)
+        $('table#enemy_template_list td').eq(4).css('width', c4w)
+        $('table#enemy_template_list th').eq(5).css('width', c5w)
+        $('table#enemy_template_list td').eq(5).css('width', c5w)
+        $('table#enemy_template_list th').eq(6).css('width', c6w)
+        $('table#enemy_template_list td').eq(6).css('width', c6w)
+    }
+}
+
+function set_template_list_height(){
+    $('#enemy_template_list_container').css('height', template_list_height());
+}
+
+function initialize_enemy_list(){
+    $('#temp-enemy_template_list').remove();    // In case it exists, delete the existing temp table
+    var table = new ttable('enemy_template_list'); 
+    table.sorting.enabled = true;
+    table.sorting.sortall = false;
+    table.search.enabled = true;
+    table.search.inputID = 'searchinput';
+    table.search.casesensitive = false;
+    table.style.num = false;
+    $('img.sort-img').remove(); // Each time rendertable is called, new set of sort images are added
+    table.rendertable();
+    
+    set_template_list_height();
+    $(window).resize(function(event){
+        set_template_list_height();
+    });
+    
+    $('input').keyup(function(event){
+        var amount = $(event.target).val();
+        if (amount > 0) {
+            var input_id = $(event.target).attr('id');
+            var row_id = $(event.target).parent().parent().attr('id');
+            var row = $(event.target).parent().parent().remove().clone(); //tr -element
+            $('#selected_enemy_template_list').append(row);
+            // Need to delete it also from the temp table created by the sorter
+            $('table#temp-enemy_template_list').find('tr#'+row_id).remove();
+            $('#selected_enemy_template_list_container').show(0);
+            var val = $('#'+input_id).val();
+            $('#'+input_id).focus().val('').val(val);
+            set_column_width();
+            set_template_list_height();
+            $('#generate_button').removeClass('disabled');
+            $('#generate_button').prop('disabled', false);
+        }
+    });
+    
+    if ($('#enemy_template_list tr').length < 2){
+        $('#enemy_template_list').hide();
+    }
+}
+
 $(document).ready(function(){
 	$('.data:input[type=number], .data:input[type=text], select.data, textarea.data').blur(function(event){
 		bind_change_listeners(event);
@@ -267,4 +406,13 @@ $(document).ready(function(){
         toggle_star(event);
     })
     
+    $('button#search_button').click(function(event){
+        search();
+    });
+    $('input#search').keyup(function(e){
+        if(e.keyCode == 13) search();   // Enter
+    });
+    
+    initialize_enemy_list();
+    $('input#search').focus();
 });

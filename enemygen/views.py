@@ -16,6 +16,12 @@ def index(request):
     context['templates'] = get_enemy_templates(filter, request.user)
     return render(request, 'index.html', context)
     
+def home(request):
+    filter = get_filter(request)
+    context = get_context(request)
+    context['templates'] = get_enemy_templates('Starred', request.user)
+    return render(request, 'home.html', context)
+    
 def party_index(request):
     filter = get_party_filter(request)
     context = get_context(request)
