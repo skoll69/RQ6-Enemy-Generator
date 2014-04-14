@@ -1,0 +1,9 @@
+{% load url from future %}
+
+<html>
+<body>
+{% for path in png_paths %}
+    <img src="{{path}}" /><br>
+{% endfor %}
+</body>
+</html>

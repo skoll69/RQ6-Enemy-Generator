@@ -21,7 +21,7 @@
     <div><p>Type to search: <input id="searchinput" /></p></div>
     
     {% if enemy_templates %}
-    <table id="enemy_template_list">
+    <table id="my_enemy_template_list">
     <thead><tr>
         <th></th>
         <th class="sort-alpha">Template name</th>
@@ -86,7 +86,7 @@
 
 <script>
 $(document).ready(function(){
-    var table = new ttable('enemy_template_list'); 
+    var table = new ttable('my_enemy_template_list'); 
     table.sorting.enabled = true;
     table.sorting.sortall = false;
     table.search.enabled = true;

@@ -228,7 +228,11 @@ function search(){
 ////////////////////////////////////////
 // Index/Home page enemy lists
 function template_list_height(){
-    var upper_point = $('#enemy_template_list').offset().top;
+    if ($('#enemy_template_list').offset()){
+        var upper_point = $('#enemy_template_list').offset().top;
+    } else if ($('#party_list').offset()){
+        var upper_point = $('#party_list').offset().top;
+    }
     var list_container_height = $(window).height() - upper_point - 22;
     return list_container_height;
 }
@@ -290,7 +294,7 @@ function initialize_enemy_list(){
     table.search.inputID = 'searchinput';
     table.search.casesensitive = false;
     table.style.num = false;
-    $('img.sort-img').remove(); // Each time rendertable is called, new set of sort images are added
+    //$('img.sort-img').remove(); // Each time rendertable is called, new set of sort images are added
     table.rendertable();
     
     set_template_list_height();
@@ -298,7 +302,7 @@ function initialize_enemy_list(){
         set_template_list_height();
     });
     
-    $('input').keyup(function(event){
+    $('input.enemy_amount').keyup(function(event){
         var amount = $(event.target).val();
         if (amount > 0) {
             var input_id = $(event.target).attr('id');
@@ -320,6 +324,7 @@ function initialize_enemy_list(){
     if ($('#enemy_template_list tr').length < 2){
         $('#enemy_template_list').hide();
     }
+    
 }
 
 $(document).ready(function(){

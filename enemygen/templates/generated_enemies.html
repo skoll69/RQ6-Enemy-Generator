@@ -119,8 +119,15 @@ div#pdf_export{
     z-index: 3;
 }
 
+div#png_export{
+    position: absolute;
+    top: 1px;
+    left: 600px;
+    z-index: 3;
+}
+
 @media print{
-    div#pdf_export{
+    div#pdf_export, div#png_export{
         display: none;
     }
     .template_link{
@@ -158,8 +165,16 @@ div#pdf_export{
 <input type="submit" value="PDF Export">
 </form>
 </div>
+<div id="png_export">
+<form action="{% url 'png_export' %}" method="GET" target="_blank">
+<input type="hidden" name="generated_html" value="{{ generated_html }}">
+<input type="hidden" name="action" value="png_export">
+<input type="submit" value="PNG Export">
+</form>
+</div>
 {% endif %}
 
+<div id="enemies">
 <div class="row_container">
 {% for enemy in enemies %}
 
@@ -482,6 +497,7 @@ div#pdf_export{
 {% endfor %}
 </div>
 
+</div>
 
 <script>
     $('.editable').blur(function(){

@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.db.models import Q
 
+from bs4 import BeautifulSoup
 from tempfile import NamedTemporaryFile
 import os
 import random
@@ -263,3 +264,20 @@ def generate_pdf(html_path):
     os.system('wkhtmltopdf.sh --enable-forms "%s" "%s" > /projects/rq_tools/pdf.log 2>&1' % (html_path.encode('utf-8'), pdf_path.encode('utf-8')))
     return pdf_path
   
+def generate_pngs(html_path):
+    ''' Generates png-images out of the generated_html '''
+    with open(html_path.encode('utf-8'), 'r') as ff:
+        soup = BeautifulSoup(ff)
+    enemies = soup.find_all('div', {'class': 'enemy_container'})
+    container = soup.find('div', {'id': 'enemies'})
+    pngs = []
+    for enemy in enemies:
+        container.clear()
+        container.append(enemy)
+        htmlfile = NamedTemporaryFile(mode='w', suffix='.html', dir='/projects/rq_tools/temp/', delete=False)
+        htmlfile.write(soup.prettify('utf-8', formatter='html'))
+        htmlfile.close()
+        png_name = htmlfile.name.replace('.html', '.png')
+        os.system('wkhtmltoimage.sh --crop-w 430 "%s" "%s" > /projects/rq_tools/png.log 2>&1' % (htmlfile.name, png_name))
+        pngs.append(png_name)
+    return pngs

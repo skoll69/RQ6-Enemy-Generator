@@ -7,7 +7,7 @@ from django.template import RequestContext
 from enemygen.models import EnemyTemplate, Ruleset, EnemyTemplate, Race, Party, ChangeLog, AdditionalFeatureList
 from enemygen.views_lib import get_ruleset, get_context, get_et_context, get_enemies, get_generated_party
 from enemygen.views_lib import get_enemy_templates, is_race_admin, get_statistics, get_random_party
-from enemygen.views_lib import generate_pdf, get_filter, get_party_templates, save_as_html
+from enemygen.views_lib import generate_pdf, get_filter, get_party_templates, save_as_html, generate_pngs
 from enemygen.views_lib import spirit_options, get_party_context, get_enemies_lucky, get_party_filter
 
 def index(request):
@@ -160,6 +160,14 @@ def pdf_export(request):
         response['Content-Length'] = len(data)
         return response
 
+def png_export(request):
+    if request.GET and request.GET.get('action') == 'png_export':
+        png_paths = generate_pngs(request.GET.get('generated_html'))
+        new_paths = []
+        for path in png_paths:
+            new_paths.append(path.replace('/projects/rq_tools/temp/', '/rq_temp/'))
+        return render(request, 'generated_enemies_as_pngs.html', {'png_paths': new_paths})
+        
 @login_required
 def create_enemy_template(request):
     race_id = request.POST.get('race_id')

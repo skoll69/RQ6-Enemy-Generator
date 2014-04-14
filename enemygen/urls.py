@@ -24,6 +24,7 @@ urlpatterns = patterns('',
     url(r'^feature_items/(?P<feature_id>\d+)/$', views.feature_items, name='feature_items'),
 
     url(r'^pdf_export/$', views.pdf_export, name='pdf_export'),
+    url(r'^png_export/$', views.png_export, name='png_export'),
     url(r'^delete_template/(?P<template_id>\d+)/$', views.delete_template, name='delete_template'),
     url(r'^clone_race/(?P<race_id>\d+)/$', views.clone_race, name='clone_race'),
     url(r'^clone_template/(?P<template_id>\d+)/$', views.clone_template, name='clone_template'),
