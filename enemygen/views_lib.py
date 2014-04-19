@@ -44,6 +44,7 @@ def get_et_context(et):
     context['mysticism_spells'] = spell_list('mysticism', et)
     context['combat_styles'] = combat_styles(et)
     context['spirit_options'] = spirit_options()
+    context['cult_options'] = cult_options()
     context['additional_feature_lists'] = AdditionalFeatureList.objects.filter(type='enemy_feature')
     context['namelists'] = AdditionalFeatureList.objects.filter(type='name')
     return context
@@ -58,28 +59,29 @@ def get_party_templates(filter=None):
 def get_party_context(party):
     context = {}
     context['party'] = party
-    context['templates'] = EnemyTemplate.objects.filter(Q(published=True) | Q(owner=party.owner)).order_by('name')
+    context['templates'] = EnemyTemplate.objects.filter(Q(published=True) | Q(owner=party.owner)).exclude(race__name='Cult').order_by('name')
     context['all_party_tags'] = sorted(list(Party.tags.all()), key=lambda x: x.name)
     context['additional_feature_lists'] = AdditionalFeatureList.objects.filter(type='party_feature')
     return context
     
 def get_enemy_templates(filter, user):
-    #if filter and filter != 'None':
+    published_templates = EnemyTemplate.objects.filter(published=True).order_by('rank').exclude(race__name='Cult')
     if filter and filter not in ('None', 'Starred'):
-        templates = list(EnemyTemplate.objects.filter(tags__name__in=[filter,], published=True).order_by('rank'))
+        templates = list(published_templates.filter(tags__name__in=[filter,]))
     elif filter == 'Starred':
         templates = EnemyTemplate.get_starred(user)
     else:
-        templates = list(EnemyTemplate.objects.filter(published=True).order_by('rank'))
-    # Add the unpublished templates of the logged-in user
+        templates = list(published_templates)
     if user.is_authenticated():
+        # Add the unpublished templates of the logged-in user
+        unpublished_templates = EnemyTemplate.objects.filter(published=False, owner=user).order_by('rank').exclude(race__name='Cult')
         if filter:
-            templates.extend(list(EnemyTemplate.objects.filter(tags__name__in=[filter,], published=False, owner=user)))
+            templates.extend(list(unpublished_templates.filter(tags__name__in=[filter,])))
         else:
-            templates.extend(list(EnemyTemplate.objects.filter(published=False, owner=user)))
-    if user.is_authenticated():
-        for et in templates:                    # We can't call is_starred with the user parameter in 
-            et.starred = et.is_starred(user)    # Django template
+            templates.extend(list(unpublished_templates))
+        # Add stars (We can't call is_starred with the user parameter in Django template)
+        for et in templates:
+            et.starred = et.is_starred(user)
     return templates
     
 def get_enemies(request):
@@ -201,6 +203,9 @@ def combat_styles(et):
     
 def spirit_options():
     return EnemyTemplate.objects.filter(race__discorporate=True, published=True)
+    
+def cult_options():
+    return EnemyTemplate.objects.filter(race__name='Cult', published=True)
     
 def is_race_admin(user):
     return bool(user.groups.filter(name='race_admin').count())

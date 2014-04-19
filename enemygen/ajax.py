@@ -5,7 +5,7 @@ from enemygen.models import SpellAbstract, SkillAbstract, EnemySpell, EnemyHitLo
 from enemygen.models import CombatStyle, Weapon, CustomSpell, EnemyWeapon, CustomWeapon
 from enemygen.models import Race, RaceStat, HitLocation, CustomSkill, Party, TemplateToParty, EnemySpirit
 from enemygen.models import EnemyAdditionalFeatureList, PartyAdditionalFeatureList, AdditionalFeatureList
-from enemygen.models import EnemyNonrandomFeature, PartyNonrandomFeature
+from enemygen.models import EnemyNonrandomFeature, PartyNonrandomFeature, EnemyCult
 
 import logging
 from bs4 import BeautifulSoup
@@ -61,7 +61,20 @@ def add_spirit(request, spirit_ids, et_id):
         except Exception as e:
             error += str(e)
     if error:
-        return simplejson.dumps({'error': str(e)})
+        return simplejson.dumps({'error': error})
+    else:
+        return simplejson.dumps({'success': True})
+        
+@dajaxice_register
+def add_cult(request, cult_ids, et_id):
+    error = ''
+    for cult_id in cult_ids:
+        try:
+            es = EnemyCult.create(cult_id, et_id)
+        except Exception as e:
+            error += str(e)
+    if error:
+        return simplejson.dumps({'error': error})
     else:
         return simplejson.dumps({'success': True})
         
@@ -119,6 +132,10 @@ def del_item(request, item_id, item_type):
             return simplejson.dumps({'success': True})
         elif item_type == 'et_spirit':
             es = EnemySpirit.objects.get(id=id)
+            es.delete()
+            return simplejson.dumps({'success': True})
+        elif item_type == 'et_cult':
+            es = EnemyCult.objects.get(id=id)
             es.delete()
             return simplejson.dumps({'success': True})
         elif item_type == 'et_additional_feature':
@@ -302,6 +319,18 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             try:
                 es.probability = int(value)
                 es.save()
+            except ValueError:
+                success = False
+                message = 'Probability must be a number.'
+        elif object == 'et_cult_amount':
+            et = EnemyTemplate.objects.get(id=id, owner=request.user)
+            et.cult_amount = value
+            et.save()
+        elif object == 'et_cult_prob':
+            ec = EnemyCult.objects.get(id=id)
+            try:
+                ec.probability = int(value)
+                ec.save()
             except ValueError:
                 success = False
                 message = 'Probability must be a number.'
@@ -565,6 +594,6 @@ def toggle_star(request, et_id):
     
 @dajaxice_register(method='GET')
 def search(request, string):
-    templates = [et.summary_dict(request.user) for et in EnemyTemplate.search(string)]
+    templates = [et.summary_dict(request.user) for et in EnemyTemplate.search(string, request.user)]
     return simplejson.dumps({'results': templates, 'success': True})
     

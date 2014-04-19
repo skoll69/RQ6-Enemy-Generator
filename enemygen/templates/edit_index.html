@@ -52,7 +52,21 @@
 {% endif %}
 </td><td width="20">
 </td><td valign="top">
-    <h3>Party</h3>
+    <h3>Cults</h3>
+    <form action="{% url 'create_cult'%}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Create new cult">
+    </form>
+    <table>
+    {% for cult in edit_cults %}
+        <tr>
+            <td><a class="edit_item" href="{% url 'enemy_template' cult.id %}">{{ cult.name }}</a>{% if not cult.published %} *{% endif %}</td>
+        </tr>
+    {% endfor %}
+    </table>
+</td><td width="20">
+</td><td valign="top">
+    <h3>Parties</h3>
     <form action="{% url 'create_party'%}" method="post">
     {% csrf_token %}
     <input type="submit" value="Create new party">

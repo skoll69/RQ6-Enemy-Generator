@@ -62,6 +62,10 @@ div.enemy_container{
     border-collapse: collapse;
 }
 
+table#attributes{
+    max-width: 240px;
+}
+
 .inner_enemy_table td{
     padding: 2px;
 }
@@ -227,6 +231,7 @@ div#png_export{
 
 {% if enemy.sorcery_spells %}
     <span class="title">Maximum shaping: </span><span class="item_list">{{ enemy.attributes.max_shaping }}</span><br>
+    <span class="title">Intensity: </span><span class="item_list">{{ enemy.attributes.intensity }}</span><br>
     <span class="title">Sorcery spells:</span><span class="item_list">
         {% for spell in enemy.sorcery_spells %}
             {{ spell.name }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}
@@ -332,13 +337,18 @@ div#png_export{
     </td><td valign="top">
         <table class="inner_enemy_table" id="attributes">
             <tr class="toprow"> <th colspan="2">Attributes</th></tr>
-            <tr class="oddrow"> <td>Action Points</td>  <td>{{ enemy.attributes.action_points }}</td></tr>
-            <tr class="evenrow"><td>Damage Modifier</td><td>{{ enemy.attributes.damage_modifier }}</td></tr>
-            <tr class="oddrow"> <td>Magic Points</td>   <td>{{ enemy.attributes.magic_points }}</td></tr>
+            <tr class="oddrow"> <td>Action&nbsp;Points</td>  <td>{{ enemy.attributes.action_points }}</td></tr>
+            <tr class="evenrow"><td>Damage&nbsp;Modifier</td><td>{{ enemy.attributes.damage_modifier }}</td></tr>
+            <tr class="oddrow"> <td>Magic&nbsp;Points</td>   <td>{{ enemy.attributes.magic_points }}</td></tr>
             <tr class="evenrow"><td>Movement</td>       <td>{{ enemy.attributes.movement }}</td></tr>
-            <tr class="oddrow"> <td>Strike Rank</td>    <td>{{ enemy.attributes.strike_rank }}</td></tr>
-            <tr class="evenrow"><td>Cult rank</td>      <td>{{ enemy.cult_rank }}</td></tr>
-            <tr class="oddrow"> <td>&nbsp;</td>         <td>&nbsp;</td></tr>
+            <tr class="oddrow"> <td>Strike&nbsp;Rank</td>    <td>{{ enemy.attributes.strike_rank }}</td></tr>
+            <tr class="evenrow"><td>Cult&nbsp;rank</td>      <td>{{ enemy.cult_rank }}</td></tr>
+            <tr class="oddrow">
+                {% if enemy.cults|length == 1 and enemy.cults.0.name|length <= 27 %}
+                    <td>Cult</td>         <td>{{ enemy.cults.0.name }}</td></tr>
+                {% else %}
+                    <td>&nbsp;</td>         <td>&nbsp;</td></tr>
+                {% endif %}
         </table>
     {% if enemy.hit_locations %}
     </td><td valign="top">
@@ -354,6 +364,14 @@ div#png_export{
     </td></tr>
 </table>
     
+{% if enemy.cults|length > 1 or enemy.cults.0.name|length > 27 %}
+<span class="title">Cults:</span><span class="item_list">
+    {% for cult in enemy.cults %}
+        {{ cult.name }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</span><br>
+{% endif %}
+
 <span class="title">Skills:</span><span class="item_list">
     {% for skill in enemy.skills %}
         {{ skill.name }} {{skill.value}}%{% if not forloop.last %}, {% endif %}
@@ -368,10 +386,9 @@ div#png_export{
     </span><br>
 {% endif %}
 
-{% if enemy.attributes.max_shaping %}
-    <span class="title">Maximum shaping: </span><span class="item_list">{{ enemy.attributes.max_shaping }}</span><br>
-{% endif %}
 {% if enemy.sorcery_spells %}
+    <span class="title">Maximum shaping: </span><span class="item_list">{{ enemy.attributes.max_shaping }}</span><br>
+    <span class="title">Intensity: </span><span class="item_list">{{ enemy.attributes.intensity }}</span><br>
     <span class="title">Sorcery spells:</span><span class="item_list">
         {% for spell in enemy.sorcery_spells %}
             {{ spell.name }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}

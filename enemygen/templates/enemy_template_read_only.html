@@ -79,6 +79,20 @@
 </table>
 </td></tr></table>
 
+{% if et.cults and et.cult_amount != '0' %}
+<h3>Cults</h3>
+Amount: {{ et.cult_amount }}
+<table>
+<tr><th>Cult</th><th>Prob.</th></tr>
+{% for cult in et.cults %}
+<tr>
+    <td><a href="{% url 'enemy_template' cult.cult.id %}">{{ cult.name }}</a></td>
+    <td>{{ cult.probability }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+
 <div> <!-- Additional Features -->
     {% if et.additional_features %}
         <h3>Additional features</h3>

@@ -55,12 +55,13 @@ def generate_party(request):
 @login_required
 def edit_index(request):
     context = get_context(request)
-    templates = EnemyTemplate.objects.filter(owner=request.user)
+    templates = EnemyTemplate.objects.filter(owner=request.user).exclude(race__name='Cult')
     for et in templates:
         et.starred = et.is_starred(request.user)
     context['enemy_templates'] = templates
-    context['races'] = Race.objects.filter(published=True)
+    context['races'] = Race.objects.filter(published=True).exclude(name='Cult')
     context['edit_races'] = Race.objects.filter(owner=request.user)
+    context['edit_cults'] = EnemyTemplate.objects.filter(owner=request.user, race__name='Cult')
     context['edit_parties'] = Party.objects.filter(owner=request.user)
     context['race_admin'] = is_race_admin(request.user)
     return render(request, 'edit_index.html', context)
@@ -70,6 +71,8 @@ def enemy_template(request, enemy_template_id):
     template = 'enemy_template.html'
     et = get_object_or_404(EnemyTemplate, id=enemy_template_id)
     et.starred = et.is_starred(request.user)
+    if et.is_cult:
+        template = 'enemy_template_cult.html'
     if et.owner != request.user:
         template = 'enemy_template_read_only.html'
     context.update(get_et_context(et))
@@ -187,6 +190,13 @@ def create_race(request):
 def create_party(request):
     p = Party.create(request.user)
     return redirect(party, p.id)
+
+@login_required
+def create_cult(request):
+    ruleset = get_ruleset(request)
+    race = Race.objects.get(name='Cult')
+    et = EnemyTemplate.create(owner=request.user, ruleset=ruleset, race=race)
+    return redirect(enemy_template, et.id)
 
 @login_required
 def delete_template(request, template_id):

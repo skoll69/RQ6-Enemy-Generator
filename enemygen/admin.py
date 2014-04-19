@@ -4,8 +4,8 @@ from enemygen.models import EnemyTemplate, Ruleset, Race, HitLocation
 from enemygen.models import SkillAbstract, SpellAbstract, StatAbstract, Weapon
 from enemygen.models import EnemySkill, EnemySpell, EnemyStat, EnemyHitLocation, RaceStat
 from enemygen.models import CombatStyle, CustomSpell, CustomWeapon, Party, TemplateToParty
-from enemygen.models import EnemySpirit, ChangeLog, EnemyNonrandomFeature
-from enemygen.models import AdditionalFeatureList, AdditionalFeatureItem
+from enemygen.models import EnemySpirit, ChangeLog, EnemyNonrandomFeature, EnemyCult
+from enemygen.models import AdditionalFeatureList, AdditionalFeatureItem, Star
 from enemygen.models import EnemyAdditionalFeatureList, PartyAdditionalFeatureList
 
 class EnemyTemplateAdmin(admin.ModelAdmin):
@@ -80,6 +80,9 @@ class PartyAdmin(admin.ModelAdmin):
     list_display = ('name', 'owner')
     ordering = ('name',)
 
+class StarAdmin(admin.ModelAdmin):
+    list_display = ('user', 'template')
+
 class HitLocationAdmin(admin.ModelAdmin):
     list_display = ('name', 'range', 'race', 'hp_modifier', 'armor')
     list_filter = ('race',)
@@ -110,3 +113,5 @@ admin.site.register(StatAbstract, StatAbstractAdmin)
 admin.site.register(EnemyStat, EnemyStatAdmin)
 admin.site.register(SpellAbstract, SpellAbstractAdmin)
 admin.site.register(EnemySpell, EnemySpellAdmin)
+admin.site.register(Star, StarAdmin)
+admin.site.register(EnemyCult)

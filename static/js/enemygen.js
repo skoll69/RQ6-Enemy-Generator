@@ -73,6 +73,12 @@ function add_spirit(event){
     Dajaxice.enemygen.add_spirit(refresh_page, {'spirit_ids': spirit_ids, 'et_id': et_id})
 }
 
+function add_cult(event){
+    var cult_ids = $('#cult_options').val();
+    var et_id = $(event.target).attr('et_id');
+    Dajaxice.enemygen.add_cult(refresh_page, {'cult_ids': cult_ids, 'et_id': et_id})
+}
+
 function add_template_to_party(event){
     var template_ids = $('#template_ids').val();
     var party_id = $(event.target).attr('party_id');
@@ -346,6 +352,10 @@ $(document).ready(function(){
 
     $('#add_spirit').click(function(event){
         add_spirit(event);
+    })
+
+    $('#add_cult').click(function(event){
+        add_cult(event);
     })
 
     $('#add_template_to_party').click(function(event){

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block title %}RQ: {{ et.name }}{% endblock %}
+
+{% block content %}
+
+<div> <!-- Buttons -->
+    <form action="{% url 'delete_template' et.id %}" method="post">
+    {% csrf_token %}
+    <div id="delete_template"><input type="submit" value="Delete template" /></div>
+    </form>
+
+    <div id="clone_template_container">
+    <form action="{% url 'clone_template' et.id %}" method="post">
+    {% csrf_token %}
+    <input id="clone_template" type="submit" value="Clone" />
+    </form>
+    </div>
+
+    <div id="generate_enemy_container">
+    <form action="{% url 'generate_enemies' %}" method="post" target="generated">
+    {% csrf_token %}
+    <input name="enemy_template_id_{{et.id}}" type="hidden" value="6">
+    <input name="dont_increment" type="hidden" value="1">
+    <input style="width: 140px;" type="submit" value="Generate" />
+    </form>
+    </div>
+</div>
+
+<h3>Cult details</h3>
+<table><tr>
+    <th>Template name</th>
+    <td><input id="et_{{ et.id }}" class="data" type="text" size="40" item_id="{{ et.id }}" item_type="et_name" value="{{ et.name }}" /></td>
+</tr><tr>
+    <th>Cult Rank</th>
+    <td>
+        <select id="et_cult_rank_{{ et.id }}" class="data" item_id="{{ et.id }}" item_type="et_cult_rank">
+            <option value="0" {% if et.cult_rank == 0 %}selected="selected"{% endif %}>None</option>
+            <option value="1" {% if et.cult_rank == 1 %}selected="selected"{% endif %}>Common</option>
+            <option value="2" {% if et.cult_rank == 2 %}selected="selected"{% endif %}>Dedicated</option>
+            <option value="3" {% if et.cult_rank == 3 %}selected="selected"{% endif %}>Proven</option>
+            <option value="4" {% if et.cult_rank == 4 %}selected="selected"{% endif %}>Overseer</option>
+            <option value="5" {% if et.cult_rank == 5 %}selected="selected"{% endif %}>Leader</option>
+        </select>
+    </td>
+</tr><tr>
+    <th>Published</th>
+    <td><input id="et_pub_{{ et.id }}" class="data" type="checkbox" item_id="{{ et.id }}" item_type="et_published" {% if et.published %}checked="checked"{% endif %} /></td>
+</tr><tr>
+    <th>Notes</th>
+    <td><textarea id="et_notes_{{ et.id }}" class="data" cols="60" rows="3" item_id="{{ et.id }}" item_type="et_notes">{{ et.notes }}</textarea></td>
+</tr></table>
+
+{% include 'enemy_template_spells.html' %}
+
+{% endblock %}

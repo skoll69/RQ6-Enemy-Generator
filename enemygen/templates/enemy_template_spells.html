@@ -135,7 +135,6 @@ Amount:
 
 </table>
 <select multiple id="spirit_options" name="spirit_options" size="4">
-    <option value="0">Select spirit</option>
     {% for spirit in spirit_options %}
         <option value="{{ spirit.id }}">{{ spirit.name }}</option>
     {% endfor %}
