@@ -3,40 +3,54 @@
 
 {% block content %}
 
-<style>
-div.statistics{
-    float: left;
-    margin-right: 10px;
-}
-</style>
+<h2>Index</h2>
+<a href="#users">Users</a><br>
+<a href="#templates">Templates</a><br>
+<a href="#races">Races</a><br>
+<a href="#cults">Cults</a><br><br>
 
-<div class="statistics">
-<h2>Templates</h2>
-<table>
-<tr><th>Template</th><th>Gen.</th></tr>
-{% for template in statistics.templates %}
-<tr><td><a href="{% url 'enemy_template' template.id %}">{{template.name}}</a></td><td>{{template.generated}}</td></tr>
-{% endfor %}
-</table>
-</div>
-
-<div class="statistics">
-<h2>Races</h2>
-<table>
-<tr><th>Race</th><th>Templates</th></tr>
-{% for race in statistics.races %}
-<tr><td><a href="{% url 'race' race.id %}">{{race.name}}</a></td><td>{{race.template_amount}}</td></tr>
-{% endfor %}
-</table>
-</div>
-
-<div class="statistics">
-<h2>Users with most templates</h2>
+<a name="users"></a><h2>Users with most templates</h2>
 <table>
 <tr><th>User</th><th>Templates</th></tr>
 {% for user in statistics.users %}
 <tr><td>{{user.name}}</td><td>{{user.template_amount}}</td></tr>
 {% endfor %}
 </table>
-</div>
+
+<a name="templates"></a><h2>Templates</h2>
+<p><b>Total number of published templates: {{ statistics.total_published_templates }}</b></p>
+<table>
+<tr><th>Template</th><th>Times Generated</th></tr>
+{% for template in statistics.templates %}
+<tr><td><a href="{% url 'enemy_template' template.id %}">{{template.name}}</a></td><td>{{template.generated}}</td></tr>
+{% endfor %}
+</table>
+
+<a name="races"></a><h2>Races</h2>
+<p><b>Total number of published races: {{ statistics.total_published_races }}</b></p>
+<table>
+<tr><th>Race</th><th>Templates</th></tr>
+{% for race in statistics.races %}
+<tr><td><a href="{% url 'race' race.id %}">{{race.name}}</a></td><td>{{race.template_amount}}</td></tr>
+{% endfor %}
+</table>
+
+<a name="cults"></a><h2>Cults</h2>
+<table>
+    <tr><th>Rank</th><th>Number of cults</th></tr>
+    <tr><td>Common / Lay Member / Follower / Novice / Aspirant</td><td>{{ statistics.common_cults }}</td></tr>
+    <tr><td>Dedicated / Initiate / Spirit Worshipper / Apprentice / Student</td><td>{{ statistics.dedicated_cults }}</td></tr>
+    <tr><td>Proven / Acolyte / Shaman / Adept / Disciple</td><td>{{ statistics.proven_cults }}</td></tr>
+    <tr><td>Overseer / Priest / High Shaman / Mage / Master</td><td>{{ statistics.overseer_cults }}</td></tr>
+    <tr><td>Leader / High Priest / Spirit Lord / Arch Mage / Sage / Grand Master</td><td>{{ statistics.leader_cults }}</td></tr>
+    <tr><td><b>Total</b></td><td><b>{{ statistics.total_published_cults }}</b></td></tr>
+</table>
+<br><br>
+<table>
+<tr><th>Cult</th><th>Rank</th></tr>
+{% for cult in statistics.cults %}
+<tr><td><a href="{% url 'enemy_template' cult.id %}">{{cult.name}}</a></td><td>{{cult.rank}}</td></tr>
+{% endfor %}
+</table>
+
 {% endblock %}

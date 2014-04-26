@@ -250,7 +250,7 @@ div#png_export{
 {% endif %}
 
 {% if enemy.mysticism_spells %}
-    <span class="title">Maximum intensity: </span><span class="item_list">{{ enemy.attributes.max_intensity }}</span> / 
+    <span class="title">Maximum intensity: </span><span class="item_list">{{ enemy.attributes.max_mysticism_intensity }}</span> / 
     <span class="title">Max total intensity: </span><span class="item_list">{{ enemy.attributes.max_total_intensity }}</span><br>
     <span class="title">Mystic talents:</span><span class="item_list">
         {% for spell in enemy.mysticism_spells %}
@@ -363,9 +363,9 @@ div#png_export{
     {% endif %}
     </td></tr>
 </table>
-    
-{% if enemy.cults|length > 1 or enemy.cults.0.name|length > 27 %}
-<span class="title">Cults:</span><span class="item_list">
+
+{% if enemy.cults|length > 1 or enemy.cults|length = 1 and enemy.cults.0.name|length > 27 %}
+<span class="title">Cult(s):</span><span class="item_list">
     {% for cult in enemy.cults %}
         {{ cult.name }}{% if not forloop.last %}, {% endif %}
     {% endfor %}
@@ -407,7 +407,7 @@ div#png_export{
 {% endif %}
 
 {% if enemy.mysticism_spells %}
-    <span class="title">Maximum intensity: </span><span class="item_list">{{ enemy.attributes.max_intensity }}</span> / 
+    <span class="title">Maximum intensity: </span><span class="item_list">{{ enemy.attributes.max_mysticism_intensity }}</span> / 
     <span class="title">Max total intensity: </span><span class="item_list">{{ enemy.attributes.max_total_intensity }}</span><br>
     <span class="title">Mystic talents:</span><span class="item_list">
         {% for spell in enemy.mysticism_spells %}

@@ -216,7 +216,7 @@ def is_superuser(user):
 def get_statistics():
     output = {}
     
-    templates = list((et.name, et.generated, et.id) for et in EnemyTemplate.objects.filter(published=True))
+    templates = list((et.name, et.generated, et.id) for et in EnemyTemplate.objects.filter(published=True).exclude(race__name='Cult'))
     templates = sorted(templates, reverse=True, key=lambda et: et[1])
     templates_out = []
     for et in templates:
@@ -238,6 +238,21 @@ def get_statistics():
         if u[1] > 2:
             users_out.append({'name': u[0], 'template_amount': u[1]})
     output['users'] = users_out
+    
+    cults = EnemyTemplate.objects.filter(published=True, race__name='Cult')
+    cults = list({'name': et.name, 'id': et.id, 'rank': et.get_cult_rank_display(), 'rank_int': et.cult_rank} for et in cults)
+    cults = sorted(cults, reverse=False, key=lambda et: et['name'])
+    cults_out = cults
+    output['cults'] = cults_out
+    
+    output['total_published_templates'] = EnemyTemplate.objects.filter(published=True).exclude(race__name='Cult').count()
+    output['total_published_races'] = Race.objects.filter(published=True).count()
+    output['total_published_cults'] = EnemyTemplate.objects.filter(published=True, race__name='Cult').count()
+    output['common_cults'] = EnemyTemplate.objects.filter(published=True, race__name='Cult', cult_rank=1).count()
+    output['dedicated_cults'] = EnemyTemplate.objects.filter(published=True, race__name='Cult', cult_rank=2).count()
+    output['proven_cults'] = EnemyTemplate.objects.filter(published=True, race__name='Cult', cult_rank=3).count()
+    output['overseer_cults'] = EnemyTemplate.objects.filter(published=True, race__name='Cult', cult_rank=4).count()
+    output['leader_cults'] = EnemyTemplate.objects.filter(published=True, race__name='Cult', cult_rank=5).count()
     
     return output
     

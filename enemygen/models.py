@@ -1352,8 +1352,6 @@ class _Enemy(object):
         self.sorcery_spells = [ x for x in self.sorcery_spells if x.name not in seen and not seen.add(x.name)]
         seen = set()
         self.mysticism_spells = [ x for x in self.mysticism_spells if x.name not in seen and not seen.add(x.name)]
-        seen = set()
-        self.spirits = [ x for x in self.spirits if x.name not in seen and not seen.add(x.name)]
             
         self.folk_spells.sort(key=lambda item: item.name)
         self.theism_spells.sort(key=lambda item: item.name)
@@ -1404,7 +1402,7 @@ class _Enemy(object):
             self.attributes['intensity'] = int(math.ceil(self.skills_dict['Invocation'] / 10.0))
         if 'Mysticism' in self.skills_dict and 'Meditation' in self.skills_dict:
             self.is_mystic = True
-            self.attributes['max_intensity'] = int(math.ceil(self.skills_dict['Mysticism'] / 20.0))
+            self.attributes['max_mysticism_intensity'] = int(math.ceil(self.skills_dict['Mysticism'] / 20.0))
             self.attributes['max_total_intensity'] = int(math.ceil(self.skills_dict['Meditation'] / 10.0))
         if 'Binding' in self.skills_dict:
             self.is_animist = True
