@@ -4,6 +4,14 @@
 {% block content %}
 <div id="search_container">
     <input id="search" size="60" type="text" /> <button id="search_button">Search</button>
+    <div id="rank_filter">
+    Filter by rank:
+    <input type="checkbox" id="1" class="rank" /> Rabble |
+    <input type="checkbox" id="2" class="rank" /> Novice | 
+    <input type="checkbox" id="3" class="rank" /> Skilled | 
+    <input type="checkbox" id="4" class="rank" /> Veteran | 
+    <input type="checkbox" id="5" class="rank" /> Master
+    </div>
 </div>
 <div id="results_number">&nbsp;</div>
 <div id="search_results" style="display: none;">
@@ -21,7 +29,7 @@
     <hr>
     </div>
     <div id="generate_button_container">
-        <input id="generate_button" disabled class="disabled" type="submit" name="generate" value="Generate">
+        <input id="generate_button" disabled class="disabled" type="submit" name="generate" value="Generate"><br>
     </div>
 </form>
 

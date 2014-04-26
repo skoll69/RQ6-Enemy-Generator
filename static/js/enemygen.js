@@ -223,7 +223,11 @@ function search_callback(result){
 
 function search(){
     var string = $('input#search').val();
-    Dajaxice.enemygen.search(function(result){search_callback(result)}, {'string': string});
+    var rank_filter = [];
+    $('input.rank:checked').each(function(){
+        rank_filter.push(parseInt($(this).attr('id')));
+    })
+    Dajaxice.enemygen.search(function(result){search_callback(result)}, {'string': string, 'rank_filter': rank_filter});
     $('#enemy_template_list tr:gt(0)').remove();
     $('#getting_started').remove();
     $('#enemy_template_list').show();

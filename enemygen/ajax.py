@@ -593,7 +593,7 @@ def toggle_star(request, et_id):
         return simplejson.dumps({'success': False})
     
 @dajaxice_register(method='GET')
-def search(request, string):
-    templates = [et.summary_dict(request.user) for et in EnemyTemplate.search(string, request.user)]
+def search(request, string, rank_filter):
+    templates = [et.summary_dict(request.user) for et in EnemyTemplate.search(string, request.user, rank_filter)]
     return simplejson.dumps({'results': templates, 'success': True})
     
