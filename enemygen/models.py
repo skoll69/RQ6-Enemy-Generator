@@ -505,7 +505,10 @@ class EnemyTemplate(models.Model, Printer):
             
     @classmethod
     def search(cls, string, user, rank_filter=None):
-        queryset = EnemyTemplate.objects.filter(Q(published=True) | Q(published=False, owner=user))#.exclude(race__name='Cult')
+        if user.is_authenticated():
+            queryset = EnemyTemplate.objects.filter(Q(published=True) | Q(published=False, owner=user))
+        else:
+            queryset = EnemyTemplate.objects.filter(published=True)
         queryset = queryset.exclude(race__name='Cult')
         if rank_filter:
             queryset = queryset.filter(rank__in=rank_filter)
