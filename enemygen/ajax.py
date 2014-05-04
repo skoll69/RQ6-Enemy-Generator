@@ -531,7 +531,8 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             party.save()
         elif object == 'party_newtag':
             p = Party.objects.get(id=id, owner=request.user)
-            p.tags.add(value.capitalize())
+            for tag in value.split(','):
+                p.tags.add(tag.strip().capitalize())
         elif object == 'party_deltag':
             p = Party.objects.get(id=id, owner=request.user)
             p.tags.remove(value.capitalize())
@@ -543,7 +544,8 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             et.save()
         elif object == 'et_newtag':
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
-            et.tags.add(value.capitalize())
+            for tag in value.split(','):
+                et.tags.add(tag.strip().capitalize())
         elif object == 'et_deltag':
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
             et.tags.remove(value.capitalize())
@@ -593,7 +595,8 @@ def toggle_star(request, et_id):
         return simplejson.dumps({'success': False})
     
 @dajaxice_register(method='GET')
-def search(request, string, rank_filter):
-    templates = [et.summary_dict(request.user) for et in EnemyTemplate.search(string, request.user, rank_filter)]
+def search(request, string, rank_filter, cult_rank_filter):
+    templs = EnemyTemplate.search(string, request.user, rank_filter, cult_rank_filter)
+    templates = [et.summary_dict(request.user) for et in templs]
     return simplejson.dumps({'results': templates, 'success': True})
     

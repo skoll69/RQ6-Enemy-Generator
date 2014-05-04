@@ -10,7 +10,7 @@ function submit_callback(result, input_object){
         $('#commit_result').html('Save successful');
         animate_background(input_object, true);
     } else {
-        if (input_object.type == 'checkbox'){
+        if (input_object && input_object.type == 'checkbox'){
             $(input_object).prop('checked', result.original_value);
         } else {
             $(input_object).val(result.original_value);
@@ -227,7 +227,12 @@ function search(){
     $('input.rank:checked').each(function(){
         rank_filter.push(parseInt($(this).attr('id')));
     })
-    Dajaxice.enemygen.search(function(result){search_callback(result)}, {'string': string, 'rank_filter': rank_filter});
+    var cult_rank_filter = [];
+    $('input.cult_rank:checked').each(function(){
+        cult_rank_filter.push(parseInt($(this).attr('id')));
+    })
+    var data = {'string': string, 'rank_filter': rank_filter, 'cult_rank_filter': cult_rank_filter}
+    Dajaxice.enemygen.search(function(result){search_callback(result)}, data);
     $('#enemy_template_list tr:gt(0)').remove();
     $('#getting_started').remove();
     $('#enemy_template_list').show();

@@ -504,7 +504,7 @@ class EnemyTemplate(models.Model, Printer):
             return []
             
     @classmethod
-    def search(cls, string, user, rank_filter=None):
+    def search(cls, string, user, rank_filter=None, cult_rank_filter=None):
         if user.is_authenticated():
             queryset = EnemyTemplate.objects.filter(Q(published=True) | Q(published=False, owner=user))
         else:
@@ -512,6 +512,8 @@ class EnemyTemplate(models.Model, Printer):
         queryset = queryset.exclude(race__name='Cult')
         if rank_filter:
             queryset = queryset.filter(rank__in=rank_filter)
+        if cult_rank_filter:
+            queryset = queryset.filter(cult_rank__in=cult_rank_filter)
         for word in string.split(' '):
             queryset = queryset.filter(Q(name__icontains=word) | 
                                        Q(race__name__icontains=word) |

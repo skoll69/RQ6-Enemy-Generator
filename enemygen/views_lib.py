@@ -146,7 +146,7 @@ def _get_party_enemies(party):
         amount = ttp.get_amount()
         et.increment_used()
         for i in xrange(amount):
-            enemies.append(et.generate(i+1))
+            enemies.append(et.generate(i+1, True))
     return enemies
     
 
@@ -231,7 +231,7 @@ def get_statistics():
         races_out.append({'name': r[0], 'id': r[1], 'template_amount': r[2]})
     output['races'] = races_out
     
-    users = list((u.username, len(EnemyTemplate.objects.filter(owner=u, published=True))) for u in User.objects.all())
+    users = list((u.username, len(EnemyTemplate.objects.filter(owner=u, published=True).exclude(race__name='Cult'))) for u in User.objects.all())
     users = sorted(users, reverse=True, key=lambda tup: tup[1])
     users_out = []
     for u in users:

@@ -64,8 +64,6 @@ $(document).ready(function(){
 <form action="{% url 'generate_party' %}" method="post" target="_blank">
 {% csrf_token %}
 <input name="party_id" type="hidden" value="{{ party.id }}">
-<input name="party_id" type="hidden" value="{{ party.id }}">
-<input name="dont_increment" type="hidden" value="1">
 <input style="width: 140px;" type="submit" value="Generate" />
 </form>
 </div>

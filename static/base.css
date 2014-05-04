@@ -123,11 +123,11 @@ h4{
 
 /* Basic stuff ends */
 
-#rank_filter{
+.rank_filter{
     font-size: 14px;
 }
 
-#rank_filter input{
+.rank_filter input{
     position: relative;
     top: 2px;
 }
