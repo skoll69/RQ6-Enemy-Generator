@@ -515,10 +515,16 @@ class EnemyTemplate(models.Model, Printer):
         if cult_rank_filter:
             queryset = queryset.filter(cult_rank__in=cult_rank_filter)
         for word in string.split(' '):
-            queryset = queryset.filter(Q(name__icontains=word) | 
-                                       Q(race__name__icontains=word) |
-                                       Q(tags__name__icontains=word)
-            )
+            if word[0] == '-':
+                word = word[1:]
+                queryset = queryset.exclude(name__icontains=word)
+                queryset = queryset.exclude(race__name__icontains=word)
+                queryset = queryset.exclude(tags__name__icontains=word)
+            else:
+                queryset = queryset.filter(Q(name__icontains=word) | 
+                                           Q(race__name__icontains=word) |
+                                           Q(tags__name__icontains=word)
+                                           )
         return queryset.distinct()
         
     def summary_dict(self, user=None):
