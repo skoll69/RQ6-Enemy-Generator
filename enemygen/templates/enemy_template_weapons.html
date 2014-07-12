@@ -14,7 +14,7 @@
         {% for weapon in cs.1h_melee %}
         <tr>
             <td>{{ weapon.name }}</td>
-            <td><input id="weapon_prob_{{weapon.id}}" class="data" size="4" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
+            <td><input id="weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
         </tr>
         {% endfor %}
     </table>
@@ -29,7 +29,7 @@
         {% for weapon in cs.2h_melee %}
         <tr>
             <td>{{ weapon.name }}</td>
-            <td><input id="weapon_prob_{{weapon.id}}" class="data" size="4" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
+            <td><input id="weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
         </tr>
         {% endfor %}
     </table>
@@ -44,7 +44,7 @@
         {% for weapon in cs.ranged %}
         <tr>
             <td>{{ weapon.name }}</td>
-            <td><input id="weapon_prob_{{weapon.id}}" class="data" size="4" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
+            <td><input id="weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
         </tr>
         {% endfor %}
     </table>
@@ -59,7 +59,7 @@
         {% for weapon in cs.shield %}
         <tr>
             <td>{{ weapon.name }}</td>
-            <td><input id="weapon_{{weapon.id}}" class="data" size="4" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
+            <td><input id="weapon_{{weapon.id}}" class="data number" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
         </tr>
         {% endfor %}
     </table>
@@ -107,9 +107,9 @@
         </td>
         <td><input id="custom_weapon_range_{{weapon.id}}" class="data" type="text" size="8" item_id="{{weapon.id}}" item_type="et_custom_weapon_range" value="{{weapon.range}}"></td>
         <td><input id="custom_weapon_dammod_{{weapon.id}}" class="data" type="checkbox" item_id="{{weapon.id}}" item_type="et_custom_weapon_damage_modifier" {% if weapon.damage_modifier %}checked="checked"{% endif %}></td>
-        <td><input id="custom_weapon_ap_{{weapon.id}}" class="data" size="2" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_ap" value="{{weapon.ap}}"></td>
-        <td><input id="custom_weapon_hp_{{weapon.id}}" class="data" size="2" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_hp" value="{{weapon.hp}}"></td>
-        <td><input id="custom_weapon_prob_{{weapon.id}}" class="data" size="4" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_prob" value="{{ weapon.probability }}" /></td>
+        <td><input id="custom_weapon_ap_{{weapon.id}}" class="data number" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_ap" value="{{weapon.ap}}"></td>
+        <td><input id="custom_weapon_hp_{{weapon.id}}" class="data number" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_hp" value="{{weapon.hp}}"></td>
+        <td><input id="custom_weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_prob" value="{{ weapon.probability }}" /></td>
         <td><img src="/rq_static/minus.png" width="23" height="23" class="del_item" item_id="{{ weapon.id }}" item_type="custom_weapon"/></td>
     </tr>
     {% endfor %}
