@@ -38,7 +38,6 @@ function bind_change_listeners(event){
 
 function animate_background(selector, success){
 	var item = $(selector);
-	var original_background = item.css('background');
     var color;
     if (success) {
         color = 'green';
@@ -46,7 +45,7 @@ function animate_background(selector, success){
         color = 'red';
     }
 	item.css('background', color)
-	item.animate({backgroundColor: original_background}, 3000);
+	item.animate({backgroundColor: 'white'}, 3000);
 }
 
 function add_custom_skill(event){
@@ -351,6 +350,11 @@ $(document).ready(function(){
 		bind_change_listeners(event);
 	});
 
+    $('.data:input[type=number]').change(function(event){
+		bind_change_listeners(event);
+    //    $(event.target).focus();
+    });
+    
 	$('input.data').focus(function(event){
 		$(event.target).data("default_value", $(event.target).val());
 	});
