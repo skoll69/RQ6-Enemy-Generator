@@ -1,5 +1,5 @@
 from enemygen.models import Ruleset, EnemyTemplate, Race, Weapon
-from enemygen.models import SpellAbstract, EnemySpell, CustomSpell
+from enemygen.models import SpellAbstract, EnemySpell, CustomSpell, ChangeLog
 from enemygen.models import Weapon, CombatStyle, EnemyWeapon, CustomWeapon, Party, AdditionalFeatureList
 
 from django.contrib.auth.models import User
@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 from tempfile import NamedTemporaryFile
 import os
 import random
+import datetime
 
 def get_filter(request):
     return request.session.get('filter', None)
@@ -28,6 +29,8 @@ def get_context(request):
     context['request'] = request
     context['all_et_tags'] = sorted(list(EnemyTemplate.tags.all()), key=lambda x: x.name)
     context['all_party_tags'] = sorted(list(Party.tags.all()), key=lambda x: x.name)
+    if (datetime.date.today() - ChangeLog.objects.all().reverse()[0].publish_date).days < 14:
+        context['recent_changes'] = True
     return context
     
 def get_et_context(et):
