@@ -1,1 +1,3 @@
-python manage.py dumpdata enemygen --indent 4 > enemygen.json
+python ./manage.py dumpdata enemygen --indent 4 > enemygen.json
+python ./manage.py dumpdata auth --indent 4 --exclude auth.permission > auth.json
+python ./manage.py dumpdata taggit --indent 4 > taggit.json
