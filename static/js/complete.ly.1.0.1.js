@@ -32,6 +32,7 @@ function completely(container, config) {
     txtInput.style.padding = '0';
     
     var txtHint = txtInput.cloneNode(); 
+    txtHint.id='txtHint';
     txtHint.disabled='';        
     txtHint.style.position = 'absolute';
     txtHint.style.top =  '0';
@@ -40,6 +41,7 @@ function completely(container, config) {
     txtHint.style.boxShadow =   'none';
     txtHint.style.color = config.hintColor;
     
+    txtInput.id='txtInput';
     txtInput.style.backgroundColor ='transparent';
     txtInput.style.verticalAlign = 'top';
     txtInput.style.position = 'relative';
@@ -356,7 +358,7 @@ function completely(container, config) {
                     txtHint.value = txtInput.value; // ensure that no hint is left.
                     txtInput.focus();
                     rs.onEnter();    
-                    return; 
+                    return;
                 }
                 
                 txtInput.value = txtHint.value;
