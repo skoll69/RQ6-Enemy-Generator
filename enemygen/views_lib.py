@@ -192,16 +192,23 @@ def weapons(combat_style):
     ''' Input: cs - CombatStyle '''
     out = {'1h_melee': [], '2h_melee': [], 'ranged': [], 'shield': []}
     filter = combat_style.enemy_template.weapon_filter if combat_style.enemy_template.weapon_filter else 'Standard'
+    prev_weapon = None
     for type in ('1h-melee', '2h-melee', 'ranged', 'shield'):
         typeout = type.replace('-', '_') # '-' is not allowed in the lookup string in Django template
         weaponlist = Weapon.objects.filter(type=type) if filter == 'All' else Weapon.objects.filter(type=type, tags__name=filter)
         for weapon in weaponlist:
+            if prev_weapon and weapon.name == prev_weapon.name:
+                j = weapon.tags.names()
+                i = ', '.join(weapon.tags.names())
+                weapon.name = '%s (%s)' % (weapon.name, ', '.join(weapon.tags.names()))
+                out[typeout][-1]['name'] = '%s (%s)' % (prev_weapon.name, ', '.join(prev_weapon.tags.names()))
             try:
                 ew = EnemyWeapon.objects.get(weapon=weapon, combat_style=combat_style)
                 prob = ew.probability
             except EnemyWeapon.DoesNotExist:
                 prob = 0
             out[typeout].append({'id': weapon.id, 'name': weapon.name, 'probability': prob})
+            prev_weapon = weapon
     return out
     
 def spirit_options():
