@@ -65,6 +65,10 @@ var Dajaxice = {
         return Dajaxice.call('enemygen.search', 'GET', callback_function, argv, custom_settings);
     },
 
+    get_weapons: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('enemygen.get_weapons', 'GET', callback_function, argv, custom_settings);
+    },
+
     get_feature_list_items: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.get_feature_list_items', 'GET', callback_function, argv, custom_settings);
     },

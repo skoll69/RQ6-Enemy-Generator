@@ -33,11 +33,6 @@ def get_context(request):
 def get_et_context(et):
     context = {}
     context['et'] = et
-    context['weapons'] = {}
-    context['weapons']['1h'] = Weapon.objects.filter(type='1h-melee')
-    context['weapons']['2h'] = Weapon.objects.filter(type='2h-melee')
-    context['weapons']['ranged'] = Weapon.objects.filter(type='ranged')
-    context['weapons']['shields'] = Weapon.objects.filter(type='shield')
     context['theism_spells'] = spell_list('theism', et)
     context['folk_spells'] = spell_list('folk', et)
     context['sorcery_spells'] = spell_list('sorcery', et)
@@ -149,7 +144,6 @@ def _get_party_enemies(party):
             enemies.append(et.generate(i+1, True))
     return enemies
     
-
 def _get_generated_amount():
     n = 0
     for et in EnemyTemplate.objects.all():
@@ -186,20 +180,29 @@ def combat_styles(et):
                   'one_h_amount': cs.one_h_amount ,'two_h_amount': cs.two_h_amount,
                   'ranged_amount': cs.ranged_amount,'shield_amount': cs.shield_amount,
                   '1h_melee': [], '2h_melee': [], 'ranged': [], 'shield': [], 'customs': []}
+        cs_out.update(weapons(cs))
+        # Append Custom weapons
         for type in ('1h-melee', '2h-melee', 'ranged', 'shield'):
-            typeout = type.replace('-', '_') # '-' is not allowed in the lookup string in Django template
-            for weapon in Weapon.objects.filter(type=type):
-                try:
-                    ew = EnemyWeapon.objects.get(weapon=weapon, combat_style=cs)
-                    prob = ew.probability
-                except EnemyWeapon.DoesNotExist:
-                    prob = 0
-                cs_out[typeout].append({'id': weapon.id, 'name': weapon.name, 'probability': prob})
-            # Append Custom weapons
             for cw in CustomWeapon.objects.filter(combat_style=cs, type=type):
                 cs_out['customs'].append(cw)
         output.append(cs_out)
     return output
+    
+def weapons(combat_style):
+    ''' Input: cs - CombatStyle '''
+    out = {'1h_melee': [], '2h_melee': [], 'ranged': [], 'shield': []}
+    filter = combat_style.enemy_template.weapon_filter if combat_style.enemy_template.weapon_filter else 'Standard'
+    for type in ('1h-melee', '2h-melee', 'ranged', 'shield'):
+        typeout = type.replace('-', '_') # '-' is not allowed in the lookup string in Django template
+        weaponlist = Weapon.objects.filter(type=type) if filter == 'All' else Weapon.objects.filter(type=type, tags__name=filter)
+        for weapon in weaponlist:
+            try:
+                ew = EnemyWeapon.objects.get(weapon=weapon, combat_style=combat_style)
+                prob = ew.probability
+            except EnemyWeapon.DoesNotExist:
+                prob = 0
+            out[typeout].append({'id': weapon.id, 'name': weapon.name, 'probability': prob})
+    return out
     
 def spirit_options():
     return EnemyTemplate.objects.filter(race__discorporate=True, published=True)
@@ -215,20 +218,14 @@ def is_superuser(user):
     
 def get_statistics():
     output = {}
-    
-    templates = list((et.name, et.generated, et.id) for et in EnemyTemplate.objects.filter(published=True).exclude(race__name='Cult'))
-    templates = sorted(templates, reverse=True, key=lambda et: et[1])
-    templates_out = []
-    for et in templates:
-        if et[1] > 9:
-            templates_out.append({'name': et[0], 'generated': et[1], 'id': et[2]})
-    output['templates'] = templates_out
+    output['templates'] = EnemyTemplate.objects.filter(published=True, generated__gt=19).exclude(race__name='Cult').order_by('-generated')
     
     races = list((r.name, r.id, len(r.templates)) for r in Race.objects.filter(published=True))
     races = sorted(races, reverse=True, key=lambda r: r[2])
     races_out = []
     for r in races:
-        races_out.append({'name': r[0], 'id': r[1], 'template_amount': r[2]})
+        if r[2] > 1:
+            races_out.append({'name': r[0], 'id': r[1], 'template_amount': r[2]})
     output['races'] = races_out
     
     users = list((u.username, len(EnemyTemplate.objects.filter(owner=u, published=True).exclude(race__name='Cult'))) for u in User.objects.all())

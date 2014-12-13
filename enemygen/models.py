@@ -48,6 +48,7 @@ class Weapon(models.Model, Printer):
     hp = models.SmallIntegerField(default=0)
     damage_modifier = models.BooleanField(default=True)
     range = models.CharField(max_length=15, null=True, blank=True)
+    tags = TaggableManager(blank=True)
         
     class Meta:
         ordering = ['name',]
@@ -182,6 +183,7 @@ class EnemyTemplate(models.Model, Printer):
     cult_rank = models.SmallIntegerField(default=0, choices=cult_choices)
     tags = TaggableManager(blank=True)
     namelist = models.ForeignKey('AdditionalFeatureList', null=True, blank=True)
+    weapon_filter = models.CharField(max_length=50, blank=True, null=True)
     
     class Meta:
         ordering = ['name',]

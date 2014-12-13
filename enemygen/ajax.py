@@ -6,6 +6,7 @@ from enemygen.models import CombatStyle, Weapon, CustomSpell, EnemyWeapon, Custo
 from enemygen.models import Race, RaceStat, HitLocation, CustomSkill, Party, TemplateToParty, EnemySpirit
 from enemygen.models import EnemyAdditionalFeatureList, PartyAdditionalFeatureList, AdditionalFeatureList
 from enemygen.models import EnemyNonrandomFeature, PartyNonrandomFeature, EnemyCult
+from enemygen.views_lib import weapons
 
 import logging
 from bs4 import BeautifulSoup
@@ -600,3 +601,11 @@ def search(request, string, rank_filter, cult_rank_filter):
     templates = [et.summary_dict(request.user) for et in templs]
     return simplejson.dumps({'results': templates, 'success': True})
     
+@dajaxice_register(method='GET')
+def get_weapons(request, cs_id, filter):
+    cs = CombatStyle.objects.get(id=cs_id)
+    cs.enemy_template.weapon_filter = filter
+    cs.enemy_template.save()
+    context = {'weapons': weapons(cs), 'success': True}
+    return simplejson.dumps(context)
+

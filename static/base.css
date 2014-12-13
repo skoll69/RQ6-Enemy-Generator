@@ -226,6 +226,10 @@ th{
     text-align: left;
 }
 
+table.weapon_table{
+    width: 180px;
+}
+
 span.weapons{
     display: inline;
 }
@@ -269,6 +273,10 @@ input[type="submit"]:active, button:active {
     position:relative;
     top:1px;
     left:1px;
+}
+
+.active_button{
+    background-color: #6D4A22;
 }
 
 input[type="submit"].party_submit{
