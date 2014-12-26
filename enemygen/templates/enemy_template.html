@@ -86,13 +86,12 @@ $(document).ready(function(){
     <form action="{% url 'generate_enemies' %}" method="post" target="generated">
     {% csrf_token %}
     <input name="enemy_template_id_{{et.id}}" type="hidden" value="6">
-    <input name="dont_increment" type="hidden" value="1">
     <input style="width: 140px;" type="submit" value="Generate" />
     </form>
     </div>
 </div>
 
-<h3>
+<h3 style="display: inline;">
     Enemy details
     {% if et.starred %}
         <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_filled.png" />
@@ -100,6 +99,8 @@ $(document).ready(function(){
         <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_empty.png" />
     {% endif %}
 </h3>
+<span class="generated_amount">(Generated {{ et.generated }} times)</span>
+
 <table><tr>
     <th>Template name</th>
     <td><input id="et_{{ et.id }}" class="data" type="text" size="40" item_id="{{ et.id }}" item_type="et_name" value="{{ et.name }}" /></td>

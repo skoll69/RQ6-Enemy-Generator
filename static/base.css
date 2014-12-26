@@ -186,6 +186,10 @@ div.small_tag {
 
 /* Enemy Template details start */
 
+span.generated_amount{
+    font-size: 9px;
+}
+
 div#tag_container{
     width: 550px;
     padding-bottom: 4px;

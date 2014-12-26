@@ -18,12 +18,11 @@
 <form action="{% url 'generate_enemies' %}" method="post" target="generated">
 {% csrf_token %}
 <input name="enemy_template_id_{{et.id}}" type="hidden" value="6">
-<input name="dont_increment" type="hidden" value="1">
 <input style="width: 140px;" type="submit" value="Generate" />
 </form>
 </div>
 
-<h3>
+<h3 style="display: inline;">
     {{ et.name }}
     {% if et.starred %}
         <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_filled.png" />
@@ -31,6 +30,8 @@
         <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_empty.png" {% if not user.is_authenticated %}title="Log in to Star favorites"{% endif %} />
     {% endif %}
 </h3>
+<span class="generated_amount">(Generated {{ et.generated }} times)</span>
+
 <table><tr>
     <th>Namelist</th>
     <td>{% if et.namelist %}{{ et.namelist.name }} (<a href="{% url 'feature_items' et.namelist.id %}">View names</a>){% else %}None{% endif %}</td>
