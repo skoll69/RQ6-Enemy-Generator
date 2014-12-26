@@ -488,10 +488,10 @@ div#png_export{
         {{ cs.name }} {{ cs.value }}%{% if not forloop.last %}, {% endif %}
         {% if cs.weapons %}
         <table class="weapon_table">
-            <tr><th align="left">Weapon</th><th>Size/Force</th><th>Reach</th><th>Damage</th><th>AP/HP</th></tr>
+            <tr><th align="left">Weapon</th><th>Size/Force</th><th>Reach</th><th align="left">Damage</th><th>AP/HP</th></tr>
             {% for weapon in cs.weapons %}
                 <tr>
-                    <td>{{ weapon.name }}</td>
+                    <td>{{ weapon.name }}{% if weapon.type == '2h-melee' %} (2h){% endif %}</td>
                     <td>{{weapon.size}}</td>
                     <td>{% if weapon.type == 'ranged' %}{{weapon.range}}{% else %}{{weapon.reach}}{% endif %}</td>
                     <td>{{weapon.damage}}{% if enemy.attributes.damage_modifier != '+0' and weapon.damage_modifier %}{{ enemy.attributes.damage_modifier }}{% endif %}</td>
