@@ -1,12 +1,11 @@
 from django.contrib import admin
 from django import forms
-from enemygen.models import EnemyTemplate, Ruleset, Race, HitLocation
+from enemygen.models import EnemyTemplate, Race, HitLocation
 from enemygen.models import SkillAbstract, SpellAbstract, StatAbstract, Weapon
 from enemygen.models import EnemySkill, EnemySpell, EnemyStat, EnemyHitLocation, RaceStat
-from enemygen.models import CombatStyle, CustomSpell, CustomWeapon, Party, TemplateToParty
-from enemygen.models import EnemySpirit, ChangeLog, EnemyNonrandomFeature, EnemyCult
+from enemygen.models import CombatStyle, Party, ChangeLog
 from enemygen.models import AdditionalFeatureList, AdditionalFeatureItem, Star
-from enemygen.models import EnemyAdditionalFeatureList, PartyAdditionalFeatureList
+from enemygen import models as m
 
 class EnemyTemplateAdmin(admin.ModelAdmin):
     list_display = ('name', 'race', 'rank', 'generated', 'published', 'owner')
@@ -91,17 +90,18 @@ class HitLocationAdmin(admin.ModelAdmin):
 admin.site.register(EnemyTemplate, EnemyTemplateAdmin)
 admin.site.register(Weapon, WeaponAdmin)
 admin.site.register(CombatStyle, CombatStyleAdmin)
-admin.site.register(Ruleset)
-admin.site.register(EnemySpirit)
 admin.site.register(Race, RaceAdmin)
-admin.site.register(CustomSpell)
-admin.site.register(CustomWeapon)
-admin.site.register(TemplateToParty)
-admin.site.register(EnemyNonrandomFeature)
+admin.site.register(m.Ruleset)
+admin.site.register(m.EnemySpirit)
+admin.site.register(m.CustomSpell)
+admin.site.register(m.CustomSkill)
+admin.site.register(m.CustomWeapon)
+admin.site.register(m.TemplateToParty)
+admin.site.register(m.EnemyNonrandomFeature)
 admin.site.register(AdditionalFeatureList, AdditionalFeatureListAdmin)
 admin.site.register(AdditionalFeatureItem, AdditionalFeatureItemAdmin)
-admin.site.register(EnemyAdditionalFeatureList)
-admin.site.register(PartyAdditionalFeatureList)
+admin.site.register(m.EnemyAdditionalFeatureList)
+admin.site.register(m.PartyAdditionalFeatureList)
 admin.site.register(Party, PartyAdmin)
 admin.site.register(ChangeLog, ChangeLogAdmin)
 admin.site.register(RaceStat, RaceStatAdmin)
@@ -114,4 +114,4 @@ admin.site.register(EnemyStat, EnemyStatAdmin)
 admin.site.register(SpellAbstract, SpellAbstractAdmin)
 admin.site.register(EnemySpell, EnemySpellAdmin)
 admin.site.register(Star, StarAdmin)
-admin.site.register(EnemyCult)
+admin.site.register(m.EnemyCult)
