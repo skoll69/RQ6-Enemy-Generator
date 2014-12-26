@@ -10,11 +10,6 @@
     <th>Movement</th>
     <td><input id="race_movement" class="data" type="text" size="8" item_id="{{ race.id }}" item_type="race_movement" value="{{race.movement}}" /></td>
 </tr><tr>
-    <!--
-    <th>Discorporate</th>
-    <td><input id="race_discorporate_{{ race.id }}" class="data" type="checkbox" item_id="{{ race.id }}" item_type="race_discorporate" {% if race.discorporate %}checked="checked"{% endif %} /></td>
-</tr><tr>
-    -->
     <th>Published</th>
     <td><input id="race_pub" class="data" type="checkbox" item_id="{{ race.id }}" item_type="race_published" {% if race.published %}checked="checked"{% endif %} /></td>
 </tr><tr>
@@ -26,11 +21,6 @@
 </tr></table>
 
 <div id="apply_notes_to_templates_confirmation">Notes copied successfully.</div>
-
-<form action="{% url 'delete_race' race.id %}" method="post">
-{% csrf_token %}
-<div id="delete_race_container"><input id="delete_race" type="submit" value="Delete race" /></div>
-</form>
 
 <div id="clone_race_container">
 <form action="{% url 'clone_race' race.id %}" method="post">

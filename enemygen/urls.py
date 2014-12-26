@@ -34,7 +34,6 @@ urlpatterns = patterns('',
     url(r'^create_cult/$', views.create_cult, name='create_cult'),
     url(r'^create_race/$', views.create_race, name='create_race'),
     url(r'^delete_party/(?P<party_id>\d+)/$', views.delete_party, name='delete_party'),
-    url(r'^delete_race/(?P<race_id>\d+)/$', views.delete_race, name='delete_race'),
     url(r'^ruleset/(?P<ruleset_id>\d+)/$', views.ruleset, name='ruleset'),
     url(r'^create_party/$', views.create_party, name='create_party'),
 )

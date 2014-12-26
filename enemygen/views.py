@@ -240,23 +240,6 @@ def apply_skill_bonus(request, template_id):
     return redirect(enemy_template, et.id)
     
 @login_required
-def delete_race(request, race_id):
-    context = get_context(request)
-    try:
-        rc = Race.objects.get(id=race_id, owner=request.user)
-    except Race.DoesNotExist:
-        rc = None
-    context['race'] = rc
-    if request.POST:
-        answer = request.POST.get('answer')
-        if answer == 'Yes':
-            rc.delete()
-            return redirect(edit_index)
-        elif answer == 'No':
-            return redirect(race, race_id)
-    return render(request, 'delete_race.html', context)
-        
-@login_required
 def delete_party(request, party_id):
     context = get_context(request)
     try:

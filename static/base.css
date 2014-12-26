@@ -317,17 +317,6 @@ input[type="submit"]#clone_race{
     width: 140px;
 }
 
-div#delete_race_container{
-    position: absolute;
-    right: 10px;
-    top: 10px;
-}
-
-input[type="submit"]#delete_race{
-    width: 140px;
-}
-
-
 table.read_only th{
     font-weight: normal;
 }
