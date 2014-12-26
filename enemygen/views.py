@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
 
-from enemygen.models import EnemyTemplate, Ruleset, EnemyTemplate, Race, Party, ChangeLog, AdditionalFeatureList
+from enemygen.models import EnemyTemplate, EnemyTemplate, Race, Party, ChangeLog, AdditionalFeatureList
 from enemygen.views_lib import get_ruleset, get_context, get_et_context, get_enemies, get_generated_party
 from enemygen.views_lib import get_enemy_templates, is_race_admin, get_statistics, get_random_party
 from enemygen.views_lib import generate_pdf, get_filter, get_party_templates, save_as_html, generate_pngs
@@ -113,12 +113,6 @@ def whats_new(request):
     context['whats_new'] = ChangeLog.objects.all().reverse()
     return render(request, 'whats_new.html', context)
     
-@login_required
-def ruleset(request, ruleset_id):
-    context = get_context(request)
-    context['ruleset'] = Ruleset.objects.get(id=ruleset_id)
-    return render(request, 'ruleset.html', context)
-    
 def account(request):
     context = get_context(request)
     return render(request, 'account.html', context)
@@ -143,11 +137,6 @@ def set_party_filter(request):
     if request.POST:
         filter = request.POST.get('party_filter', None)
         request.session['party_filter'] = filter
-        return redirect(request.POST['coming_from'])
-    return redirect(index)
-
-def select_setting_ruleset(request):
-    if request.POST:
         return redirect(request.POST['coming_from'])
     return redirect(index)
 
@@ -176,9 +165,8 @@ def create_enemy_template(request):
     race_id = request.POST.get('race_id')
     if race_id is None:
         return redirect(edit_index)
-    ruleset = get_ruleset(request)
     race = Race.objects.get(id=race_id)
-    et = EnemyTemplate.create(owner=request.user, ruleset=ruleset, race=race)
+    et = EnemyTemplate.create(owner=request.user, ruleset=get_ruleset(request), race=race)
     return redirect(enemy_template, et.id)
 
 @login_required
@@ -193,9 +181,8 @@ def create_party(request):
 
 @login_required
 def create_cult(request):
-    ruleset = get_ruleset(request)
     race = Race.objects.get(name='Cult')
-    et = EnemyTemplate.create(owner=request.user, ruleset=ruleset, race=race)
+    et = EnemyTemplate.create(owner=request.user, ruleset=get_ruleset(request), race=race)
     return redirect(enemy_template, et.id)
 
 @login_required
