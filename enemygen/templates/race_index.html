@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block content %}
+
+<h3>Races</h3>
+<form action="{% url 'create_race'%}" method="post">
+{% csrf_token %}
+<input type="submit" value="Create new race">
+</form>
+<table>
+{% for race in edit_races %}
+    <tr>
+        <td><a class="edit_item" href="{% url 'race' race.id %}">{{ race.name }}</a>{% if not race.published %} *{% endif %}</td>
+    </tr>
+{% endfor %}
+</table>
+
+<p>* Unpublished</p>
+
+
+<script>
+$(document).ready(function(){
+    var table = new ttable('my_enemy_template_list'); 
+    table.sorting.enabled = true;
+    table.sorting.sortall = false;
+    table.search.enabled = true;
+    table.search.inputID = 'searchinput';
+    table.search.casesensitive = false;
+    table.style.num = false;
+    table.rendertable();
+});
+</script>
+
+{% endblock %}

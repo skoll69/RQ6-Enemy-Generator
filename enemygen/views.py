@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
 
@@ -60,11 +60,18 @@ def edit_index(request):
         et.starred = et.is_starred(request.user)
     context['enemy_templates'] = templates
     context['races'] = Race.objects.filter(published=True).exclude(name='Cult')
-    context['edit_races'] = Race.objects.filter(owner=request.user)
     context['edit_cults'] = EnemyTemplate.objects.filter(owner=request.user, race__name='Cult')
     context['edit_parties'] = Party.objects.filter(owner=request.user)
     context['race_admin'] = is_race_admin(request.user)
     return render(request, 'edit_index.html', context)
+    
+@login_required
+def race_index(request):
+    context = get_context(request)
+    if not is_race_admin(request.user):
+        raise Http404
+    context['edit_races'] = Race.objects.filter(owner=request.user)
+    return render(request, 'race_index.html', context)
     
 def enemy_template(request, enemy_template_id):
     context = get_context(request)

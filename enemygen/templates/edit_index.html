@@ -3,6 +3,24 @@
 
 {% block content %}
 
+{% if race_admin %}
+<div id="manage_races_container">
+    <h3>Races</h3>
+    <a href="{% url 'race_index' %}"><button>Manage Races</button></a>
+</div>
+<script>
+function set_width(){
+    var w1 = window.innerWidth-50+'px';
+    var w2 = window.innerWidth-86+'px';
+    $('#main_container').css('width', w1);
+    $('#header').css('width', w2);
+    $('#main_content').css('width', w2);
+}
+set_width();
+$(window).resize(set_width)
+</script>
+{% endif %}
+
 <table><tr><td valign="top">
     <h3>Enemy Templates</h3>
 
@@ -50,7 +68,7 @@
     {% endfor %}
     </table>
 {% endif %}
-</td><td width="20">
+</td><td width="10">
 </td><td valign="top">
     <h3>Cults</h3>
     <form action="{% url 'create_cult'%}" method="post">
@@ -64,7 +82,7 @@
         </tr>
     {% endfor %}
     </table>
-</td><td width="20">
+</td><td width="10">
 </td><td valign="top">
     <h3>Parties</h3>
     <form action="{% url 'create_party'%}" method="post">
@@ -78,22 +96,6 @@
         </tr>
     {% endfor %}
     </table>
-{% if edit_races %}
-</td><td width="20">
-</td><td valign="top">
-    <h3>Races</h3>
-    <form action="{% url 'create_race'%}" method="post">
-    {% csrf_token %}
-    <input type="submit" value="Create new race">
-    </form>
-    <table>
-    {% for race in edit_races %}
-        <tr>
-            <td><a class="edit_item" href="{% url 'race' race.id %}">{{ race.name }}</a>{% if not race.published %} *{% endif %}</td>
-        </tr>
-    {% endfor %}
-    </table>
-{% endif %}
 </td></tr></table>
 <p>* Unpublished</p>
 
