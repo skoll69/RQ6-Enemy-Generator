@@ -134,6 +134,17 @@ Amount: {{ et.cult_amount }}
 {% endfor %}
 </tr></table>
 
+{% if et.included_magic_skills %}
+<h3>Magic skills</h3>
+<table class="read_only"><tr>
+{% for skill in et.included_magic_skills %}
+    <th>{{ skill.name }}</th>
+    <td>{{ skill.die_set }}</td>
+    {% if forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
+{% endfor %}
+</tr></table>
+{% endif %}
+
 {% if et.included_professional_skills %}
 <h3>Professional skills</h3>
 <table class="read_only"><tr>

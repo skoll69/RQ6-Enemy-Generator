@@ -44,8 +44,8 @@ class CombatStyleAdmin(admin.ModelAdmin):
     list_display = ('name', 'enemy_template', 'one_h_amount', 'two_h_amount', 'ranged_amount', 'shield_amount')
     
 class SkillAbstractAdmin(admin.ModelAdmin):
-    list_display = ('name', 'default_value', 'standard')
-    list_filter = ('standard',)
+    list_display = ('name', 'default_value', 'standard', 'magic')
+    list_filter = ('standard', 'magic')
     
 class SpellAbstractAdmin(admin.ModelAdmin):
     list_display = ('name', 'type')

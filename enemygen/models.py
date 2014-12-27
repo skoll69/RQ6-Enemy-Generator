@@ -342,12 +342,20 @@ class EnemyTemplate(models.Model, Printer):
         return EnemySkill.objects.filter(enemy_template=self, skill__standard=True)
         
     @property
+    def included_magic_skills(self):
+        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, skill__magic=True, include=True)
+        
+    @property
+    def magic_skills(self):
+        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, skill__magic=True)
+        
+    @property
     def included_professional_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, include=True)
+        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, skill__magic=False, include=True)
         
     @property
     def professional_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False)
+        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, skill__magic=False)
         
     @property
     def included_custom_skills(self):
@@ -840,6 +848,7 @@ class CustomWeapon(models.Model, Printer):
 class SkillAbstract(models.Model, Printer):
     name = models.CharField(max_length=80)
     standard = models.BooleanField(default=True)
+    magic = models.BooleanField(default=False)
     default_value = models.CharField(max_length=30, blank=True)
     include = models.BooleanField()
 

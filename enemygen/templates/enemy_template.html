@@ -66,6 +66,10 @@ $(document).ready(function(){
   $('#txtHint').focus(function(){  // For some reason IE takes focus to the hint input instead of the text input
     $('#txtInput').focus();
   });
+  
+  $('#toggle_pro_skills').click(function(event){
+    $('#professional_skills_table').toggle();
+  });
 });
 </script>
 
