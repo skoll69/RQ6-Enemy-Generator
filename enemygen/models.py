@@ -47,6 +47,7 @@ class Weapon(models.Model, Printer):
     ap = models.SmallIntegerField(default=0)
     hp = models.SmallIntegerField(default=0)
     damage_modifier = models.BooleanField(default=True)
+    special_effects = models.CharField(max_length=300, null=True, blank=True)
     range = models.CharField(max_length=15, null=True, blank=True)
     tags = TaggableManager(blank=True)
         
@@ -784,6 +785,10 @@ class EnemyWeapon(models.Model, Printer):
     @property
     def hp(self):
         return self.weapon.hp
+        
+    @property
+    def special_effects(self):
+        return self.weapon.special_effects if self.weapon.special_effects else ''
         
     @property
     def damage_modifier(self):
