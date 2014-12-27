@@ -76,8 +76,10 @@ class EnemyHitLocationAdmin(admin.ModelAdmin):
     list_display = ('enemy_template', 'hit_location', )
 
 class WeaponAdmin(admin.ModelAdmin):
-    list_display = ('name', 'damage', 'type')
+    list_display = ('name', 'damage', 'type', 'tag_names')
     ordering = ('type', 'name')
+    def tag_names(self, obj):
+        return ', '.join(obj.tags.names())
 
 class PartyAdmin(admin.ModelAdmin):
     list_display = ('name', 'owner')
