@@ -39,6 +39,10 @@ class AdditionalFeatureItemAdmin(admin.ModelAdmin):
     list_display = ('name', 'feature_list')
     form = AdditionalFeatureItemForm
     list_filter = ('feature_list',)
+
+class EnemyAdditionalFeatureListAdmin(admin.ModelAdmin):
+    list_display = ('enemy_template', 'feature_list', 'probability')
+    list_filter = ('feature_list',)
     
 class CombatStyleAdmin(admin.ModelAdmin):
     list_display = ('name', 'enemy_template', 'one_h_amount', 'two_h_amount', 'ranged_amount', 'shield_amount')
@@ -100,7 +104,7 @@ admin.site.register(m.TemplateToParty)
 admin.site.register(m.EnemyNonrandomFeature)
 admin.site.register(AdditionalFeatureList, AdditionalFeatureListAdmin)
 admin.site.register(AdditionalFeatureItem, AdditionalFeatureItemAdmin)
-admin.site.register(m.EnemyAdditionalFeatureList)
+admin.site.register(m.EnemyAdditionalFeatureList, EnemyAdditionalFeatureListAdmin)
 admin.site.register(m.PartyAdditionalFeatureList)
 admin.site.register(Party, PartyAdmin)
 admin.site.register(ChangeLog, ChangeLogAdmin)
