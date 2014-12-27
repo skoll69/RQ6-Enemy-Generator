@@ -1179,7 +1179,7 @@ class EnemyNonrandomFeature(models.Model):
     @classmethod
     def create(cls, enemy_template, feature_id):
         feature = AdditionalFeatureItem.objects.get(id=feature_id)
-        nonrandom_feature = cls(enemy_template=enemy_template, feature=feature.name)
+        nonrandom_feature = cls(enemy_template=enemy_template, feature=feature)
         nonrandom_feature.save()
         return nonrandom_feature
         
