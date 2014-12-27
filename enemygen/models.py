@@ -1130,7 +1130,7 @@ class AdditionalFeatureItem(models.Model, Printer):
     class Meta:
         ordering = ['name',]
 
-class EnemyAdditionalFeatureList(models.Model, Printer):
+class EnemyAdditionalFeatureList(models.Model):
     probability = models.CharField(max_length=30, default='POW+POW', null=True, blank=True)
     feature_list = models.ForeignKey(AdditionalFeatureList)
     enemy_template = models.ForeignKey(EnemyTemplate)
@@ -1168,6 +1168,9 @@ class EnemyAdditionalFeatureList(models.Model, Printer):
         Dice(temp_value).roll()
         self.probability = value.upper()
         self.save()
+        
+    def __unicode__(self):
+        return '%s(%s) - %s' % (self.enemy_template.name, self.enemy_template.id, self.feature_list.name)
 
 class EnemyNonrandomFeature(models.Model):
     enemy_template = models.ForeignKey(EnemyTemplate)
@@ -1176,9 +1179,13 @@ class EnemyNonrandomFeature(models.Model):
     @classmethod
     def create(cls, enemy_template, feature_id):
         feature = AdditionalFeatureItem.objects.get(id=feature_id)
-        nonrandom_feature = cls(enemy_template=enemy_template, feature=feature)
+        nonrandom_feature = cls(enemy_template=enemy_template, feature=feature.name)
         nonrandom_feature.save()
         return nonrandom_feature
+        
+    def __unicode__(self):
+        feature_name = self.feature.name[:40]+'...' if len(self.feature.name) > 43 else self.feature.name
+        return '%s(%s) - %s' % (self.enemy_template.name, self.enemy_template.id, feature_name)
         
 class PartyNonrandomFeature(models.Model):
     party = models.ForeignKey(Party)
