@@ -36,10 +36,10 @@ $(window).resize(set_width)
     </form>
 
     <h3>My Enemy Templates</h3>
-    <div><p>Type to search: <input id="searchinput" /></p></div>
+    <div><p>Search: <input id="template_searchinput" /></p></div>
     
     {% if enemy_templates %}
-    <table id="my_enemy_template_list">
+    <table id="my_enemy_template_list" style="min-width: 430px;">
     <thead><tr>
         <th></th>
         <th class="sort-alpha">Template name</th>
@@ -69,13 +69,15 @@ $(window).resize(set_width)
     </table>
 {% endif %}
 </td><td width="10">
+
 </td><td valign="top">
     <h3>Cults</h3>
+    <div><p>Search: <input id="cult_searchinput" /></p></div>
     <form action="{% url 'create_cult'%}" method="post">
     {% csrf_token %}
     <input type="submit" value="Create new cult">
     </form>
-    <table>
+    <table id="cult_table">
     {% for cult in edit_cults %}
         <tr>
             <td><a class="edit_item" href="{% url 'enemy_template' cult.id %}">{{ cult.name }}</a>{% if not cult.published %} *{% endif %}</td>
@@ -83,13 +85,15 @@ $(window).resize(set_width)
     {% endfor %}
     </table>
 </td><td width="10">
+
 </td><td valign="top">
     <h3>Parties</h3>
+    <div><p>Search: <input id="party_searchinput" /></p></div>
     <form action="{% url 'create_party'%}" method="post">
     {% csrf_token %}
     <input type="submit" value="Create new party">
     </form>
-    <table>
+    <table id="party_table">
     {% for party in edit_parties %}
         <tr>
             <td><a class="edit_item" href="{% url 'party' party.id %}">{{ party.name }}</a>{% if not party.published %} *{% endif %}</td>
@@ -106,7 +110,21 @@ $(document).ready(function(){
     table.sorting.enabled = true;
     table.sorting.sortall = false;
     table.search.enabled = true;
-    table.search.inputID = 'searchinput';
+    table.search.inputID = 'template_searchinput';
+    table.search.casesensitive = false;
+    table.style.num = false;
+    table.rendertable();
+    
+    var table = new ttable('cult_table'); 
+    table.search.enabled = true;
+    table.search.inputID = 'cult_searchinput';
+    table.search.casesensitive = false;
+    table.style.num = false;
+    table.rendertable();
+    
+    var table = new ttable('party_table'); 
+    table.search.enabled = true;
+    table.search.inputID = 'party_searchinput';
     table.search.casesensitive = false;
     table.style.num = false;
     table.rendertable();
