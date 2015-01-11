@@ -845,11 +845,11 @@ ttable.prototype.rendertable = function () {
         var pagination = ttid.pagination.enabled;
         var rowperpage = ttid.pagination.rowperpage;
         var strip = ttid.style.odd_row;
-        $('#' + inputID).keyup(function () {
-            var word = $(this).val();
-
-            $('#' + tableid).filter_table(word, sens, num, num_class,
-                pagination, rowperpage, strip);
+        $('#' + inputID).keyup(function (event) {
+            if (event.keyCode == 13){
+                var word = $(this).val();
+                $('#' + tableid).filter_table(word, sens, num, num_class, pagination, rowperpage, strip);
+            }
         });
 
     }
