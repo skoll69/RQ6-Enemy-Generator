@@ -16,10 +16,13 @@
     </form>
 </div>
 
-<form action="{% url 'generate_party' %}" method="post" target="_blank">
-    {% csrf_token %}
-    <div>Type to search: <input id="searchinput" /> | <input type="submit" name="lucky" value="Do you feel lucky?"></div>
-</form>
+<div>
+    Type to search: <input id="searchinput" /> | <form style="display: inline-block;" action="{% url 'generate_party' %}" method="post" target="_blank">
+        {% csrf_token %}
+        <input type="submit" name="lucky" value="Do you feel lucky?">
+    </form>
+</div>
+
 
 <div id="party_list_container">
 <table id="party_list" class="index_list">
