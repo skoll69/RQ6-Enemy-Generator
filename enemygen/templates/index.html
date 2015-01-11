@@ -17,8 +17,8 @@
     </form>
 </div>
 
-<form action="{% url 'generate_enemies' %}" method="post" target="_blank">
-    Type to search: <input id="searchinput" /> | <input id="generate_button" type="submit" disabled class="disabled" name="generate" value="Generate"> | <input type="submit" name="lucky" value="Do you feel lucky?">
+Search: <input id="searchinput" /> |<form style="display: inline;" action="{% url 'generate_enemies' %}" method="post" target="_blank">
+     <input id="generate_button" type="submit" disabled class="disabled" name="generate" value="Generate"> | <input type="submit" name="lucky" value="Do you feel lucky?">
     {% csrf_token %}
     <div id="selected_enemy_template_list_container" style="display:none;">
         <table id="selected_enemy_template_list">
