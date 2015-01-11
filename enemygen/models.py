@@ -6,6 +6,10 @@ from taggit.managers import TaggableManager
 import ordereddict, random, math
 from django.db.models import Q
 
+WEAPON_TYPE_CHOICES = (('1h-melee', '1-h Melee'), ('2h-melee', '2-h Melee'), ('ranged', 'Ranged'), ('shield', 'Shield'),)
+WEAPON_SIZE_CHOICES = (('S', 'S'),('M', 'M'),('L', 'L'),('H', 'H'),('E', 'E'),('C', 'C'),)
+WEAPON_REACH_CHOICES = (('-', '-'),('T', 'T'),('S', 'S'),('M', 'M'),('L', 'L'),('VL', 'VL'),('U', 'U'),)
+
 class Printer:
     def __unicode__(self):
         return self.name
@@ -20,30 +24,9 @@ class Ruleset(models.Model, Printer):
 class Weapon(models.Model, Printer):
     name = models.CharField(max_length=80)
     damage = models.CharField(max_length=30, default=0)
-    type_choices = (
-                ('1h-melee', '1-h Melee'),
-                ('2h-melee', '2-h Melee'),
-                ('ranged', 'Ranged'),
-                ('shield', 'Shield'),
-                )
-    type = models.CharField(max_length=30, choices=type_choices)
-    size_choices = (
-                        ('S', 'S'),
-                        ('M', 'M'),
-                        ('L', 'L'),
-                        ('H', 'H'),
-                        ('E', 'E'),
-                    )
-    size = models.CharField(max_length=1, choices=size_choices)
-    reach_choices = (
-                        ('-', '-'),
-                        ('T', 'T'),
-                        ('S', 'S'),
-                        ('M', 'M'),
-                        ('L', 'L'),
-                        ('VL', 'VL'),
-                    )
-    reach = models.CharField(max_length=2, choices=reach_choices)
+    type = models.CharField(max_length=30, choices=WEAPON_TYPE_CHOICES)
+    size = models.CharField(max_length=1, choices=WEAPON_SIZE_CHOICES)
+    reach = models.CharField(max_length=2, choices=WEAPON_REACH_CHOICES)
     ap = models.SmallIntegerField(default=0)
     hp = models.SmallIntegerField(default=0)
     damage_modifier = models.BooleanField(default=True)
@@ -1335,8 +1318,24 @@ class _Enemy(object):
         output.extend(self._get_items(cs.two_h_options, two_h_amount))
         output.extend(self._get_items(cs.ranged_options, ranged_amount))
         output.extend(self._get_items(cs.shield_options, shield_amount))
+        output = self._adjust_size_and_reach(output)
         return output
         
+    def _adjust_size_and_reach(self, weapons):
+        ''' Adjusts weapon size and reach of big creatures '''
+        step = (self.stats['SIZ']-11) / 10    # SIZ 21-30: step 1; 31-40: step 2, etc.
+        if step == 0:
+            return weapons
+        sizes = [value for value, lable in WEAPON_SIZE_CHOICES]
+        reaches = [value for value, lable in WEAPON_REACH_CHOICES]
+        for item in weapons:
+            if item.__class__.__name__ == 'EnemyWeapon':
+                try:                item.weapon.size = sizes[sizes.index(item.weapon.size) + step]
+                except IndexError:  item.weapon.size = 'C'
+                try:                item.weapon.reach = reaches[reaches.index(item.weapon.reach) + step]
+                except IndexError:  item.weapon.reach = 'U'
+        return weapons
+    
     def _add_hit_locations(self):
         con_siz = self.stats['CON'] + self.stats['SIZ']
         base_hp = ((con_siz-1) / 5) + 1 # used by Head and Legs
@@ -1396,7 +1395,6 @@ class _Enemy(object):
         self.sorcery_spells.sort(key=lambda item: item.name)
         self.mysticism_spells.sort(key=lambda item: item.name)
         self.spirits.sort(key=lambda item: item.name)
-           
         
     def _add_additional_features(self):
         for feature_list in self.et.additional_features:
