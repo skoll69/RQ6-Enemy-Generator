@@ -837,6 +837,7 @@ class CustomWeapon(models.Model, Printer):
     ap = models.SmallIntegerField(default=0)
     hp = models.SmallIntegerField(default=0)
     damage_modifier = models.BooleanField(default=True)
+    special_effects = models.CharField(max_length=300, null=True, blank=True)
     range = models.CharField(max_length=15, default='-', null=True, blank=True)
 
     def set_probability(self, value):

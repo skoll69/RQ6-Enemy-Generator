@@ -10,7 +10,7 @@ from enemygen import models as m
 class EnemyTemplateAdmin(admin.ModelAdmin):
     list_display = ('name', 'race', 'rank', 'generated', 'published', 'owner')
     list_filter = ('owner',)
-
+    search_fields = ['name',]
 class RaceAdmin(admin.ModelAdmin):
     list_display = ('name', 'owner', 'published')
 
@@ -76,7 +76,7 @@ class EnemyHitLocationAdmin(admin.ModelAdmin):
     list_display = ('enemy_template', 'hit_location', )
 
 class WeaponAdmin(admin.ModelAdmin):
-    list_display = ('name', 'damage', 'type', 'tag_names')
+    list_display = ('name', 'damage', 'type', 'tag_names', 'special_effects')
     ordering = ('type', 'name')
     def tag_names(self, obj):
         return ', '.join(obj.tags.names())

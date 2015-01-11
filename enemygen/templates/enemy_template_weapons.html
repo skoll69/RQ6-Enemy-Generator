@@ -126,11 +126,11 @@ $('.weapon_selector').click(function(event){
     <h4>Custom weapons</h4>
     <table>
     <tr>
-        <th>Name</th><th>Type</th><th>Damage</th><th>Size</th><th>Reach</th><th>Range</th><th>Dam. mod.</th><th>AP</th><th>HP</th><th>Prob.</th><th></th>
+        <th>Name</th><th>Type</th><th>Damage</th><th>Size</th><th>Reach</th><th>Range</th><th>SpecialFX</th><th>Dam. mod.</th><th>AP</th><th>HP</th><th>Prob.</th><th></th>
     </tr>
     {% for weapon in cs.customs %}
     <tr>
-        <td><input id="custom_weapon_name_{{weapon.id}}" class="data" type="text" size="20" item_id="{{weapon.id}}" item_type="et_custom_weapon_name" value="{{ weapon.name }}" /></td>
+        <td><input id="custom_weapon_name_{{weapon.id}}" class="data" type="text" size="16" item_id="{{weapon.id}}" item_type="et_custom_weapon_name" value="{{ weapon.name }}" /></td>
         <td>
             <select id="custom_weapon_type_{{weapon.id}}" class="data" item_id="{{ weapon.id }}" item_type="et_custom_weapon_type">
                 <option value="1h-melee" {% if weapon.type == '1h-melee' %}selected="selected"{% endif %}>1-handed</option>
@@ -139,7 +139,7 @@ $('.weapon_selector').click(function(event){
                 <option value="shield" {% if weapon.type == 'shield' %}selected="selected"{% endif %}>Shield</option>
             </select>
         </td>
-        <td><input id="custom_weapon_damage_{{weapon.id}}" class="data" type="text" size="6" item_id="{{weapon.id}}" item_type="et_custom_weapon_damage" value="{{weapon.damage}}"></td>
+        <td><input id="custom_weapon_damage_{{weapon.id}}" class="data" type="text" size="4" item_id="{{weapon.id}}" item_type="et_custom_weapon_damage" value="{{weapon.damage}}"></td>
         <td>
             <select id="custom_weapon_size_{{weapon.id}}" class="data" item_id="{{ weapon.id }}" item_type="et_custom_weapon_size">
                 <option value="-" {% if weapon.size == '-' %}selected="selected"{% endif %}>-</option>
@@ -161,7 +161,8 @@ $('.weapon_selector').click(function(event){
                 <option value="VL" {% if weapon.reach == 'VL' %}selected="selected"{% endif %}>VL</option>
             </select>
         </td>
-        <td><input id="custom_weapon_range_{{weapon.id}}" class="data" type="text" size="8" item_id="{{weapon.id}}" item_type="et_custom_weapon_range" value="{{weapon.range}}"></td>
+        <td><input id="custom_weapon_range_{{weapon.id}}" class="data" type="text" size="6" item_id="{{weapon.id}}" item_type="et_custom_weapon_range" value="{{weapon.range}}"></td>
+        <td><input id="custom_weapon_special_effects_{{weapon.id}}" class="data" type="text" size="6" item_id="{{weapon.id}}" item_type="et_custom_weapon_special_effects" value="{{weapon.special_effects}}"></td>
         <td><input id="custom_weapon_dammod_{{weapon.id}}" class="data" type="checkbox" item_id="{{weapon.id}}" item_type="et_custom_weapon_damage_modifier" {% if weapon.damage_modifier %}checked="checked"{% endif %}></td>
         <td><input id="custom_weapon_ap_{{weapon.id}}" class="data number" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_ap" value="{{weapon.ap}}"></td>
         <td><input id="custom_weapon_hp_{{weapon.id}}" class="data number" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_hp" value="{{weapon.hp}}"></td>

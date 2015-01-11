@@ -434,6 +434,10 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             cw = CustomWeapon.objects.get(id=id)
             cw.damage_modifier = to_bool(value)
             cw.save()
+        elif object == 'et_custom_weapon_special_effects':
+            cw = CustomWeapon.objects.get(id=id)
+            cw.special_effects = value
+            cw.save()
             
         #Race
         elif object == 'race_name':
