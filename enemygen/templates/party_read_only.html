@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load markdown %}
 {% load url from future %}
 
 {% block title %}RQ: {{party.name}}{% endblock %}
@@ -36,7 +37,7 @@
     <td>{{ party.owner.username }}</td>
 </tr><tr>
     <th>Notes</th>
-    <td>{{ party.notes }}</td>
+    <td>{{ party.notes|markdown }}</td>
 </tr></table>
 
 <h3>Templates</h3>
