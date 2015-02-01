@@ -1191,6 +1191,9 @@ class PartyAdditionalFeatureList(models.Model, Printer):
     probability = models.CharField(max_length=30, default='50', null=True, blank=True)
     feature_list = models.ForeignKey(AdditionalFeatureList)
     party = models.ForeignKey(Party)
+    
+    class Meta:
+        ordering = ['feature_list',]
 
     @classmethod
     def create(cls, party, feature_list_id):
