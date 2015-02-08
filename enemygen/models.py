@@ -1124,6 +1124,9 @@ class EnemyAdditionalFeatureList(models.Model):
     feature_list = models.ForeignKey(AdditionalFeatureList)
     enemy_template = models.ForeignKey(EnemyTemplate)
 
+    class Meta:
+        ordering = ['feature_list',]
+    
     @classmethod
     def create(cls, enemy_template, feature_list_id, probability='POW+POW'):
         feature_list = AdditionalFeatureList.objects.get(id=feature_list_id)
@@ -1406,6 +1409,7 @@ class _Enemy(object):
                 self.additional_features.append(feature)
         for feature in self.et.nonrandom_features:
             self.additional_features.append(feature.feature)
+        self.additional_features.sort(key=lambda item: item.feature_list.name)
         
     def _get_items(self, item_list, amount):
         ''' Randomly selects the given amount of spells from the given list 
