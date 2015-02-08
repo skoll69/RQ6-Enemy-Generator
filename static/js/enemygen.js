@@ -316,29 +316,32 @@ function initialize_enemy_list(){
         set_template_list_height();
     });
     
-    $('input.enemy_amount').keyup(function(event){
-        var amount = $(event.target).val();
-        if (amount > 0) {
-            var input_id = $(event.target).attr('id');
-            var row_id = $(event.target).parent().parent().attr('id');
-            var row = $(event.target).parent().parent().remove().clone(); //tr -element
-            $('#selected_enemy_template_list').append(row);
-            // Need to delete it also from the temp table created by the sorter
-            $('table#temp-enemy_template_list').find('tr#'+row_id).remove();
-            $('#selected_enemy_template_list_container').show(0);
-            var val = $('#'+input_id).val();
-            $('#'+input_id).focus().val('').val(val);
-            set_column_width();
-            set_template_list_height();
-            $('#generate_button').removeClass('disabled');
-            $('#generate_button').prop('disabled', false);
-        }
-    });
+    $('input.enemy_amount').keyup(bind_amount_listeners);
+    $('input.enemy_amount').change(bind_amount_listeners);
     
     if ($('#enemy_template_list tr').length < 2){
         $('#enemy_template_list').hide();
     }
-    
+}
+
+function bind_amount_listeners(event){
+    /* Binds the listeners of for the amount fields for the dynaimically created enemy rows on home page */
+    var amount = $(event.target).val();
+    if (amount > 0) {
+        var input_id = $(event.target).attr('id');
+        var row_id = $(event.target).parent().parent().attr('id');
+        var row = $(event.target).parent().parent().remove().clone(); //tr -element
+        $('#selected_enemy_template_list').append(row);
+        // Need to delete it also from the temp table created by the sorter
+        $('table#temp-enemy_template_list').find('tr#'+row_id).remove();
+        $('#selected_enemy_template_list_container').show(0);
+        var val = $('#'+input_id).val();
+        $('#'+input_id).focus().val('').val(val);
+        set_column_width();
+        set_template_list_height();
+        $('#generate_button').removeClass('disabled');
+        $('#generate_button').prop('disabled', false);
+    }
 }
 
 $(document).ready(function(){
