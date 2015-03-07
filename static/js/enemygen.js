@@ -446,4 +446,8 @@ $(document).ready(function(){
     
     initialize_enemy_list();
     $('input#search').focus();
+    
+    $('.natural_weapon').change(function(event){
+        $(event.target).parent().parent().find('.ap_hp').toggle();
+    });
 });

@@ -127,8 +127,19 @@ $('.weapon_selector').click(function(event){
     {% if cs.customs %}
     <h4>Custom weapons</h4>
     <table>
-    <tr>
-        <th>Name</th><th>Type</th><th>Damage</th><th>Size</th><th>Reach</th><th>Range</th><th>SpecialFX</th><th>Dam. mod.</th><th>AP</th><th>HP</th><th>Prob.</th><th></th>
+    <tr valign="bottom">
+        <th>Name</th>
+        <th>Type</th>
+        <th>Damage</th>
+        <th>Size</th>
+        <th>Reach</th>
+        <th>Range</th>
+        <th>SpecialFX</th>
+        <th>Dam.<br>mod.</th>
+        <th>Natural<br>weapon</th>
+        <th>AP</th>
+        <th>HP</th>
+        <th>Prob.</th><th></th>
     </tr>
     {% for weapon in cs.customs %}
     <tr>
@@ -166,8 +177,10 @@ $('.weapon_selector').click(function(event){
         <td><input id="custom_weapon_range_{{weapon.id}}" class="data" type="text" size="6" item_id="{{weapon.id}}" item_type="et_custom_weapon_range" value="{{weapon.range}}"></td>
         <td><input id="custom_weapon_special_effects_{{weapon.id}}" class="data" type="text" size="6" item_id="{{weapon.id}}" item_type="et_custom_weapon_special_effects" value="{{weapon.special_effects}}"></td>
         <td><input id="custom_weapon_dammod_{{weapon.id}}" class="data" type="checkbox" item_id="{{weapon.id}}" item_type="et_custom_weapon_damage_modifier" {% if weapon.damage_modifier %}checked="checked"{% endif %}></td>
-        <td><input id="custom_weapon_ap_{{weapon.id}}" class="data number" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_ap" value="{{weapon.ap}}"></td>
-        <td><input id="custom_weapon_hp_{{weapon.id}}" class="data number" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_hp" value="{{weapon.hp}}"></td>
+        <td><input id="custom_weapon_natweap_{{weapon.id}}" class="data natural_weapon" type="checkbox" item_id="{{weapon.id}}" item_type="et_custom_weapon_natural_weapon" {% if weapon.natural_weapon %}checked="checked"{% endif %}></td>
+        <td class="ap_hp"{% if weapon.natural_weapon %}style="display: none;"{% endif %}><input id="custom_weapon_ap_{{weapon.id}}" class="data number" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_ap" value="{{weapon.ap}}"></td>
+        <td class="ap_hp" {% if weapon.natural_weapon %}style="display: none;"{% endif %}><input id="custom_weapon_hp_{{weapon.id}}" class="data number" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_hp" value="{{weapon.hp}}"></td>
+        <td class="ap_hp" colspan="2" {% if not weapon.natural_weapon %}style="display: none;"{% endif %}><input id="custom_weapon_ap_hp_as_per_{{weapon.id}}" class="data" type="text" size="7" item_id="{{weapon.id}}" item_type="et_custom_weapon_ap_hp_as_per" value="{{ weapon.ap_hp_as_per }}" /></td>
         <td><input id="custom_weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_prob" value="{{ weapon.probability }}" /></td>
         <td><img src="/rq_static/minus.png" width="23" height="23" class="del_item" item_id="{{ weapon.id }}" item_type="custom_weapon"/></td>
     </tr>

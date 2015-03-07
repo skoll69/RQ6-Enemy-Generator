@@ -822,6 +822,8 @@ class CustomWeapon(models.Model, Printer):
     ap = models.SmallIntegerField(default=0)
     hp = models.SmallIntegerField(default=0)
     damage_modifier = models.BooleanField(default=True)
+    natural_weapon = models.BooleanField(default=False)
+    ap_hp_as_per = models.CharField(max_length=30, default='', null=True, blank=True)
     special_effects = models.CharField(max_length=300, null=True, blank=True)
     range = models.CharField(max_length=15, default='-', null=True, blank=True)
 
