@@ -1533,6 +1533,8 @@ class _Spirit(_Enemy):
         self._calculate_attributes()
         if self.is_animist:
             self._add_spirits()
+        if self.et.cult_amount:
+            self._add_cults()
         return self
 
     def _add_stats(self):
