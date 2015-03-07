@@ -596,7 +596,7 @@ class Party(models.Model, Printer):
     def get_random_additional_features(self):
         features = []
         for feature in self.additional_features:
-            if feature.random_has_feature():
+            if feature.random_has_feature() and len(feature.items) > 0:
                 features.append(feature.get_random_item())
         return features
 
@@ -1404,7 +1404,7 @@ class _Enemy(object):
         
     def _add_additional_features(self):
         for feature_list in self.et.additional_features:
-            if feature_list.random_has_feature(self.stats):
+            if feature_list.random_has_feature(self.stats) and len(feature_list.items) > 0:
                 feature = feature_list.get_random_item()
                 self.additional_features.append(feature)
         for feature in self.et.nonrandom_features:
