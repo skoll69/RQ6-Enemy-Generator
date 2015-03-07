@@ -159,6 +159,7 @@ class EnemyTemplate(models.Model, Printer):
     generated = models.IntegerField(default=0)
     used = models.IntegerField(default=0)
     published = models.BooleanField(default=False)
+    natural_armor = models.BooleanField(default=False)
     rank_choices = ((1, 'Rabble'), (2, 'Novice'), (3, 'Skilled'), (4, 'Veteran'), (5, 'Master'))
     rank = models.SmallIntegerField(max_length=30, default=2, choices=rank_choices)
     movement = models.CharField(max_length=50, default=6)
@@ -1465,11 +1466,13 @@ class _Enemy(object):
         return int(math.ceil(self.stats['POW'] * devpool_multiplier))
         
     def _sr_penalty(self):
+        if self.et.natural_armor:
+            return 0
         enc = 0
         for hl in self.hit_locations:
-            # For the purposes of calculating Strike Rank Penaly, only take Worn armor into account
-            # We assume, that the armor defined on the Race is natural armor, so it's substracted.
-            ap = hl['ap'] - int(hl['parent'].hit_location.armor)
+            ap = hl['ap']
+            # Disregard armor of the race, which is assumed to be natural
+            ap = ap - int(hl['parent'].hit_location.armor)
             if ap == 1:
                 enc += 2
             elif ap > 1:

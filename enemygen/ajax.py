@@ -204,6 +204,10 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             et = EnemyTemplate.objects.get(id=id, owner=request.user)
             et.published = to_bool(value)
             et.save()
+        elif object == 'et_natural_armor':
+            et = EnemyTemplate.objects.get(id=id, owner=request.user)
+            et.natural_armor = to_bool(value)
+            et.save()
 
         #Attributes
         elif object == 'et_stat_value':

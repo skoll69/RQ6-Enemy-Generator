@@ -211,6 +211,10 @@ $(document).ready(function(){
     <td>Movement</td>
     <td><input id="movement_{{et.id}}" class="data" type="text" size="8" item_id="{{et.id}}" item_type="et_movement" value="{{ et.movement }}" /></td>
 </tr>
+<tr>
+    <td>Natrual armor</td>
+    <td><input id="et_natural_{{ et.id }}" class="data" type="checkbox" item_id="{{ et.id }}" item_type="et_natural_armor" {% if et.natural_armor %}checked="checked"{% endif %} /></td>
+</tr>
 </table>
 </td></tr></table>
 
