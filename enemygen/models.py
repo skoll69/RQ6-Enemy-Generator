@@ -719,6 +719,7 @@ class CombatStyle(models.Model):
             cw.ap = weapon.ap
             cw.hp = weapon.hp
             cw.damage_modifier = weapon.damage_modifier
+            cw.special_effects = weapon.special_effects
             cw.save()
         
 class EnemyWeapon(models.Model, Printer):
