@@ -422,6 +422,7 @@ class EnemyTemplate(models.Model, Printer):
         new.notes = self.notes
         new.cult_rank = self.cult_rank
         new.namelist = self.namelist
+        new.natural_armor = self.natural_armor
         new.save()
         for tag in self.tags.all():
             new.tags.add(tag)
@@ -721,6 +722,8 @@ class CombatStyle(models.Model):
             cw.hp = weapon.hp
             cw.damage_modifier = weapon.damage_modifier
             cw.special_effects = weapon.special_effects
+            cw.natural_weapon = weapon.natural_weapon
+            cw.ap_hp_as_per = weapon.ap_hp_as_per
             cw.save()
         
 class EnemyWeapon(models.Model, Printer):
