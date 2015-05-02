@@ -11,6 +11,7 @@ class EnemyTemplateAdmin(admin.ModelAdmin):
     list_display = ('name', 'race', 'rank', 'generated', 'published', 'owner')
     list_filter = ('owner',)
     search_fields = ['name',]
+    
 class RaceAdmin(admin.ModelAdmin):
     list_display = ('name', 'owner', 'published')
 
@@ -46,6 +47,9 @@ class EnemyAdditionalFeatureListAdmin(admin.ModelAdmin):
     
 class CombatStyleAdmin(admin.ModelAdmin):
     list_display = ('name', 'enemy_template', 'one_h_amount', 'two_h_amount', 'ranged_amount', 'shield_amount')
+    
+class CustomWeaponAdmin(admin.ModelAdmin):
+    list_display = ('name', 'damage', 'special_effects')
     
 class SkillAbstractAdmin(admin.ModelAdmin):
     list_display = ('name', 'default_value', 'standard', 'magic')
@@ -101,7 +105,7 @@ admin.site.register(m.Ruleset)
 admin.site.register(m.EnemySpirit)
 admin.site.register(m.CustomSpell)
 admin.site.register(m.CustomSkill)
-admin.site.register(m.CustomWeapon)
+admin.site.register(m.CustomWeapon, CustomWeaponAdmin)
 admin.site.register(m.TemplateToParty)
 admin.site.register(m.EnemyNonrandomFeature)
 admin.site.register(AdditionalFeatureList, AdditionalFeatureListAdmin)
