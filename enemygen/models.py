@@ -137,6 +137,11 @@ class HitLocation(models.Model, Printer):
         range_end = min(biggest_range+3, 20)
         hl = HitLocation(name='New hit location', range_start=range_start, range_end=range_end, race=race)
         hl.save()
+        
+        # Add the new hitlocation also to any existing templates
+        for et in race.templates:
+            EnemyHitLocation.create(hl, et)
+        
         return hl
         
     def set_armor(self, value):
