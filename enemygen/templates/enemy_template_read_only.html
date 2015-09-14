@@ -225,9 +225,47 @@ Amount: {{ et.cult_amount }}
     <tr><td>{{ weapon.name }} ({{weapon.probability}})</td></tr>
     {% endfor %}
 </table>
+</td></tr></table>
+
+{% if cs.custom_weapons %}
+<h4>Custom weapons</h4>
+<table>
+<tr valign="bottom">
+    <th>Name</th>
+    <th>Type</th>
+    <th>Damage</th>
+    <th>Size</th>
+    <th>Reach</th>
+    <th>Range</th>
+    <th>SpecialFX</th>
+    <th>Dam.<br>mod.</th>
+    <th>Natural<br>weapon</th>
+    <th>AP</th>
+    <th>HP</th>
+</tr>
+{% for weapon in cs.custom_weapons %}
+<tr>
+    <td>{{ weapon.name }}</td>
+    <td>{{ weapon.type }}</td>
+    <td>{{ weapon.damage }}</td>
+    <td>{{ weapon.size }}</td>
+    <td>{{ weapon.reach }}</td>
+    <td>{{weapon.range}}</td>
+    <td>{{weapon.special_effects}}</td>
+    <td>{% if weapon.damage_modifier %}Y{% else %}N{% endif %}</td>
+    <td>{% if weapon.natural_weapon %}Y{% else %}N{% endif %}</td>
+    <td {% if weapon.natural_weapon %}style="display: none;"{% endif %}>{{weapon.ap}}</td>
+    <td {% if weapon.natural_weapon %}style="display: none;"{% endif %}>{{weapon.hp}}</td>
+    <td colspan="2" {% if not weapon.natural_weapon %}style="display: none;"{% endif %}>{{ weapon.ap_hp_as_per }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+
 {% endfor %}
 <br>
-</td></tr></table>
+
+
 {% endif %} <!-- et.spirit if ends -->
 
 {% if et.folk_spells %}

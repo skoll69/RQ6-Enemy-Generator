@@ -679,6 +679,10 @@ class CombatStyle(models.Model):
         output.extend(list(CustomWeapon.objects.filter(type='shield', combat_style=self)))
         return output
         
+    @property
+    def custom_weapons(self):
+        return CustomWeapon.objects.filter(combat_style=self)
+    
     def roll(self, replace):
         die_set = replace_die_set(self.die_set, replace)
         dice = Dice(die_set)
