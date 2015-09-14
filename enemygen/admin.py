@@ -14,6 +14,7 @@ class EnemyTemplateAdmin(admin.ModelAdmin):
     
 class RaceAdmin(admin.ModelAdmin):
     list_display = ('name', 'owner', 'published')
+    search_fields = ['name',]
 
 class AdditionalFeatureListAdmin(admin.ModelAdmin):
     list_display = ('name', 'type')
@@ -77,7 +78,8 @@ class RaceStatAdmin(admin.ModelAdmin):
     list_filter = ('race', 'stat')
 
 class EnemyHitLocationAdmin(admin.ModelAdmin):
-    list_display = ('enemy_template', 'hit_location', )
+    list_display = ('enemy_template', 'hit_location',)
+    search_fields = ['enemy_template__name',]
 
 class WeaponAdmin(admin.ModelAdmin):
     list_display = ('name', 'damage', 'type', 'tag_names', 'special_effects')
