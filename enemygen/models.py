@@ -860,7 +860,7 @@ class SkillAbstract(models.Model, Printer):
 class EnemySkill(models.Model, Printer):
     skill = models.ForeignKey(SkillAbstract)
     enemy_template = models.ForeignKey(EnemyTemplate)
-    die_set = models.CharField(max_length=30, blank=True)
+    die_set = models.CharField(max_length=100, blank=True)
     include = models.BooleanField()
     
     class Meta:
@@ -870,7 +870,7 @@ class EnemySkill(models.Model, Printer):
     @property
     def name(self):
         return self.skill.name
-        
+
     def roll(self, replace={}):
         die_set = replace_die_set(self.die_set, replace)
         dice = Dice(die_set)
