@@ -1,27 +1,43 @@
 from django.db import models
 from django.contrib.auth.models import User
-from enemygen_lib import _select_random_item, ValidationError, replace_die_set
+from enemygen_lib import ValidationError, replace_die_set, select_random_items
 from dice import Dice
 from taggit.managers import TaggableManager
-import ordereddict, random, math
+import ordereddict
+import random
+import math
 from django.db.models import Q
 
-WEAPON_TYPE_CHOICES = (('1h-melee', '1-h Melee'), ('2h-melee', '2-h Melee'), ('ranged', 'Ranged'), ('shield', 'Shield'),)
-WEAPON_SIZE_CHOICES = (('S', 'S'),('M', 'M'),('L', 'L'),('H', 'H'),('E', 'E'),('C', 'C'),)
-WEAPON_REACH_CHOICES = (('-', '-'),('T', 'T'),('S', 'S'),('M', 'M'),('L', 'L'),('VL', 'VL'),('U', 'U'),)
+WEAPON_TYPE_CHOICES = (('1h-melee', '1-h Melee'), ('2h-melee', '2-h Melee'), ('ranged', 'Ranged'), ('shield', 'Shield'))
+WEAPON_SIZE_CHOICES = (('S', 'S'), ('M', 'M'), ('L', 'L'), ('H', 'H'), ('E', 'E'), ('C', 'C'))
+WEAPON_REACH_CHOICES = (('-', '-'), ('T', 'T'), ('S', 'S'), ('M', 'M'), ('L', 'L'), ('VL', 'VL'), ('U', 'U'))
+DICE_STEPS = ('-1d8', '-1d6', '-1d4', '-1d2', '+0', '+1d2', '+1d4', '+1d6', '+1d8', '+1d10', '+1d12',
+              '+2d6', '+1d8+1d6', '+2d8', '+1d10+1d8', '+2d10', '+2d10+1d2', '+2d10+1d4', '+2d10+1d6', '+2d10+1d8',
+              '+3d10', '+3d10+1d2', '+3d10+1d4', '+3d10+1d6', '+3d10+1d8',
+              '+4d10', '+4d10+1d2', '+4d10+1d4', '+4d10+1d6', '+4d10+1d8',
+              '+5d10', '+5d10+1d2', '+5d10+1d4', '+5d10+1d6', '+5d10+1d8')
+
 
 class Printer:
+    """ A simple class for returning the name of the element """
+    def __init__(self):
+        self.name = ''  # Not used. Added just to keep Pycharm from complaining.
+
     def __unicode__(self):
         return self.name
+
         
 class Ruleset(models.Model, Printer):
+    """  Ruleset element. Not really utilized currently, as the tools supports only RQ6 """
     name = models.CharField(max_length=30)
     owner = models.ForeignKey(User)
     stats = models.ManyToManyField('StatAbstract', null=True, blank=True)
     skills = models.ManyToManyField('SkillAbstract', null=True, blank=True)
     races = models.ManyToManyField('Race', null=True, blank=True)
+
         
 class Weapon(models.Model, Printer):
+    """ Weapons. Created by admins based on rulebooks. """
     name = models.CharField(max_length=80)
     damage = models.CharField(max_length=30, default=0)
     type = models.CharField(max_length=30, choices=WEAPON_TYPE_CHOICES)
@@ -35,9 +51,11 @@ class Weapon(models.Model, Printer):
     tags = TaggableManager(blank=True)
         
     class Meta:
-        ordering = ['name',]
+        ordering = ['name', ]
+
         
 class Race(models.Model, Printer):
+    """ Template race. Templates inherit Movement, Hit Locations and notes. Discorporated attribute used by Spirits """
     name = models.CharField(max_length=30)
     owner = models.ForeignKey(User)
     movement = models.CharField(max_length=50, default=6)
@@ -47,7 +65,7 @@ class Race(models.Model, Printer):
     elemental = models.BooleanField(default=False)
     
     class Meta:
-        ordering = ['name',]
+        ordering = ['name', ]
         
     @property
     def hit_locations(self):
@@ -64,13 +82,13 @@ class Race(models.Model, Printer):
         for stat in StatAbstract.objects.all():
             rs = RaceStat(stat=stat, race=race, default_value='3D6')
             rs.save()
-        hl = HitLocation(name='Right leg', range_start=1, range_end=3, race=race, hp_modifier=0); hl.save()
-        hl = HitLocation(name='Left leg', range_start=4, range_end=6, race=race, hp_modifier=0); hl.save()
-        hl = HitLocation(name='Abdomen', range_start=7, range_end=9, race=race, hp_modifier=1); hl.save()
-        hl = HitLocation(name='Chest', range_start=10, range_end=12, race=race, hp_modifier=2); hl.save()
-        hl = HitLocation(name='Right Arm', range_start=13, range_end=15, race=race, hp_modifier=-1); hl.save()
-        hl = HitLocation(name='Left Arm', range_start=16, range_end=18, race=race, hp_modifier=-1); hl.save()
-        hl = HitLocation(name='Head', range_start=19, range_end=20, race=race, hp_modifier=0); hl.save()
+        HitLocation(name='Right leg', range_start=1, range_end=3, race=race, hp_modifier=0).save()
+        HitLocation(name='Left leg', range_start=4, range_end=6, race=race, hp_modifier=0).save()
+        HitLocation(name='Abdomen', range_start=7, range_end=9, race=race, hp_modifier=1).save()
+        HitLocation(name='Chest', range_start=10, range_end=12, race=race, hp_modifier=2).save()
+        HitLocation(name='Right Arm', range_start=13, range_end=15, race=race, hp_modifier=-1).save()
+        HitLocation(name='Left Arm', range_start=16, range_end=18, race=race, hp_modifier=-1).save()
+        HitLocation(name='Head', range_start=19, range_end=20, race=race, hp_modifier=0).save()
         return race
         
     def set_published(self, published):
@@ -84,7 +102,7 @@ class Race(models.Model, Printer):
             covered = []
             for hl in self.hit_locations:
                 covered.extend(range(hl.range_start, hl.range_end+1))
-            for x in range(1, 21): #Iterate through 1-20
+            for x in range(1, 21):  # Iterate through 1-20
                 if x not in covered:
                     ok = False
         if ok:
@@ -108,24 +126,25 @@ class Race(models.Model, Printer):
                              race=race, hp_modifier=loc.hp_modifier, armor=loc.armor)
             hl.save()
         return race
-        
+
+
 class HitLocation(models.Model, Printer):
     name = models.CharField(max_length=30)
-    armor = models.CharField(max_length=30, default='0') # die_set
+    armor = models.CharField(max_length=30, default='0')  # die_set
     range_start = models.SmallIntegerField()
     range_end = models.SmallIntegerField()
     race = models.ForeignKey(Race)
     hp_modifier = models.SmallIntegerField(default=0)
     
     class Meta:
-        ordering = ['range_start',]
+        ordering = ['range_start', ]
 
     @property
     def range(self):
         if self.range_start == self.range_end:
             return '%02d' % self.range_start
         else:
-            return '%02d-%02d' % (self.range_start, self.range_end)
+            return '%02d-%02d' % (int(self.range_start), int(self.range_end))
             
     @classmethod
     def create(cls, race_id):
@@ -145,11 +164,13 @@ class HitLocation(models.Model, Printer):
         return hl
         
     def set_armor(self, value):
-        if not value: value = '0'
-        Dice(value).roll()  #Test that the value is valid
+        if not value:
+            value = '0'
+        Dice(value).roll()  # Test that the value is valid
         self.armor = value.lower()
         self.save()
-    
+
+
 class EnemyTemplate(models.Model, Printer):
     name = models.CharField(max_length=50)
     owner = models.ForeignKey(User)
@@ -176,7 +197,7 @@ class EnemyTemplate(models.Model, Printer):
     weapon_filter = models.CharField(max_length=50, blank=True, null=True)
     
     class Meta:
-        ordering = ['name',]
+        ordering = ['name', ]
         
     @classmethod
     def create(cls, owner, ruleset, race, name="Enemy Template"):
@@ -200,7 +221,7 @@ class EnemyTemplate(models.Model, Printer):
     
     def _create_normal_template(self):
         spirit_skills = ('Spectral Combat', 'Discorporate')
-        for skill in self.ruleset.skills.all().exclude(name__in = spirit_skills):
+        for skill in self.ruleset.skills.all().exclude(name__in=spirit_skills):
             es = EnemySkill(skill=skill, enemy_template=self, die_set=skill.default_value, include=skill.include)
             es.save()
         for hit_location in self.race.hit_locations:
@@ -225,7 +246,7 @@ class EnemyTemplate(models.Model, Printer):
     def get_cult_rank(self):
         theist_ranks = ('None', 'Lay Member', 'Initiate', 'Acolyte', 'Priest', 'High priest')
         if self.is_theist:
-            return theist_ranks[self.cult_rank]
+            return theist_ranks[int(self.cult_rank)]
         else:
             return self.get_cult_rank_display()
     
@@ -288,7 +309,7 @@ class EnemyTemplate(models.Model, Printer):
             return _Enemy(self).generate(suffix)
 
     def increment_used(self):
-        ''' Increments the used-count by one. '''
+        """ Increments the used-count by one. """
         self.used += 1
         self.save()
         
@@ -432,9 +453,10 @@ class EnemyTemplate(models.Model, Printer):
         for tag in self.tags.all():
             new.tags.add(tag)
         for stat in self.stats:
-            es = EnemyStat(stat=stat.stat, enemy_template=new, die_set=stat.die_set); es.save()
+            es = EnemyStat(stat=stat.stat, enemy_template=new, die_set=stat.die_set)
+            es.save()
         for hl in self.hit_locations:
-            new_hl = EnemyHitLocation.create(hl.hit_location, enemy_template=new, armor=hl.armor)
+            EnemyHitLocation.create(hl.hit_location, enemy_template=new, armor=hl.armor)
         for skill in self.raw_skills:
             es = EnemySkill(skill=skill.skill, enemy_template=new, die_set=skill.die_set, include=skill.include)
             es.save()
@@ -530,17 +552,13 @@ class EnemyTemplate(models.Model, Printer):
         return queryset.distinct()
         
     def summary_dict(self, user=None):
-        ''' Returns summary information about the EnemyTemplate in as a dict so that it can be jsoned '''
-        output = {}
-        output['name'] = self.name
-        output['race'] = self.race.name
-        output['rank'] = self.rank
-        output['owner'] = self.owner.username
-        output['tags'] = self.get_tags()
-        output['id'] = self.id
+        """ Returns summary information about the EnemyTemplate in as a dict so that it can be jsoned """
+        output = {'name': self.name, 'race': self.race.name, 'rank': self.rank, 'owner': self.owner.username,
+                  'tags': self.get_tags(), 'id': self.id}
         if user:
             output['starred'] = self.is_starred(user)
         return output
+
 
 class Party(models.Model, Printer):
     name = models.CharField(max_length=50)
@@ -550,7 +568,7 @@ class Party(models.Model, Printer):
     tags = TaggableManager(blank=True)
     
     class Meta:
-        ordering = ['name',]
+        ordering = ['name', ]
         
     @classmethod
     def create(cls, owner):
@@ -559,13 +577,13 @@ class Party(models.Model, Printer):
         return p
         
     def add(self, template):
-        ''' Adds a template to the Party '''
+        """ Adds a template to the Party """
         if len(TemplateToParty.objects.filter(template=template, party=self)) == 0:
             ttp = TemplateToParty(template=template, party=self, amount='1')
             ttp.save()
             
     def set_amount(self, template, amount):
-        Dice(amount).roll()  #Test that the value is valid
+        Dice(amount).roll()  # Test that the value is valid
         ttp = TemplateToParty.objects.get(template=template, party=self)
         ttp.amount = amount
         ttp.save()
@@ -626,6 +644,7 @@ class Party(models.Model, Printer):
             PartyNonrandomFeature.create(new, nrf.feature.id)
         return new
 
+
 class TemplateToParty(models.Model):
     template = models.ForeignKey(EnemyTemplate)
     party = models.ForeignKey(Party)
@@ -633,7 +652,8 @@ class TemplateToParty(models.Model):
     
     def get_amount(self):
         return Dice(self.amount).roll()        
-        
+
+
 class CombatStyle(models.Model):
     name = models.CharField(max_length=80)
     die_set = models.CharField(max_length=30, default="STR+DEX")
@@ -689,22 +709,22 @@ class CombatStyle(models.Model):
         return dice.roll()
         
     def set_one_h_amount(self, value):
-        Dice(value).roll()  #Test that the value is valid
+        Dice(value).roll()  # Test that the value is valid
         self.one_h_amount = value.lower()
         self.save()
         
     def set_two_h_amount(self, value):
-        Dice(value).roll()  #Test that the value is valid
+        Dice(value).roll()  # Test that the value is valid
         self.two_h_amount = value.lower()
         self.save()
         
     def set_ranged_amount(self, value):
-        Dice(value).roll()  #Test that the value is valid
+        Dice(value).roll()  # Test that the value is valid
         self.ranged_amount = value.lower()
         self.save()
         
     def set_shield_amount(self, value):
-        Dice(value).roll()  #Test that the value is valid
+        Dice(value).roll()  # Test that the value is valid
         self.shield_amount = value.lower()
         self.save()
         
@@ -735,22 +755,18 @@ class CombatStyle(models.Model):
             cw.natural_weapon = weapon.natural_weapon
             cw.ap_hp_as_per = weapon.ap_hp_as_per
             cw.save()
-        
+
+
 class EnemyWeapon(models.Model, Printer):
-    ''' Enemy-specific instance of a Weapon. Links selected weapon to CombatStyle and records
+    """ Enemy-specific instance of a Weapon. Links selected weapon to CombatStyle and records
         Probability.
-    '''
+    """
     combat_style = models.ForeignKey(CombatStyle)
     weapon = models.ForeignKey(Weapon)
     probability = models.SmallIntegerField(default=1)
     
     class Meta:
         unique_together = ('combat_style', 'weapon')
-    
-    #def __getattr__(self, attr):
-    #    jalla = self.weapon
-    #    return self.weapon.__dict_[attr]
-        #return getattr(self.weapon, attr)
     
     @property
     def name(self):
@@ -803,7 +819,8 @@ class EnemyWeapon(models.Model, Printer):
         ew = EnemyWeapon(combat_style=combat_style, weapon=weapon, probability=probability)
         ew.save()
         return ew
-        
+
+
 class CustomWeapon(models.Model, Printer):
     combat_style = models.ForeignKey(CombatStyle)
     name = models.CharField(max_length=80)
@@ -845,12 +862,13 @@ class CustomWeapon(models.Model, Printer):
         self.save()
     
     @classmethod
-    def create(cls, cs_id, type, name='Custom weapon', probability=1):
+    def create(cls, cs_id, weapontype, name='Custom weapon', probability=1):
         cs = CombatStyle.objects.get(id=cs_id)
-        cw = cls(combat_style=cs, type=type, name=name, probability=probability)
+        cw = cls(combat_style=cs, type=weapontype, name=name, probability=probability)
         cw.save()
         return cw
-        
+
+
 class SkillAbstract(models.Model, Printer):
     name = models.CharField(max_length=80)
     standard = models.BooleanField(default=True)
@@ -859,8 +877,9 @@ class SkillAbstract(models.Model, Printer):
     include = models.BooleanField()
 
     class Meta:
-        ordering = ['name',]
-    
+        ordering = ['name', ]
+
+
 class EnemySkill(models.Model, Printer):
     skill = models.ForeignKey(SkillAbstract)
     enemy_template = models.ForeignKey(EnemyTemplate)
@@ -868,14 +887,14 @@ class EnemySkill(models.Model, Printer):
     include = models.BooleanField()
     
     class Meta:
-        ordering = ['skill',]
+        ordering = ['skill', ]
         unique_together = ('enemy_template', 'skill')
     
     @property
     def name(self):
         return self.skill.name
 
-    def roll(self, replace={}):
+    def roll(self, replace=None):
         die_set = replace_die_set(self.die_set, replace)
         dice = Dice(die_set)
         return dice.roll()
@@ -886,15 +905,16 @@ class EnemySkill(models.Model, Printer):
         Dice(temp_value).roll()
         self.die_set = value.upper()
         self.save()
-        
+
+
 class CustomSkill(models.Model, Printer):
-    ''' Customs skills on the Enemy Templates '''
+    """ Customs skills on the Enemy Templates """
     enemy_template = models.ForeignKey(EnemyTemplate)
     name = models.CharField(max_length=80)
     die_set = models.CharField(max_length=30, blank=True)
     include = models.BooleanField()
 
-    def roll(self, replace={}):
+    def roll(self, replace=None):
         die_set = replace_die_set(self.die_set, replace)
         dice = Dice(die_set)
         return dice.roll()
@@ -912,14 +932,15 @@ class CustomSkill(models.Model, Printer):
         cs = CustomSkill(enemy_template=et, name='Custom skill', include=True)
         cs.save()
         return cs
-    
+
+
 class EnemyHitLocation(models.Model, Printer):
     hit_location = models.ForeignKey(HitLocation)
     enemy_template = models.ForeignKey(EnemyTemplate)
-    armor = models.CharField(max_length=30, blank=True) # die_set
+    armor = models.CharField(max_length=30, blank=True)  # die_set
     
     class Meta:
-        ordering = ['hit_location',]
+        ordering = ['hit_location', ]
     
     @property
     def name(self):
@@ -938,7 +959,7 @@ class EnemyHitLocation(models.Model, Printer):
         return dice.roll()
         
     def set_armor(self, value):
-        Dice(value).roll()  #Test that the value is valid
+        Dice(value).roll()  # Test that the value is valid
         self.armor = value.lower()
         self.save()
         
@@ -953,39 +974,42 @@ class EnemyHitLocation(models.Model, Printer):
                                armor=armor)
         ehl.save()
         return ehl
-        
+
+
 class StatAbstract(models.Model, Printer):
     name = models.CharField(max_length=30)
     order = models.SmallIntegerField(null=True)
     
     class Meta:
-        ordering = ['order',]
-        
+        ordering = ['order', ]
+
+
 class RaceStat(models.Model, Printer):
     stat = models.ForeignKey(StatAbstract)
     race = models.ForeignKey(Race)
     default_value = models.CharField(max_length=30, null=True)
     
     class Meta:
-        ordering = ['stat',]
+        ordering = ['stat', ]
 
     @property
     def name(self):
         return self.stat.name
         
     def set_value(self, value):
-        #Test that the value is valid
+        # Test that the value is valid
         Dice(value).roll()
         self.default_value = value.lower()
         self.save()
-        
+
+
 class EnemyStat(models.Model, Printer):
     stat = models.ForeignKey(StatAbstract)
     enemy_template = models.ForeignKey(EnemyTemplate)
     die_set = models.CharField(max_length=30, null=True)
     
     class Meta:
-        ordering = ['stat',]
+        ordering = ['stat', ]
     
     @property
     def name(self):
@@ -996,12 +1020,13 @@ class EnemyStat(models.Model, Printer):
         return dice.roll()
 
     def set_value(self, value):
-        Dice(value).roll()  #Test that the value is valid
+        Dice(value).roll()  # Test that the value is valid
         self.die_set = value.lower()
         self.save()
 
+
 class SpellAbstract(models.Model, Printer):
-    ''' A Spell. '''
+    """ A Spell. """
     name = models.CharField(max_length=30)
     
     choices = (
@@ -1015,17 +1040,18 @@ class SpellAbstract(models.Model, Printer):
     default_detail = models.CharField(max_length=50, null=True, blank=True)
     
     class Meta:
-        ordering = ['name',]
-    
+        ordering = ['name', ]
+
+
 class EnemySpell(models.Model, Printer):
-    ''' Enemy-specific instance of a SpellAbstract '''
+    """ Enemy-specific instance of a SpellAbstract """
     spell = models.ForeignKey(SpellAbstract)
     enemy_template = models.ForeignKey(EnemyTemplate)
     probability = models.SmallIntegerField(default=0)
     detail = models.CharField(max_length=50, null=True, blank=True)
         
     class Meta:
-        ordering = ['spell',]
+        ordering = ['spell', ]
         unique_together = ('spell', 'enemy_template')
     
     @property
@@ -1042,8 +1068,9 @@ class EnemySpell(models.Model, Printer):
         if value == 0:
             self.delete()
 
+
 class CustomSpell(models.Model, Printer):
-    ''' Custom spells created by users '''
+    """ Custom spells created by users """
     enemy_template = models.ForeignKey(EnemyTemplate)
     name = models.CharField(max_length=80)
     probability = models.SmallIntegerField(default=0)
@@ -1054,9 +1081,9 @@ class CustomSpell(models.Model, Printer):
                                                     ))
 
     @classmethod
-    def create(cls, et_id, type):
+    def create(cls, et_id, spelltype):
         et = EnemyTemplate.objects.get(id=et_id)
-        cs = cls(enemy_template=et, type=type, name='Custom spell', probability=1)
+        cs = cls(enemy_template=et, type=spelltype, name='Custom spell', probability=1)
         cs.save()
         return cs
     
@@ -1065,16 +1092,17 @@ class CustomSpell(models.Model, Printer):
         self.save()
 
     class Meta:
-        ordering = ['name',]
+        ordering = ['name', ]
+
 
 class EnemySpirit(models.Model, Printer):
-    ''' Links spirits (EnemyTemplates) to animists '''
+    """ Links spirits (EnemyTemplates) to animists """
     enemy_template = models.ForeignKey(EnemyTemplate, related_name='animist')   # The animist
     spirit = models.ForeignKey(EnemyTemplate, related_name='spirit')
     probability = models.SmallIntegerField(default=0)
     
     class Meta:
-        ordering = ['spirit',]
+        ordering = ['spirit', ]
         
     @property
     def name(self):
@@ -1088,14 +1116,15 @@ class EnemySpirit(models.Model, Printer):
         es.save()
         return es
 
+
 class EnemyCult(models.Model, Printer):
-    ''' Links Cults to EnemyTemplates '''
+    """ Links Cults to EnemyTemplates """
     enemy_template = models.ForeignKey(EnemyTemplate, related_name='enemytemplate')
     cult = models.ForeignKey(EnemyTemplate, related_name='cult')
     probability = models.SmallIntegerField(default=0)
     
     class Meta:
-        ordering = ['cult',]
+        ordering = ['cult', ]
         
     @property
     def name(self):
@@ -1109,13 +1138,14 @@ class EnemyCult(models.Model, Printer):
         ec.save()
         return ec
 
+
 class AdditionalFeatureList(models.Model):
     name = models.CharField(max_length=80)
     type_choices = (('enemy_feature', 'Enemy feature'), ('party_feature', 'Party feature'), ('name', 'Name'))
     type = models.CharField(max_length=20, choices=type_choices)
     
     class Meta:
-        ordering = ['type', 'name',]
+        ordering = ['type', 'name']
     
     @property
     def items(self):
@@ -1129,12 +1159,14 @@ class AdditionalFeatureList(models.Model):
     def __unicode__(self):
         return '%s - %s' % (self.get_type_display(), self.name)
 
+
 class AdditionalFeatureItem(models.Model, Printer):
     name = models.CharField(max_length=1000)
     feature_list = models.ForeignKey(AdditionalFeatureList)
  
     class Meta:
-        ordering = ['name',]
+        ordering = ['name', ]
+
 
 class EnemyAdditionalFeatureList(models.Model):
     probability = models.CharField(max_length=30, default='POW+POW', null=True, blank=True)
@@ -1142,7 +1174,7 @@ class EnemyAdditionalFeatureList(models.Model):
     enemy_template = models.ForeignKey(EnemyTemplate)
 
     class Meta:
-        ordering = ['feature_list',]
+        ordering = ['feature_list', ]
     
     @classmethod
     def create(cls, enemy_template, feature_list_id, probability='POW+POW'):
@@ -1162,8 +1194,8 @@ class EnemyAdditionalFeatureList(models.Model):
     def get_random_item(self):
         return self.feature_list.get_random_item()
         
-    def random_has_feature(self, replace={}):
-        ''' Determines randomly whether the enemy has the additional feature or not '''
+    def random_has_feature(self, replace=None):
+        """ Determines randomly whether the enemy has the additional feature or not """
         prob = replace_die_set(self.probability, replace)
         prob = Dice(prob).roll()
         roll = random.randint(1, 100)
@@ -1181,6 +1213,7 @@ class EnemyAdditionalFeatureList(models.Model):
     def __unicode__(self):
         return '%s(%s) - %s' % (self.enemy_template.name, self.enemy_template.id, self.feature_list.name)
 
+
 class EnemyNonrandomFeature(models.Model):
     enemy_template = models.ForeignKey(EnemyTemplate)
     feature = models.ForeignKey(AdditionalFeatureItem)
@@ -1195,7 +1228,8 @@ class EnemyNonrandomFeature(models.Model):
     def __unicode__(self):
         feature_name = self.feature.name[:40]+'...' if len(self.feature.name) > 43 else self.feature.name
         return '%s(%s) - %s' % (self.enemy_template.name, self.enemy_template.id, feature_name)
-        
+
+
 class PartyNonrandomFeature(models.Model):
     party = models.ForeignKey(Party)
     feature = models.ForeignKey(AdditionalFeatureItem)
@@ -1206,14 +1240,15 @@ class PartyNonrandomFeature(models.Model):
         nonrandom_feature = cls(party=party, feature=feature)
         nonrandom_feature.save()
         return nonrandom_feature
-        
+
+
 class PartyAdditionalFeatureList(models.Model, Printer):
     probability = models.CharField(max_length=30, default='50', null=True, blank=True)
     feature_list = models.ForeignKey(AdditionalFeatureList)
     party = models.ForeignKey(Party)
     
     class Meta:
-        ordering = ['feature_list',]
+        ordering = ['feature_list', ]
 
     @classmethod
     def create(cls, party, feature_list_id):
@@ -1233,8 +1268,8 @@ class PartyAdditionalFeatureList(models.Model, Printer):
     def get_random_item(self):
         return self.feature_list.get_random_item()
         
-    def random_has_feature(self, replace={}):
-        ''' Determines randomly whether the enemy has the additional feature or not '''
+    def random_has_feature(self):
+        """ Determines randomly whether the enemy has the additional feature or not """
         prob = int(self.probability)
         roll = random.randint(1, 100)
         return roll <= prob
@@ -1246,18 +1281,20 @@ class PartyAdditionalFeatureList(models.Model, Printer):
         self.probability = value
         self.save()
 
+
 class ChangeLog(models.Model, Printer):
     publish_date = models.DateField()
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=3000)
     
     class Meta:
-        ordering = ['publish_date',]
-        
+        ordering = ['publish_date', ]
+
+
 class _Enemy(object):
-    ''' Enemy instance created based on an EnemyTemplate. This is the stuff that gets printed
+    """ Enemy instance created based on an EnemyTemplate. This is the stuff that gets printed
         for the user when Generate is clicked.
-    '''
+    """
     def __init__(self, enemy_template):
         self.name = ''
         self.et = enemy_template
@@ -1282,6 +1319,7 @@ class _Enemy(object):
         self.is_sorcerer = False
         self.is_animist = False
         self.is_mystic = False
+        self.is_spirit = self.et.is_spirit
 
     def generate(self, suffix=None):
         self._generate_name(suffix)
@@ -1323,29 +1361,26 @@ class _Enemy(object):
     
     def _add_combat_styles(self):
         for cs in self.et.combat_styles:
-            combat_style = {}
-            combat_style['value'] = cs.roll(self.stats)
-            combat_style['name'] = cs.name
-            combat_style['weapons'] = self._add_weapons(cs)
+            combat_style = {'value': cs.roll(self.stats), 'name': cs.name, 'weapons': self._add_weapons(cs)}
             self.combat_styles.append(combat_style)
             
     def _add_weapons(self, cs):
-        ''' Returns a list of weapons based on the given CombatStyle's weapon selections and probabilities
-        '''
+        """ Returns a list of weapons based on the given CombatStyle's weapon selections and probabilities
+        """
         output = []
         one_h_amount = min(cs.roll_one_h_amount(), len(cs.one_h_options))
         two_h_amount = min(cs.roll_two_h_amount(), len(cs.two_h_options))
         ranged_amount = min(cs.roll_ranged_amount(), len(cs.ranged_options))
         shield_amount = min(cs.roll_shield_amount(), len(cs.shield_options))
-        output.extend(self._get_items(cs.one_h_options, one_h_amount))
-        output.extend(self._get_items(cs.two_h_options, two_h_amount))
-        output.extend(self._get_items(cs.ranged_options, ranged_amount))
-        output.extend(self._get_items(cs.shield_options, shield_amount))
+        output.extend(select_random_items(cs.one_h_options, one_h_amount))
+        output.extend(select_random_items(cs.two_h_options, two_h_amount))
+        output.extend(select_random_items(cs.ranged_options, ranged_amount))
+        output.extend(select_random_items(cs.shield_options, shield_amount))
         output = self._adjust_size_and_reach(output)
         return output
         
     def _adjust_size_and_reach(self, weapons):
-        ''' Adjusts weapon size and reach of big creatures '''
+        """ Adjusts weapon size and reach of big creatures """
         step = (self.stats['SIZ']-11) / 10    # SIZ 21-30: step 1; 31-40: step 2, etc.
         if step == 0:
             return weapons
@@ -1353,15 +1388,19 @@ class _Enemy(object):
         reaches = [value for value, lable in WEAPON_REACH_CHOICES]
         for item in weapons:
             if item.__class__.__name__ == 'EnemyWeapon':
-                try:                item.weapon.size = sizes[sizes.index(item.weapon.size) + step]
-                except IndexError:  item.weapon.size = 'C'
-                try:                item.weapon.reach = reaches[reaches.index(item.weapon.reach) + step]
-                except IndexError:  item.weapon.reach = 'U'
+                try:
+                    item.weapon.size = sizes[sizes.index(item.weapon.size) + step]
+                except IndexError:
+                    item.weapon.size = 'C'
+                try:
+                    item.weapon.reach = reaches[reaches.index(item.weapon.reach) + step]
+                except IndexError:
+                    item.weapon.reach = 'U'
         return weapons
     
     def _add_hit_locations(self):
         con_siz = self.stats['CON'] + self.stats['SIZ']
-        base_hp = ((con_siz-1) / 5) + 1 # used by Head and Legs
+        base_hp = ((con_siz-1) / 5) + 1  # used by Head and Legs
         for hl in self.et.hit_locations:
             hp = max(base_hp + hl.hp_modifier, 1)
             ap = hl.roll()
@@ -1370,17 +1409,18 @@ class _Enemy(object):
         
     def _add_spells(self):
         amount = min(Dice(self.et.folk_spell_amount).roll(), len(self.et.folk_spells))
-        self.folk_spells = sorted(self._get_items(self.et.folk_spells, amount), key=lambda s: s.name)
+        self.folk_spells = sorted(select_random_items(self.et.folk_spells, amount), key=lambda s: s.name)
         amount = min(Dice(self.et.theism_spell_amount).roll(), len(self.et.theism_spells))
-        self.theism_spells = sorted(self._get_items(self.et.theism_spells, amount), key=lambda s: s.name)
+        self.theism_spells = sorted(select_random_items(self.et.theism_spells, amount), key=lambda s: s.name)
         amount = min(Dice(self.et.sorcery_spell_amount).roll(), len(self.et.sorcery_spells))
-        self.sorcery_spells = sorted(self._get_items(self.et.sorcery_spells, amount), key=lambda s: s.name)
+        self.sorcery_spells = sorted(select_random_items(self.et.sorcery_spells, amount), key=lambda s: s.name)
         amount = min(Dice(self.et.mysticism_spell_amount).roll(), len(self.et.mysticism_spells))
-        self.mysticism_spells = sorted(self._get_items(self.et.mysticism_spells, amount), key=lambda s: s.name)
+        self.mysticism_spells = sorted(select_random_items(self.et.mysticism_spells, amount), key=lambda s: s.name)
         
     def _add_spirits(self):
-        amount = min(Dice(self.et.spirit_amount).roll(), len(self.et.spirits.filter(probability__gt=0).exclude(spirit__race__name='Cult')))
-        spirit_templates = self._get_items(self.et.spirits.filter(probability__gt=0).exclude(spirit__race__name='Cult'), amount)
+        spirit_options = self.et.spirits.filter(probability__gt=0).exclude(spirit__race__name='Cult')
+        amount = min(Dice(self.et.spirit_amount).roll(), len(spirit_options))
+        spirit_templates = select_random_items(spirit_options, amount)
         retries = 5
         for st in spirit_templates:
             i = 0
@@ -1393,7 +1433,7 @@ class _Enemy(object):
         
     def _add_cults(self):
         amount = min(Dice(self.et.cult_amount).roll(), len(self.et.cults.filter(probability__gt=0)))
-        cult_templates = self._get_items(self.et.cults.filter(probability__gt=0), amount)
+        cult_templates = select_random_items(self.et.cults.filter(probability__gt=0), amount)
         for ct in cult_templates:
             self.cult = ct.cult
             cult = ct.cult.generate()
@@ -1405,13 +1445,13 @@ class _Enemy(object):
             self.cults.append(cult)
             
         seen = set()
-        self.folk_spells = [ x for x in self.folk_spells if x.name not in seen and not seen.add(x.name)]
+        self.folk_spells = [x for x in self.folk_spells if x.name not in seen and not seen.add(x.name)]
         seen = set()
-        self.theism_spells = [ x for x in self.theism_spells if x.name not in seen and not seen.add(x.name)]
+        self.theism_spells = [x for x in self.theism_spells if x.name not in seen and not seen.add(x.name)]
         seen = set()
-        self.sorcery_spells = [ x for x in self.sorcery_spells if x.name not in seen and not seen.add(x.name)]
+        self.sorcery_spells = [x for x in self.sorcery_spells if x.name not in seen and not seen.add(x.name)]
         seen = set()
-        self.mysticism_spells = [ x for x in self.mysticism_spells if x.name not in seen and not seen.add(x.name)]
+        self.mysticism_spells = [x for x in self.mysticism_spells if x.name not in seen and not seen.add(x.name)]
             
         self.folk_spells.sort(key=lambda item: item.name)
         self.theism_spells.sort(key=lambda item: item.name)
@@ -1427,21 +1467,6 @@ class _Enemy(object):
         for feature in self.et.nonrandom_features:
             self.additional_features.append(feature.feature)
         self.additional_features.sort(key=lambda item: item.feature_list.name)
-        
-    def _get_items(self, item_list, amount):
-        ''' Randomly selects the given amount of spells from the given list 
-            Input: item_list: List of items where to pick from. The items need to have the attribute
-                   'probability'
-                   amount: amount of items to be selected
-        '''
-        output = []
-        selected_items = []
-        for x in range(amount):
-            item = _select_random_item(item_list, selected_items)
-            selected_items.append(item)
-            output.append(item)
-        output.sort()
-        return output
         
     def _calculate_attributes(self):
         sr_natural = (self.stats['INT'] + self.stats['DEX']) / 2
@@ -1470,7 +1495,7 @@ class _Enemy(object):
             self.attributes['max_spirits'] = self._get_max_spirits()
             
     def _get_max_spirits(self):
-        ''' Calculates and returns the maximun number of spirits the animist can control. '''
+        """ Calculates and returns the maximun number of spirits the animist can control. """
         mult_options = [0, 0.25, 0.5, 0.75, 1, 1]
         spirit_multiplier = mult_options[self.et.cult_rank]
         return int(math.ceil(self.stats['CHA'] * spirit_multiplier))
@@ -1487,7 +1512,7 @@ class _Enemy(object):
         for hl in self.hit_locations:
             ap = hl['ap']
             # Disregard armor of the race, which is assumed to be natural
-            ap = ap - int(hl['parent'].hit_location.armor)
+            ap -= int(hl['parent'].hit_location.armor)
             if ap == 1:
                 enc += 2
             elif ap > 1:
@@ -1496,24 +1521,22 @@ class _Enemy(object):
     
     def _calculate_action_points(self):
         dex_int = self.stats['DEX'] + self.stats['INT']
-        if dex_int <= 12: self.attributes['action_points'] = 1
-        elif dex_int <= 24: self.attributes['action_points'] = 2
-        elif dex_int <= 36: self.attributes['action_points'] = 3
-        elif dex_int <= 48: self.attributes['action_points'] = 4
-        else: self.attributes['action_points'] = 5
+        if dex_int <= 12:
+            self.attributes['action_points'] = 1
+        elif dex_int <= 24:
+            self.attributes['action_points'] = 2
+        elif dex_int <= 36:
+            self.attributes['action_points'] = 3
+        elif dex_int <= 48:
+            self.attributes['action_points'] = 4
+        else:
+            self.attributes['action_points'] = 5
         
-    def _calculate_damage_modifier(self, str, siz):
-        if str == 0 or siz == 0:
+    def _calculate_damage_modifier(self, strength, siz):
+        if strength == 0 or siz == 0:
             self.attributes['damage_modifier'] = '+0'
             return
-        DICE_STEPS = ('-1d8', '-1d6', '-1d4', '-1d2', '+0', '+1d2', '+1d4', '+1d6', '+1d8', '+1d10', '+1d12',
-                      '+2d6', '+1d8+1d6', '+2d8', '+1d10+1d8', 
-                      '+2d10', '+2d10+1d2', '+2d10+1d4', '+2d10+1d6', '+2d10+1d8',
-                      '+3d10', '+3d10+1d2', '+3d10+1d4', '+3d10+1d6', '+3d10+1d8',
-                      '+4d10', '+4d10+1d2', '+4d10+1d4', '+4d10+1d6', '+4d10+1d8',
-                      '+5d10', '+5d10+1d2', '+5d10+1d4', '+5d10+1d6', '+5d10+1d8',
-                      )
-        str_siz = str + siz
+        str_siz = strength + siz
         if str_siz <= 50:
             index = (str_siz-1) / 5
         else:
@@ -1522,7 +1545,8 @@ class _Enemy(object):
             self.attributes['damage_modifier'] = DICE_STEPS[index]
         except IndexError:
             self.attributes['damage_modifier'] = '+6d10'
-            
+
+
 class _Cult(_Enemy):
     def __init__(self, enemy_template):
         super(_Cult, self).__init__(enemy_template)
@@ -1535,15 +1559,15 @@ class _Cult(_Enemy):
         
     def _add_spirits(self):
         amount = min(Dice(self.et.spirit_amount).roll(), len(self.et.spirits.filter(probability__gt=0)))
-        spirit_templates = self._get_items(self.et.spirits.filter(probability__gt=0), amount)
+        spirit_templates = select_random_items(self.et.spirits.filter(probability__gt=0), amount)
         for st in spirit_templates:
             spirit = st.spirit.generate()
             self.spirits.append(spirit)
-   
+
+
 class _Spirit(_Enemy):
-    ''' Spirit type of Enemy '''
+    """ Spirit type of Enemy """
     def generate(self, suffix=None):
-        self.is_spirit = self.et.is_spirit
         self._generate_name(suffix)
         self._add_stats()
         self._add_skills()
@@ -1570,7 +1594,7 @@ class _Spirit(_Enemy):
         self._calculate_action_points()
         self._calculate_spirit_damage()
         self.attributes['magic_points'] = self.stats['POW']
-        self.attributes['strike_rank'] = '%s' % (sr)
+        self.attributes['strike_rank'] = '%s' % sr
         self.attributes['movement'] = self.et.movement
         if 'Devotion' in self.skills_dict:
             self.is_theist = True
@@ -1591,11 +1615,16 @@ class _Spirit(_Enemy):
         
     def _calculate_action_points(self):
         pow_int = self.stats['POW'] + self.stats['INT']
-        if pow_int <= 12: self.attributes['action_points'] = 1
-        elif pow_int <= 24: self.attributes['action_points'] = 2
-        elif pow_int <= 36: self.attributes['action_points'] = 3
-        elif pow_int <= 48: self.attributes['action_points'] = 4
-        else: self.attributes['action_points'] = 5
+        if pow_int <= 12:
+            self.attributes['action_points'] = 1
+        elif pow_int <= 24:
+            self.attributes['action_points'] = 2
+        elif pow_int <= 36:
+            self.attributes['action_points'] = 3
+        elif pow_int <= 48:
+            self.attributes['action_points'] = 4
+        else:
+            self.attributes['action_points'] = 5
         
     def _calculate_spirit_damage(self):
         damage_table = ['0', '1d2', '1d4', '1d6', '1d8', '1d10', '2d6', '1d8+1d6', '2d8', '1d10+1d8', '2d10',
@@ -1607,11 +1636,12 @@ class _Spirit(_Enemy):
         except IndexError:
             spirit_damage = '3d10+1d6'
         self.attributes['spirit_damage'] = spirit_damage
-        
+
+
 class _Elemental(_Enemy):
-    ''' Elemental type of enemy '''
+    """ Elemental type of enemy """
+
     def generate(self, suffix=None):
-        self.is_spirit = self.et.is_spirit
         self._generate_name(suffix)
         self._add_stats()
         self.stats['SIZ'] = self.stats['STR']
@@ -1631,12 +1661,9 @@ class _Elemental(_Enemy):
         # hit poits, so I'm calculating them based on POW.
         # If POW is 1d6+6, HP is 1d6+12. So both of them have 1d6 always, and the additional
         # part is double for hit points.
-        for stat in self.et.stats:
-            if stat.name == 'POW':
-                pow = stat.die_set
-                break
+        power = next((stat.die_set for stat in self.et.stats if stat.name == 'POW'), '')
         try:
-            modifier = 2 * int(pow.split('+')[1])
+            modifier = 2 * int(power.split('+')[1])
         except (IndexError, TypeError):
             modifier = 0
         for hl in self.et.hit_locations:
@@ -1644,9 +1671,10 @@ class _Elemental(_Enemy):
             ap = hl.roll()
             enemy_hl = {'name': hl.name, 'range': hl.range, 'hp': hp, 'ap': ap, 'parent': hl}
             self.hit_locations.append(enemy_hl)
-    
+
+
 class Star(models.Model):
-    ''' Functionality for starring templates (marking as favourite) '''
+    """ Functionality for starring templates (marking as favourite) """
     user = models.ForeignKey(User)
     template = models.ForeignKey(EnemyTemplate)
     
@@ -1655,7 +1683,7 @@ class Star(models.Model):
     
     @classmethod
     def create_or_delete(cls, user, template):
-        ''' Creates a Star if it doesn't exist, or deletes it if it does '''
+        """ Creates a Star if it doesn't exist, or deletes it if it does """
         try:
             star = Star.objects.get(user=user, template=template)
             star.delete()
@@ -1666,4 +1694,3 @@ class Star(models.Model):
     
 def _divide_round_up(n, d):
     return (n + (d - 1))/d
-    
