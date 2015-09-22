@@ -12,6 +12,7 @@ import json
 from bs4 import BeautifulSoup
 from enemygen.enemygen_lib import to_bool, int_or_zero
 
+
 @dajaxice_register
 def apply_notes_to_templates(request, race_id, notes):
     try:
@@ -22,8 +23,10 @@ def apply_notes_to_templates(request, race_id, notes):
                 et.save()
         return json.dumps({'success': True})
     except Exception as e:
-        return json.dumps({'error': str(e), 'notes': et.notes})
-    
+        return json.dumps({'error': str(e)})
+
+
+# noinspection PyShadowingBuiltins
 @dajaxice_register
 def add_additional_feature(request, parent_id, feature_list_id, type):
     try:
@@ -36,7 +39,9 @@ def add_additional_feature(request, parent_id, feature_list_id, type):
         return json.dumps({'success': True})
     except Exception as e:
         return json.dumps({'error': str(e)})
-    
+
+
+# noinspection PyUnusedLocal,PyShadowingBuiltins
 @dajaxice_register
 def add_custom_spell(request, et_id, type):
     try:
@@ -44,7 +49,9 @@ def add_custom_spell(request, et_id, type):
         return json.dumps({'success': True})
     except Exception as e:
         return json.dumps({'error': str(e)})
-    
+
+
+# noinspection PyUnusedLocal
 @dajaxice_register
 def add_custom_skill(request, et_id):
     try:
@@ -52,7 +59,9 @@ def add_custom_skill(request, et_id):
         return json.dumps({'success': True})
     except Exception as e:
         return json.dumps({'error': str(e)})
-    
+
+
+# noinspection PyUnusedLocal
 @dajaxice_register
 def add_spirit(request, spirit_ids, et_id):
     error = ''
@@ -65,7 +74,9 @@ def add_spirit(request, spirit_ids, et_id):
         return json.dumps({'error': error})
     else:
         return json.dumps({'success': True})
-        
+
+
+# noinspection PyUnusedLocal
 @dajaxice_register
 def add_cult(request, cult_ids, et_id):
     error = ''
@@ -78,7 +89,9 @@ def add_cult(request, cult_ids, et_id):
         return json.dumps({'error': error})
     else:
         return json.dumps({'success': True})
-        
+
+
+# noinspection PyUnusedLocal
 @dajaxice_register
 def add_template_to_party(request, party_id, template_ids):
     party = Party.objects.get(id=party_id)
@@ -86,7 +99,9 @@ def add_template_to_party(request, party_id, template_ids):
         t = EnemyTemplate.objects.get(id=template_id)
         party.add(t)
     return json.dumps({'success': True})
-        
+
+
+# noinspection PyUnusedLocal
 @dajaxice_register
 def add_nonrandom_feature(request, feature_id, et_id=None, party_id=None):
     if et_id:
@@ -99,6 +114,8 @@ def add_nonrandom_feature(request, feature_id, et_id=None, party_id=None):
         return json.dumps({'success': True})
     return json.dumps({'success': False})
 
+
+# noinspection PyUnusedLocal,PyShadowingBuiltins
 @dajaxice_register
 def add_custom_weapon(request, cs_id, type):
     try:
@@ -106,7 +123,9 @@ def add_custom_weapon(request, cs_id, type):
         return json.dumps({'success': True})
     except Exception as e:
         return json.dumps({'error': str(e)})
-    
+
+
+# noinspection PyUnusedLocal
 @dajaxice_register
 def add_hit_location(request, race_id):
     try:
@@ -114,54 +133,58 @@ def add_hit_location(request, race_id):
         return json.dumps({'success': True})
     except Exception as e:
         return json.dumps({'error': str(e)})
-    
+
+
+# noinspection PyUnusedLocal
 @dajaxice_register
 def del_item(request, item_id, item_type):
     try:
-        id = int(item_id)
+        item_id = int(item_id)
         if item_type == 'hit_location':
-            hl = HitLocation.objects.get(id=id)
+            hl = HitLocation.objects.get(id=item_id)
             hl.delete()
             return json.dumps({'success': True})
         elif item_type == 'custom_weapon':
-            cw = CustomWeapon.objects.get(id=id)
+            cw = CustomWeapon.objects.get(id=item_id)
             cw.delete()
             return json.dumps({'success': True})
         elif item_type == 'party_template_spec':
-            ttp = TemplateToParty.objects.get(id=id)
+            ttp = TemplateToParty.objects.get(id=item_id)
             ttp.delete()
             return json.dumps({'success': True})
         elif item_type == 'et_spirit':
-            es = EnemySpirit.objects.get(id=id)
+            es = EnemySpirit.objects.get(id=item_id)
             es.delete()
             return json.dumps({'success': True})
         elif item_type == 'et_cult':
-            es = EnemyCult.objects.get(id=id)
+            es = EnemyCult.objects.get(id=item_id)
             es.delete()
             return json.dumps({'success': True})
         elif item_type == 'et_additional_feature':
-            item = EnemyAdditionalFeatureList.objects.get(id=id)
+            item = EnemyAdditionalFeatureList.objects.get(id=item_id)
             item.delete()
             return json.dumps({'success': True})
         elif item_type == 'party_additional_feature':
-            item = PartyAdditionalFeatureList.objects.get(id=id)
+            item = PartyAdditionalFeatureList.objects.get(id=item_id)
             item.delete()
             return json.dumps({'success': True})
         elif item_type == 'et_custom_spell':
-            item = CustomSpell.objects.get(id=id)
+            item = CustomSpell.objects.get(id=item_id)
             item.delete()
             return json.dumps({'success': True})
         elif item_type == 'et_nonrandom_feature':
-            item = EnemyNonrandomFeature.objects.get(id=id)
+            item = EnemyNonrandomFeature.objects.get(id=item_id)
             item.delete()
             return json.dumps({'success': True})
         elif item_type == 'party_nonrandom_feature':
-            item = PartyNonrandomFeature.objects.get(id=id)
+            item = PartyNonrandomFeature.objects.get(id=item_id)
             item.delete()
             return json.dumps({'success': True})
     except Exception as e:
         return json.dumps({'error': str(e)})
-    
+
+
+# noinspection PyUnusedLocal
 @dajaxice_register(method='GET')
 def get_feature_list_items(request, list_id):
     flist = AdditionalFeatureList.objects.get(id=list_id)
@@ -169,7 +192,9 @@ def get_feature_list_items(request, list_id):
     for item in flist.items:
         output.append({'id': item.id, 'name': item.name})
     return json.dumps({'data': output})
-    
+
+
+# noinspection PyBroadException,PyShadowingBuiltins
 @dajaxice_register
 def submit(request, value, id, object, parent_id=None, extra={}):
     logger = logging.getLogger(__name__)
@@ -209,7 +234,7 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             et.natural_armor = to_bool(value)
             et.save()
 
-        #Attributes
+        # Attributes
         elif object == 'et_stat_value':
             es = EnemyStat.objects.get(id=id)
             original_value = es.die_set
@@ -231,7 +256,7 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             et.movement = value
             et.save()
                 
-        #Skills
+        # Skills
         elif object == 'et_skill_value':
             es = EnemySkill.objects.get(id=id)
             original_value = es.die_set
@@ -245,7 +270,7 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             es.include = to_bool(value)
             es.save()
 
-        #Custom Skills
+        # Custom Skills
         elif object == 'et_custom_skill_value':
             cs = CustomSkill.objects.get(id=id)
             try:
@@ -263,7 +288,7 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             cs.name = value
             cs.save()
 
-        #Spells
+        # Spells
         elif object == 'et_spell_prob':
             sa = SpellAbstract.objects.get(id=id)
             et = EnemyTemplate.objects.get(id=parent_id, owner=request.user)
@@ -340,7 +365,7 @@ def submit(request, value, id, object, parent_id=None, extra={}):
                 success = False
                 message = 'Probability must be a number.'
             
-        #Weapons and Combat Styles
+        # Weapons and Combat Styles
         elif object == 'et_combat_style_name':
             cs = CombatStyle.objects.get(id=id)
             cs.name = value
@@ -451,7 +476,7 @@ def submit(request, value, id, object, parent_id=None, extra={}):
             cw.special_effects = value
             cw.save()
             
-        #Race
+        # Race
         elif object == 'race_name':
             race = Race.objects.get(id=id, owner=request.user)
             race.name = value
@@ -586,13 +611,15 @@ def submit(request, value, id, object, parent_id=None, extra={}):
         logger.error(str(e))
         return json.dumps({'error': str(e)})
 
+
+# noinspection PyUnusedLocal,PyShadowingBuiltins
 @dajaxice_register
 def change_template(request, html_file, id, value):
-    ''' Changes the name of the generated enemy, in the given html
+    """ Changes the name of the generated enemy, in the given html
         Input: html_file    - name of the html file to modify
                id           - id of the html element to modify
                value        - new value
-    '''
+    """
     with open(html_file.encode('utf-8'), 'r') as ff:
         soup = BeautifulSoup(ff)
     span_tag = soup.find('span', {'id': id})
@@ -602,7 +629,8 @@ def change_template(request, html_file, id, value):
     with open(html_file.encode('utf-8'), 'w') as ff:
         ff.write(soup.prettify('utf-8', formatter='html'))
     return json.dumps({'html_file': html_file})
-    
+
+
 @dajaxice_register
 def toggle_star(request, et_id):
     if request.user.is_authenticated():
@@ -610,13 +638,16 @@ def toggle_star(request, et_id):
         return json.dumps({'success': True})
     else:
         return json.dumps({'success': False})
-    
+
+
 @dajaxice_register(method='GET')
 def search(request, string, rank_filter, cult_rank_filter):
     templs = EnemyTemplate.search(string, request.user, rank_filter, cult_rank_filter)
     templates = [et.summary_dict(request.user) for et in templs]
     return json.dumps({'results': templates, 'success': True})
-    
+
+
+# noinspection PyUnusedLocal,PyShadowingBuiltins
 @dajaxice_register(method='GET')
 def get_weapons(request, cs_id, filter):
     cs = CombatStyle.objects.get(id=cs_id)
@@ -624,4 +655,3 @@ def get_weapons(request, cs_id, filter):
     cs.enemy_template.save()
     context = {'weapons': weapons(cs), 'success': True}
     return json.dumps(context)
-
