@@ -1,5 +1,6 @@
 import random
 
+
 def select_random_items(item_list, amount):
     """ Randomly selects the given amount of items from the given list
         Input: item_list: List of items where to pick from. The items on the list need to have the attribute
