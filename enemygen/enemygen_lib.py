@@ -54,9 +54,3 @@ def replace_die_set(die_set, replace=None):
     for key, value in replace.items():
         die_set = die_set.replace(key, str(value))
     return die_set
-
-
-def int_or_zero(value):
-    if value == '':
-        return 0
-    return int(value)

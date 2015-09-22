@@ -134,8 +134,8 @@ class HitLocation(models.Model, Printer):
     range_start = models.SmallIntegerField()
     range_end = models.SmallIntegerField()
     race = models.ForeignKey(Race)
-    hp_modifier = models.SmallIntegerField(default=0)
-    
+    hp_modifier = models.CharField(max_length=30, default='0')
+
     class Meta:
         ordering = ['range_start', ]
 
@@ -1402,7 +1402,7 @@ class _Enemy(object):
         con_siz = self.stats['CON'] + self.stats['SIZ']
         base_hp = ((con_siz-1) / 5) + 1  # used by Head and Legs
         for hl in self.et.hit_locations:
-            hp = max(base_hp + hl.hp_modifier, 1)
+            hp = max(base_hp + Dice(hl.hp_modifier).roll(), 1)
             ap = hl.roll()
             enemy_hl = {'name': hl.name, 'range': hl.range, 'hp': hp, 'ap': ap, 'parent': hl}
             self.hit_locations.append(enemy_hl)

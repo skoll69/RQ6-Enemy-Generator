@@ -6,11 +6,12 @@ from enemygen.models import Race, RaceStat, HitLocation, CustomSkill, Party, Tem
 from enemygen.models import EnemyAdditionalFeatureList, PartyAdditionalFeatureList, AdditionalFeatureList
 from enemygen.models import EnemyNonrandomFeature, PartyNonrandomFeature, EnemyCult
 from enemygen.views_lib import weapons
+from enemygen.dice import Dice
 
 import logging
 import json
 from bs4 import BeautifulSoup
-from enemygen.enemygen_lib import to_bool, int_or_zero
+from enemygen.enemygen_lib import to_bool
 
 
 @dajaxice_register
@@ -526,12 +527,13 @@ def submit(request, value, id, object, parent_id=None):
         elif object == 'race_hl_hp_modifier':
             hl = HitLocation.objects.get(id=id, race__owner=request.user)
             try:
-                hl.hp_modifier = int_or_zero(value)
+                Dice(value).roll()
+                hl.hp_modifier = value
                 hl.save()
             except ValueError:
                 original_value = hl.hp_modifier
                 success = False
-                message = "HP Modifier must be a number"
+                message = "HP Modifier must be a number or a valid die"
         elif object == 'race_hl_armor':
             hl = HitLocation.objects.get(id=id, race__owner=request.user)
             try:
