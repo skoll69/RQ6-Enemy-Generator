@@ -196,7 +196,7 @@ def get_feature_list_items(request, list_id):
 
 # noinspection PyBroadException,PyShadowingBuiltins
 @dajaxice_register
-def submit(request, value, id, object, parent_id=None, extra={}):
+def submit(request, value, id, object, parent_id=None):
     logger = logging.getLogger(__name__)
     try:
         id = int(id)
