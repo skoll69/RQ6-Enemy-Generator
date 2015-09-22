@@ -1,7 +1,6 @@
-from django.utils import simplejson
 from dajaxice.decorators import dajaxice_register
-from enemygen.models import EnemyStat, EnemySkill, EnemyTemplate, Ruleset, StatAbstract
-from enemygen.models import SpellAbstract, SkillAbstract, EnemySpell, EnemyHitLocation
+from enemygen.models import EnemyStat, EnemySkill, EnemyTemplate
+from enemygen.models import SpellAbstract, EnemySpell, EnemyHitLocation
 from enemygen.models import CombatStyle, Weapon, CustomSpell, EnemyWeapon, CustomWeapon
 from enemygen.models import Race, RaceStat, HitLocation, CustomSkill, Party, TemplateToParty, EnemySpirit
 from enemygen.models import EnemyAdditionalFeatureList, PartyAdditionalFeatureList, AdditionalFeatureList
@@ -9,6 +8,7 @@ from enemygen.models import EnemyNonrandomFeature, PartyNonrandomFeature, EnemyC
 from enemygen.views_lib import weapons
 
 import logging
+import json
 from bs4 import BeautifulSoup
 from enemygen.enemygen_lib import to_bool, int_or_zero
 
@@ -20,9 +20,9 @@ def apply_notes_to_templates(request, race_id, notes):
             if notes not in et.notes:
                 et.notes = et.notes + '\n' + notes
                 et.save()
-        return simplejson.dumps({'success': True})
+        return json.dumps({'success': True})
     except Exception as e:
-        return simplejson.dumps({'error': str(e), 'notes': et.notes})
+        return json.dumps({'error': str(e), 'notes': et.notes})
     
 @dajaxice_register
 def add_additional_feature(request, parent_id, feature_list_id, type):
@@ -33,25 +33,25 @@ def add_additional_feature(request, parent_id, feature_list_id, type):
         elif type == 'party':
             party = Party.objects.get(id=parent_id, owner=request.user)
             party.add_additional_feature(feature_list_id)
-        return simplejson.dumps({'success': True})
+        return json.dumps({'success': True})
     except Exception as e:
-        return simplejson.dumps({'error': str(e)})
+        return json.dumps({'error': str(e)})
     
 @dajaxice_register
 def add_custom_spell(request, et_id, type):
     try:
         CustomSpell.create(et_id, type)
-        return simplejson.dumps({'success': True})
+        return json.dumps({'success': True})
     except Exception as e:
-        return simplejson.dumps({'error': str(e)})
+        return json.dumps({'error': str(e)})
     
 @dajaxice_register
 def add_custom_skill(request, et_id):
     try:
         CustomSkill.create(et_id)
-        return simplejson.dumps({'success': True})
+        return json.dumps({'success': True})
     except Exception as e:
-        return simplejson.dumps({'error': str(e)})
+        return json.dumps({'error': str(e)})
     
 @dajaxice_register
 def add_spirit(request, spirit_ids, et_id):
@@ -62,22 +62,22 @@ def add_spirit(request, spirit_ids, et_id):
         except Exception as e:
             error += str(e)
     if error:
-        return simplejson.dumps({'error': error})
+        return json.dumps({'error': error})
     else:
-        return simplejson.dumps({'success': True})
+        return json.dumps({'success': True})
         
 @dajaxice_register
 def add_cult(request, cult_ids, et_id):
     error = ''
     for cult_id in cult_ids:
         try:
-            es = EnemyCult.create(cult_id, et_id)
+            EnemyCult.create(cult_id, et_id)
         except Exception as e:
             error += str(e)
     if error:
-        return simplejson.dumps({'error': error})
+        return json.dumps({'error': error})
     else:
-        return simplejson.dumps({'success': True})
+        return json.dumps({'success': True})
         
 @dajaxice_register
 def add_template_to_party(request, party_id, template_ids):
@@ -85,35 +85,35 @@ def add_template_to_party(request, party_id, template_ids):
     for template_id in template_ids:
         t = EnemyTemplate.objects.get(id=template_id)
         party.add(t)
-    return simplejson.dumps({'success': True})
+    return json.dumps({'success': True})
         
 @dajaxice_register
 def add_nonrandom_feature(request, feature_id, et_id=None, party_id=None):
     if et_id:
         et = EnemyTemplate.objects.get(id=et_id)
         et.add_nonrandom_feature(feature_id)
-        return simplejson.dumps({'success': True})
+        return json.dumps({'success': True})
     elif party_id:
         party = Party.objects.get(id=party_id)
         party.add_nonrandom_feature(feature_id)
-        return simplejson.dumps({'success': True})
-    return simplejson.dumps({'success': False})
+        return json.dumps({'success': True})
+    return json.dumps({'success': False})
 
 @dajaxice_register
 def add_custom_weapon(request, cs_id, type):
     try:
         CustomWeapon.create(cs_id, type)
-        return simplejson.dumps({'success': True})
+        return json.dumps({'success': True})
     except Exception as e:
-        return simplejson.dumps({'error': str(e)})
+        return json.dumps({'error': str(e)})
     
 @dajaxice_register
 def add_hit_location(request, race_id):
     try:
         HitLocation.create(race_id)
-        return simplejson.dumps({'success': True})
+        return json.dumps({'success': True})
     except Exception as e:
-        return simplejson.dumps({'error': str(e)})
+        return json.dumps({'error': str(e)})
     
 @dajaxice_register
 def del_item(request, item_id, item_type):
@@ -122,45 +122,45 @@ def del_item(request, item_id, item_type):
         if item_type == 'hit_location':
             hl = HitLocation.objects.get(id=id)
             hl.delete()
-            return simplejson.dumps({'success': True})
+            return json.dumps({'success': True})
         elif item_type == 'custom_weapon':
             cw = CustomWeapon.objects.get(id=id)
             cw.delete()
-            return simplejson.dumps({'success': True})
+            return json.dumps({'success': True})
         elif item_type == 'party_template_spec':
             ttp = TemplateToParty.objects.get(id=id)
             ttp.delete()
-            return simplejson.dumps({'success': True})
+            return json.dumps({'success': True})
         elif item_type == 'et_spirit':
             es = EnemySpirit.objects.get(id=id)
             es.delete()
-            return simplejson.dumps({'success': True})
+            return json.dumps({'success': True})
         elif item_type == 'et_cult':
             es = EnemyCult.objects.get(id=id)
             es.delete()
-            return simplejson.dumps({'success': True})
+            return json.dumps({'success': True})
         elif item_type == 'et_additional_feature':
             item = EnemyAdditionalFeatureList.objects.get(id=id)
             item.delete()
-            return simplejson.dumps({'success': True})
+            return json.dumps({'success': True})
         elif item_type == 'party_additional_feature':
             item = PartyAdditionalFeatureList.objects.get(id=id)
             item.delete()
-            return simplejson.dumps({'success': True})
+            return json.dumps({'success': True})
         elif item_type == 'et_custom_spell':
             item = CustomSpell.objects.get(id=id)
             item.delete()
-            return simplejson.dumps({'success': True})
+            return json.dumps({'success': True})
         elif item_type == 'et_nonrandom_feature':
             item = EnemyNonrandomFeature.objects.get(id=id)
             item.delete()
-            return simplejson.dumps({'success': True})
+            return json.dumps({'success': True})
         elif item_type == 'party_nonrandom_feature':
             item = PartyNonrandomFeature.objects.get(id=id)
             item.delete()
-            return simplejson.dumps({'success': True})
+            return json.dumps({'success': True})
     except Exception as e:
-        return simplejson.dumps({'error': str(e)})
+        return json.dumps({'error': str(e)})
     
 @dajaxice_register(method='GET')
 def get_feature_list_items(request, list_id):
@@ -168,7 +168,7 @@ def get_feature_list_items(request, list_id):
     output = []
     for item in flist.items:
         output.append({'id': item.id, 'name': item.name})
-    return simplejson.dumps({'data': output})
+    return json.dumps({'data': output})
     
 @dajaxice_register
 def submit(request, value, id, object, parent_id=None, extra={}):
@@ -581,10 +581,10 @@ def submit(request, value, id, object, parent_id=None, extra={}):
                 original_value = afl.probability
                 success = False
             
-        return simplejson.dumps({'success': success, 'message': message, 'original_value': original_value})
+        return json.dumps({'success': success, 'message': message, 'original_value': original_value})
     except Exception as e:
         logger.error(str(e))
-        return simplejson.dumps({'error': str(e)})
+        return json.dumps({'error': str(e)})
 
 @dajaxice_register
 def change_template(request, html_file, id, value):
@@ -601,21 +601,21 @@ def change_template(request, html_file, id, value):
     soup.find('span', {'id': id}).replaceWith(new_tag)
     with open(html_file.encode('utf-8'), 'w') as ff:
         ff.write(soup.prettify('utf-8', formatter='html'))
-    return simplejson.dumps({'html_file': html_file})
+    return json.dumps({'html_file': html_file})
     
 @dajaxice_register
 def toggle_star(request, et_id):
     if request.user.is_authenticated():
         EnemyTemplate.objects.get(id=et_id).toggle_star(request.user)
-        return simplejson.dumps({'success': True})
+        return json.dumps({'success': True})
     else:
-        return simplejson.dumps({'success': False})
+        return json.dumps({'success': False})
     
 @dajaxice_register(method='GET')
 def search(request, string, rank_filter, cult_rank_filter):
     templs = EnemyTemplate.search(string, request.user, rank_filter, cult_rank_filter)
     templates = [et.summary_dict(request.user) for et in templs]
-    return simplejson.dumps({'results': templates, 'success': True})
+    return json.dumps({'results': templates, 'success': True})
     
 @dajaxice_register(method='GET')
 def get_weapons(request, cs_id, filter):
@@ -623,5 +623,5 @@ def get_weapons(request, cs_id, filter):
     cs.enemy_template.weapon_filter = filter
     cs.enemy_template.save()
     context = {'weapons': weapons(cs), 'success': True}
-    return simplejson.dumps(context)
+    return json.dumps(context)
 
