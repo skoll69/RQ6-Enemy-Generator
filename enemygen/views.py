@@ -10,6 +10,7 @@ from enemygen.views_lib import get_party_context, get_enemies_lucky, get_party_f
 
 import os
 
+
 def index(request):
     context = get_context(request)
     context['templates'] = get_enemy_templates(get_filter(request), request.user)
@@ -166,7 +167,6 @@ def pdf_export(request):
     if request.GET and request.GET.get('action') == 'pdf_export':
         pdf_path = generate_pdf(request.GET.get('generated_html'))
         file_name, extension = os.path.splitext(os.path.basename(pdf_path))
-        #file_name = pdf_path.split('/')[-1:][0]
         file_name = '_'.join(file_name.split('_')[:-1])  # Remove the last unique identifier from file name
         file_name = file_name.replace(',', '')
         file_name += extension
