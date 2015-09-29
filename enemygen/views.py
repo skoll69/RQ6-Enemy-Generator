@@ -8,6 +8,7 @@ from enemygen.views_lib import get_enemy_templates, is_race_admin, get_statistic
 from enemygen.views_lib import generate_pdf, get_filter, get_party_templates, save_as_html, generate_pngs
 from enemygen.views_lib import get_party_context, get_enemies_lucky, get_party_filter, determine_enemies
 
+import os
 
 def index(request):
     context = get_context(request)
@@ -164,9 +165,11 @@ def set_party_filter(request):
 def pdf_export(request):
     if request.GET and request.GET.get('action') == 'pdf_export':
         pdf_path = generate_pdf(request.GET.get('generated_html'))
-        file_name = pdf_path.split('/')[-1:][0]
+        file_name, extension = os.path.splitext(os.path.basename(pdf_path))
+        #file_name = pdf_path.split('/')[-1:][0]
         file_name = '_'.join(file_name.split('_')[:-1])  # Remove the last unique identifier from file name
         file_name = file_name.replace(',', '')
+        file_name += extension
         data = open(pdf_path.encode('utf-8')).read()
         response = HttpResponse(data, mimetype='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="%s"' % file_name.encode('utf-8')
