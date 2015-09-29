@@ -1465,7 +1465,10 @@ class _Enemy(object):
                 feature = feature_list.get_random_item()
                 self.additional_features.append(feature)
         for feature in self.et.nonrandom_features:
-            self.additional_features.append(feature.feature)
+            fture = feature.feature
+            # Used in the html template to show the non-random features only once if there's only one type of enemies
+            fture.non_random = True
+            self.additional_features.append(fture)
         self.additional_features.sort(key=lambda item: item.feature_list.name)
         
     def _calculate_attributes(self):

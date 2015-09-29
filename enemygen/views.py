@@ -6,7 +6,7 @@ from enemygen.models import EnemyTemplate, Race, Party, ChangeLog, AdditionalFea
 from enemygen.views_lib import get_ruleset, get_context, get_et_context, get_enemies, get_generated_party
 from enemygen.views_lib import get_enemy_templates, is_race_admin, get_statistics, get_random_party
 from enemygen.views_lib import generate_pdf, get_filter, get_party_templates, save_as_html, generate_pngs
-from enemygen.views_lib import get_party_context, get_enemies_lucky, get_party_filter
+from enemygen.views_lib import get_party_context, get_enemies_lucky, get_party_filter, determine_enemies
 
 
 def index(request):
@@ -34,8 +34,12 @@ def generate_enemies(request):
     context = get_context(request)
     if request.POST.get('lucky', None):
         context['enemies'] = get_enemies_lucky(request)
+        context['single_template'] = True
     else:
-        context['enemies'] = get_enemies(request)
+        enemy_index = determine_enemies(request.POST)
+        increment = False if request.POST.get('dont_increment') else True  # Increment the number of enemies generated
+        context['enemies'] = get_enemies(enemy_index, increment)
+        context['single_template'] = (len(enemy_index) == 1)
     context['generated_html'] = save_as_html(context)
     return render(request, 'generated_enemies.html', context)
 

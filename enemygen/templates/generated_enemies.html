@@ -161,6 +161,24 @@ div#png_export{
     <p><b>Notes:</b> <span id="party_notes" class="editable" contenteditable>{{ party.notes|markdown }}</span></p>
 {% endif %}
 
+{% if single_template and enemies.0.additional_features %}
+    <div> <!-- Additional Features -->
+        <b><u>All creatures have the following features:</u></b><br>
+        {% for feature in enemies.0.additional_features %}
+            {% if feature.non_random %}
+            <span class="title">{{ feature.feature_list.name }}:</span><span class="item_list">
+                {{ feature.name|markdown }}
+            </span><br>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% if enemies.0.notes %}
+        <span class="title">Notes:</span>
+        <span id="notes" class="item_list editable" contenteditable>{{ enemies.0.notes|markdown }}</span>
+    {% endif %}
+{% endif %}
+
+
 {% if generated_html %}
 <div id="pdf_export">
 <form action="{% url 'pdf_export' %}" method="GET">
@@ -302,14 +320,16 @@ div#png_export{
 <div> <!-- Additional Features -->
 {% if enemy.additional_features %}
     {% for feature in enemy.additional_features %}
+        {% if not single_template or not feature.non_random %}
         <span class="title">{{ feature.feature_list.name }}:</span><span class="item_list">
             {{ feature.name|markdown }}
         </span><br>
+        {% endif %}
     {% endfor %}
 {% endif %}
 </div>
 
-{% if enemy.notes %}
+{% if enemy.notes and not single_template%}
 <span class="title">Notes:</span>
 <span id="notes_{{ forloop.counter }}" class="item_list editable" contenteditable>{{ enemy.notes|markdown }}</span>
 {% endif %}
@@ -475,9 +495,11 @@ div#png_export{
 <div> <!-- Additional Features -->
 {% if enemy.additional_features %}
     {% for feature in enemy.additional_features %}
+        {% if not single_template or not feature.non_random %}
         <span class="title">{{ feature.feature_list.name }}:</span><span class="item_list">
             {{ feature.name|markdown }}
         </span><br>
+        {% endif %}
     {% endfor %}
 {% endif %}
 </div>
@@ -504,7 +526,7 @@ div#png_export{
     {% endfor %}
 </span>
 
-{% if enemy.notes %}
+{% if enemy.notes and not single_template %}
 <span class="title">Notes:</span>
 <span id="notes_{{ forloop.counter }}" class="item_list editable" contenteditable>{{ enemy.notes|markdown }}</span>
 {% endif %}

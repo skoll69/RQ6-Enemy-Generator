@@ -92,11 +92,12 @@ def get_enemy_templates(filtr, user):
     return templates
 
 
-def get_enemies(request):
-    enemies = []
+def determine_enemies(post):
+    """ Determines the EnemyTemplates to be used and the amounts to be generated based on the POST data
+        Output is a list of tuples of (EnemyTemplate, amount)
+    """
     index = []
-    increment = False if request.POST.get('dont_increment') else True   # Increment the number of enemies generated?
-    for key, amount in request.POST.items():
+    for key, amount in post.items():
         if 'enemy_template_id_' not in key:
             continue
         enemy_template_id = int(key.replace('enemy_template_id_', ''))
@@ -109,8 +110,18 @@ def get_enemies(request):
         except ValueError:
             continue
         amount = min(amount, 40)
-        index.append((et, amount))
+        if amount > 0:
+            index.append((et, amount))
     index.sort(key=lambda tup: tup[0].rank, reverse=True)
+    return index
+
+
+
+def get_enemies(index, increment):
+    """ Generates the enemies.
+        Input: a list of tuples of (EnemyTemplate, amount)
+    """
+    enemies = []
     for et, amount in index:
         if increment:
             et.increment_used()
@@ -120,7 +131,7 @@ def get_enemies(request):
 
 
 def get_enemies_lucky(request):
-    """ Returns a four instances of a randomly selected enemy based on the current filter """
+    """ Returns a six instances of a randomly selected enemy based on the current filter """
     filtr = get_filter(request)
     if filtr and filtr != 'None':
         templates = EnemyTemplate.objects.filter(tags__name__in=[filtr, ], published=True)
