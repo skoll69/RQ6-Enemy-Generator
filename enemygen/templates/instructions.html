@@ -64,35 +64,40 @@ So the average of a D6 is 3.5, and the average of 2D6 is 7, the average of 3D6 i
 </ul>
 
 <h3>Weapon and spell probabilities</h3>
-<p>Adding weapons, features or spells to a template all use the same system for selecting which item to add. There are two elements you can modify: <u>Probability</u> of 
-the specific items and the <u>Amount</u>. The Amount tells how many weapons/spells to add from the list. The Probability describes relative chances for the item to be picked. Items with
-probability 0 will never be included.</p>
+<p>Adding weapons and spells to a template both use the same system for selecting which item to add. There are two elements you can modify:
+<u>Probability</u> of the specific items and the <u>Amount</u>. The Amount tells how many weapons/spells to add from the current category.
+The Probability describes relative chances for the item to be picked. Items with probability 0 will never be included.</p>
 
 <h4>How probability is calculated?</h4>
-When calculating the probability of a single item, the probabilities of all the items are first added together. The chance of a specific item to be picked is relative to the total.
-<p>Example 1: Amount 1; Dagger prob 1; Knife prob 1 (all other weapons have probability 0). One weapon will be selected and it will be either knife or dagger. The total probabilities
-are 2 (1+1) and the chances for either dagger or knife to be selected are 1/2 (50%).</p>
-<p>Example 2: Amount 1; Shortsword prob 1; Battleaxe prob 2; Shortspear prob 3. Out of the three options, one will be picked. The total probability is 6 (1+2+3). The chances for 
-the different options are: Shortsword 1/6 = 17%; Battleaxe 2/6 = 33%; Shortspear 3/6 = 50%.
-<p>Example 3: Amount 2; Dagger prob 9999; Shortsword prob 1; Battleaxe prob 2; Shortspear prob 3; Out of the four options, two will be selected. The total probability is 10005 (9999+1+2+3).
-Dagger will be picked almost always (9999 chances out of 10005 = 99,94%). The second weapon will be picked as per example 2.</p>
-<p>Example 4: Amount 1d3+1; Alarm 1, Repair 1, Protection 1, Darkness 1, Ignite 1, Bludgeon 1, Might 1, Shock 1. The generate enemy will have 2-4 spells (1d3+1). Each spell has an equal
-possibility to be included.</p>
+<p>When calculating the probability of a single item, the probabilities of all the items are first added together. The chance of a specific item
+to be picked is relative to the total.</p>
+<p>Example 1: Amount 1; Dagger prob 1; Knife prob 1 (all other weapons have probability 0). One weapon will be selected and it will be either knife
+or dagger. The total probabilities are 2 (1+1) and the chances for either dagger or knife to be selected are 1/2 (50%).</p>
+<p>Example 2: Amount 1; Shortsword prob 1; Battleaxe prob 2; Shortspear prob 3. Out of the three options, one will be picked. The total probability
+is 6 (1+2+3). The chances for the different options are: Shortsword 1/6 = 17%; Battleaxe 2/6 = 33%; Shortspear 3/6 = 50%.</p>
+<p>Example 3: Amount 2; Dagger prob 9999; Shortsword prob 1; Battleaxe prob 2; Shortspear prob 3; Out of the four options, two will be selected. The
+total probability is 10005 (9999+1+2+3). Dagger will be picked practically always (9999 chances out of 10005 = 99,94%). The second weapon will be picked
+as per example 2.</p>
+<p>Example 4: Amount 1d3+1; Alarm 1, Repair 1, Protection 1, Darkness 1, Ignite 1, Bludgeon 1, Might 1, Shock 1. The generate enemy will have 2-4
+spells (1d3+1). Each spell has an equal possibility to be included.</p>
 
-<p><b>Note!</b> The amounts apply only within the specific categories. For weapons the categories are 1-h melee weapons, 2-h melee weapons, ranged weapons and shields.</p>
+<p><b>Note!</b> The amounts apply only within the specific categories. For weapons the categories are 1-h melee weapons, 2-h melee weapons, ranged
+weapons and shields.</p>
 
 <h3>Additional features</h3>
-<p>The generated enemies can have some random and non-random features added to them. To add a random feature, select the feature from the list, click add, and assign a percentile
-probability. 100 will mean it will always be selected. POW+POW+POW will mean, that there's a POWx3% chance for the feature to be selected. If the feature is added, a random item 
-from the feature list will be added to the enemy. To see the items on the different feature lists, add
-feature to the template and click 'View items'. (You can remove the feature if you don't want to add it.)</p>
+<p>The generated enemies can have some random and non-random features added to them. To add a random feature, select the feature from the list,
+click add, and assign a percentile probability. 100 will mean it will always be selected. POW+POW+POW will mean, that there's a POWx3% chance
+for the feature to be selected. If the feature is added, a random item from the feature list will be added to the enemy. To see the items on
+the different feature lists, add feature to the template and click 'View items'. (You can remove the feature if you don't want to add it.)</p>
 
-<p>To add a non-random feature, select first the feature list, and then the item from the list. Non-random features (for example Nightvision on Trolls) are always added to the enemy.</p>
+<p>To add a non-random feature, select first the feature list, and then the item from the list. Non-random features (for example Nightvision
+on Trolls) are always added to the enemy.</p>
 
 <h3>Skills</h3>
-<p>All <b>Standard skills</b> and <b>Professional skills</b> work along the same lines: you get the skill name, then a checkbox to indicate whether this skill must be included when
-generating NPC. Next is the calculation field. Default setting is the skill calculation formula as per the rulebook. In order to make your character more competent you can change
-these formulas. Athletics starts at STR+DEX. For a skilled warrior, you might want to increase this to STR+DEX+20. You can also use dice variables, so STR+DEX+D20+10 would work
-too. The final field, <b>Combat Styles</b>, works similarly. Only difference here: it cannot be deselected, and you need to name your combat skill, as described in the rulebook.
-This can be any name, it's only for flavour.</p>
+<p>All <b>Standard skills</b> and <b>Professional skills</b> work along the same lines: you get the skill name, then a checkbox to indicate
+whether this skill must be included when generating NPC. Next is the calculation field. Default setting is the skill calculation formula as
+per the rulebook. In order to make your character more competent you can change these formulas. Athletics starts at STR+DEX. For a skilled
+warrior, you might want to increase this to STR+DEX+20. You can also use dice variables, so STR+DEX+D20+10 would work too. The final field,
+<b>Combat Styles</b>, works similarly. Only difference here: it cannot be deselected, and you need to name your combat skill, as described
+in the rulebook. This can be any name, it's only for flavour.</p>
 {% endblock %}
