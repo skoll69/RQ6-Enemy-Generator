@@ -24,26 +24,18 @@ ol, li{
 }
 </style>
 
-<h2>What is it?</h2>
-<p>Runequest D100 Encounter Generator is a tool that allows gamemasters to quickly create, maintain and generate groups of NPC and monsters for Runequest 6.</p>
+<h3>What is it?</h3>
+<p>RuneQuest 6 Encounter Generator is a tool that allows gamemasters to quickly define, maintain and generate groups of NPC's and monsters.</p>
 
-<h2>Generating NPCs using existing templates</h2>
-<img class="img" src="/rq_static/images/manual/index.png" width="400" align="left" />
-<p>In the index screen you will find a list of all available templates.  The dynamic search field at the bottom will start limiting the available templates as soon as you start typing.  The entries are sorted by level (rabble, novice, skilled, veteran, master) and then alphabetically by creator.  You can sort by Rank or Creator by clicking on the column header, easily grouping all your templates, or all veterans, and so on.</p>
-<p>For generating NPC, simply enter the number of desired NPC and hit generate.  You can also look at the template itself by clicking view.  If this is a template you created yourself, you will enter edit mode immediately.  If the template was created by someone else, you can inspect, but not change any setting.</p>
-
-<h2>Creating new templates</h2>
-<p>If you don't find the NPC/monster type from the list of existing templates (for example a Moon Elf Arch-Lich), you can create the template youself. To create new templates, you need to register and login.</p>
-
-<h3>Manage templates</h3>
-<img class="img" src="/rq_static/images/manual/edit_index.png" width="400" align="left" />
-<p>In the manage templates tab, you are presented with a list of your templates and races.  On the left you can see your templates.  On the right is a list of races you created so far.</p>
-<p>Click on any template or race to open the template editor or the race editor screen.</p>
-<p>In order to create a new NPC template, you have to first select the desired race on which to base your template, and then hit Create new template.  This procedure is described in the Template Editor chapter.</p>
+<h3>Creating new templates</h3>
+<p>If you don't find the NPC/monster you need from the list of existing templates, you can create the template yourself (login required).
+Use the <a href="{% url 'edit_index' %}">My Content</a> -page to manage and create your templates. You can also create your own parties (collections of enemies).</p>
 
 <div id="die_formulas">
 <h4>A word on die formulas</h4>
-<p>The program makes extensive use of die formulas. The theory behind this is simple. The standard 3D6 roll yields an average value of 10-11. The minimum roll is 3, the maximum roll is 18.  The distribution of values is a bell curve: the average results will appear much more often than the extremes. If you want a higher result, you could enter 2D6+6.  This yields a minimal 8, average 13, maximum 18. A significant increase. A less brutal improvement could be 3D5 + 3. This yields 6-18, average 12.</p>
+<p>The program makes extensive use of die formulas. The theory behind this is simple. The standard 3D6 roll yields an average value of 10-11. The minimum roll is 3, the maximum roll is 18.
+The distribution of values is a bell curve: the average results will appear much more often than the extremes. If you want a higher result, you could enter 2D6+6.
+This yields a minimal 8, average 13, maximum 18. A significant increase. A less brutal improvement could be 3D5 + 3. This yields 6-18, average 12.</p>
 <p>The simple way to calculate this is as follows:</p>
 <ol>
 <li>The average result of any die is: (min+max)/2.</li>
@@ -51,46 +43,56 @@ ol, li{
 So the average of a D6 is 3.5, and the average of 2D6 is 7, the average of 3D6 is 10.5 (hence the 10-11).  The average of a D5 is 3.</li>
 <li>Whenever you roll more than one dice, the outcome will be a bell curve:  extremes are rare, averages are common.  When rolling one dice, the result is linear.</li>
 </ol>
-<p>So if you want to add 10-20 percentiles to a skill, you can add +D10+10. This gives a linear result of 11-20. Every result occurs equally often.</p>
-<p>If you want a very strong human you can use 2D3+12. This yields an average of 2+2+12=16 and a result beween 14 and 18, with 16 occurring most often, and 14 and 18 most infrequently.</p>
-<p>If you want a veteran to have a combat skill of basic value +20 to +50, add +20+D30 for a linear result.  For a more average result within the same limits (less variation) use +20+3D10.</p>
+<p>So if you want to add 10-20 percentiles to a skill, you can add 1D10+10. This gives a linear result of 11-20. Every result occurs equally often.</p>
+<p>If you want a very strong human you can use 2D3+12. This yields an average of 16 and a result beween 14 and 18, with 16 occurring most often, and 14 and 18 most infrequently.</p>
+<p>If you want a veteran to have a combat skill with value 60-80, use 60+1D20 for a linear result, or 60+2D10 for a result where 70 is more likely than 62 or 78.</p>
 </div>
 
 <h3>Template editor</h3>
-<p>As soon as you enter this screen, you have created a template, based on your selected race.  This template will remain in your template list, until you delete it using the Delete Template button.  You can edit it as follows:</p>
+<ul>
+    <li><b>Template name:</b> Use a descriptive but short names.
+    <li><b>Random name list:</b> Assing a name list for the generated enemy to get a random name. Select a list and click 'View names' to see the content of the list.
+    If you'd like a new name list to be added, please <a href="mailto:erkki.lepre@iki.fi">contact me</a>.
+    <li><b>Tags:</b> Add a tag (keyword) to help identifying and searching the templates. Do not replicate cult rank or race info in tags. Good tags help other users to find your templates.
+    For example ghouls living in a swamp could have: Undead, Swamp, March, Bog
+    <li><b>Rank:</b> Estimation of how tough the creature is.
+    <li><b>Cult rank:</b> Leave 'None' if the creature isn't part of a cult/brotherhood/society.
+    <li><b>Published:</b> The template will remain hidden from other users until you set it as Published.
+    <li><b>Notes:</b> The notes will be prited out on the generated enemy.
+    <li><b>Stats:</b> The stats will be used to calculate skill as per rules. Use for example 3D5+3 or 3D4+6 for tougher enemies, or 3D5 for weaker enemies.
+    <li><b>Armor:</b> Armor of the hit location. Dice (2+1D2) are allowed also here.
+</ul>
 
-<h4>Enemy details</h4>
-<img class="img" src="/rq_static/images/manual/stats.png" width="400" align="left" />
-<p>The <b>Template name</b> is the name under which your template will appear in the index.  Go for a descriptive name, no need to indicate toughness, since the next property, <b>Rank</b>, will show just that.  Good names make clear in one look what kind of weaponry, armor and magic the NPC carries, if applicable.</p>
-<p>The <b>Setting</b> list allows a choice between settings in which the character can be used. This is not set in stone: no real reason why a generic NPC cannot be used in Glorantha, or vice versa. It's a matter of usefulness.</p>
-<p>The <b>Published</b> checkbox determines whether the template will be visible to others. Once you check it, the template will be available as a choice for all users.</p>
-<p>The <b>Stats</b> table allows definition of the characteristics. You can enter natural numbers or simple formulas. Use D6 to indicate a rolled 6 sided die. You can use the racial values, like 3D6 for strength, or spice it up like 2D6+6 to make sure your NPC is stronger than average. The D20 and <b>Hit location</b> fields are straightforward indications.  They are race-dependent. Armor values can be entered next. You can enter a fixed value, or a formula like D2+2 to get an AP of 3 or 4.</p>
-<p>Final attribute that has to be entered is the <b>Movement</b> factor. This is race dependent, but can be altered on the template level.</p>
+<h3>On probabilities</h3>
+<p>Adding weapons, features or spells to a template all use the same system for selecting which item to add. There are two elements you can modify: <u>Probability</u> of 
+the specific items and the <u>Amount</u>. The Amount tells how many weapons/spells to add from the list. The Probability describes relative chances for the item to be picked. Items with
+probability 0 will never be included.</p>
 
-<h4>Standard Skills, Professional Skills and Combat Styles</h4>
-<img class="img" src="/rq_static/images/manual/skills.png" width="400" align="left" />
-<p>All <b>Standard skills</b> and <b>Professional skills</b> work along the same lines: you get the skill name, then a checkbox to indicate whether this skill must be included when generating NPC. Next is the calculation field. Default setting is the skill calculation formula as per the rulebook. In order to make your character more competent you can change these formulas. Athletics starts at STR+DEX. For a skilled warrior, you might want to increase this to STR+DEX+20. You can also use dice variables, so STR+DEX+D20+10 would work too. The final field, <b>Combat Styles</b>, works similarly. Only difference here: it cannot be deselected, and you need to name your combat skill, as described in the rulebook. This can be any name, it's only for flavour.</p>
+<h4>How probability is calculated?</h4>
+When calculating the probability of a single item, the probabilities of all the items are first added together. The chance of a specific item to be picked is relative to the total.
+<p>Example 1: Amount 1; Dagger prob 1; Knife prob 1 (all other weapons have probability 0). One weapon will be selected and it will be either knife or dagger. The total probabilities
+are 2 (1+1) and the chances for either dagger or knife to be selected are 1/2 (50%).</p>
+<p>Example 2: Amount 1; Shortsword prob 1; Battleaxe prob 2; Shortspear prob 3. Out of the three options, one will be picked. The total probability is 6 (1+2+3). The chances for 
+the different options are: Shortsword 1/6 = 17%; Battleaxe 2/6 = 33%; Shortspear 3/6 = 50%.
+<p>Example 3: Amount 2; Dagger prob 9999; Shortsword prob 1; Battleaxe prob 2; Shortspear prob 3; Out of the four options, two will be selected. The total probability is 10005 (9999+1+2+3).
+Dagger will be picked almost always (9999 chances out of 10005 = 99,94%). The second weapon will be picked as per example 2.</p>
+<p>Example 4: Amount 1d3+1; Alarm 1, Repair 1, Protection 1, Darkness 1, Ignite 1, Bludgeon 1, Might 1, Shock 1. The generate enemy will have 2-4 spells (1d3+1). Each spell has an equal
+possibility to be included.</p>
 
-<h4>Weapon Options</h4>
-<img class="img" src="/rq_static/images/manual/weapons.png" width="400" align="left" />
-<p>The weapon options list several weapon categories: 1 handed weapons, 2 handed weapons, ranged weapons and shields. These categories are only for classification and generation purposes, all weapons will appear in one list on the NPC sheet. Enter the <b>Amount</b> of weapons you want the NPC to have for each category. This can be a fixed number or a dice formula like D2-1 (one or no weapon of this type) for a bit of variety.  The program will generate the required number of weapons for each category. The list of weapons and <b>Probability</b> are used to determine which weapons the NPC will wield. Probability is weighted against the probabilities of other weapons. For example you can set the amount of 1-handed weapons to three and have the probabilities Sword 1, Spear 1, Mace 8, Axe 10.  The likelihood of any of the weapon to be included is their probability divided by the sum of all probabilities(1+1+8+10=20). When selecting the first weapon, the probabilities are thus: Sword 5%(1/20), Spear 5%(1/20), Mace 40%(8/20) and Axe 50%(10/20). Most probably the Axe will be selected, so the probabilities for the second weapon are: Sword 10%(1/10), Spear 10%(1/10) and Mace 80%(8/10).</p>
-<p>If you want a template to always have a sword as the main weapon and either dagger or knife as a secondary weapon, you set the amount of 1-handed weapons to 2 and set the probabilities: Sword 100, Knife 1, Dagger 1. (There is 0,02% probability, that Knife and Dagger will be selected.)</p>
-<img class="img" src="/rq_static/images/manual/custom_weapons.png" width="400" align="left" />
-<p>The <b>Add custom weapon</b> button on the bottom allows defining a new weapon not currently in the list.  You just need to enter the Name of the weapon, and fill in Type (for the purposes of determining which weapons will be selected), Damage, Size and Reach, and AP/HP, as per the rules used. The Probability at the end is required to make it possible to actually include the weapon when generating.</p>
+<p><b>Note!</b> The amounts apply only within the specific categories. For weapons the categories are 1-h melee weapons, 2-h melee weapons, ranged weapons and shields.</p>
 
-<h4>Spells</h4>
-<p>Selecting spells works the same way as selecting weapons (see above). Enter <b>Amount</b> per spell category and <b>Probability</b> for each spell you'd like to include.
+<h3>Additional features</h3>
+<p>The generated enemies can have some random and non-random features added to them. To add a random feature, select the feature from the list, click add, and assign a percentile
+probability. 100 will mean it will always be selected. POW+POW+POW will mean, that there's a POWx3% chance for the feature to be selected. If the feature is added, a random item 
+from the feature list will be added to the enemy. To see the items on the different feature lists, add
+feature to the template and click 'View items'. (You can remove the feature if you don't want to add it.)</p>
 
-<h3>Race Editor</h3>
-<img class="img" src="/rq_static/images/manual/race_editor.png" width="400" align="left" />
-<p>The Race Editor is available only for proven users. Create and publish some templates using the existing races, and contact Erkki if you'd like the rights to add new races.</p>
-<p>The race editor allows the addition of new races. The new race will appear in the dropdown list in the Manage Templates screen, when you select the race for a new template.  New races are mainly required when you need new hit locations.  An added bonus is that you can enter the rulebook stat values for every race.</p>
-<p>After opening the race editor, you get a screen with standard values. Your first choice is Setting.  Select Glorantha or Generic Fantasy. This is only used for classification on the index screen.</p>
-<p>Then enter a name for the race (e.g. Human, Elf or Centaur) and enter the basic movement rate. The Published checkbox determines whether the race will be visible to others. Once you check it, the race will be available as a template choice for all users.</p>
-<p>The stats determine the default range of the stat values in the template. At this stage enter the standard rule book values for a given race. If you'd like to make an NPC stronger or weaker, you can tweak the stats when editing the enemy template.</p>
-<p>The hit locations have to be entered for every race.  Take care to enter the correct body part names, and change the Hit location value start and end value accordingly.  You can simply press Add hit location to add a location, and enter the correct values, without worrying about the position: upon reloading the hit locations will be in the right order. Press the delete button on the right to remove a hit location.</p>
-<p>The Armor column allows a default armor value for every location, typically useful for natural armor. This value will be presented in the template editor, but can be edited there.</p>
-<p>The HP modifier is used to determine the HP per location, based on the calculated value for Legs/Head. This is slightly different than the rulebook location factor system, but yields very similar and totally useable results.  Typically, Chest gets +2, Abdomen gets +1, Head gets a 0, arms get a -1, spindly things get a -3.</p>
-<p>The button on the right, Delete Race, will delete the race, <b>and all the templates based on it</b>.</p>
+<p>To add a non-random feature, select first the feature list, and then the item from the list. Non-random features (for example Nightvision on Trolls) are always added to the enemy.</p>
 
+<h3>Skills</h3>
+<p>All <b>Standard skills</b> and <b>Professional skills</b> work along the same lines: you get the skill name, then a checkbox to indicate whether this skill must be included when
+generating NPC. Next is the calculation field. Default setting is the skill calculation formula as per the rulebook. In order to make your character more competent you can change
+these formulas. Athletics starts at STR+DEX. For a skilled warrior, you might want to increase this to STR+DEX+20. You can also use dice variables, so STR+DEX+D20+10 would work
+too. The final field, <b>Combat Styles</b>, works similarly. Only difference here: it cannot be deselected, and you need to name your combat skill, as described in the rulebook.
+This can be any name, it's only for flavour.</p>
 {% endblock %}
