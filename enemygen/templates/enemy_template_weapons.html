@@ -27,22 +27,22 @@ function get_weapons_callback(result){
         $('#ranged > tbody').html('');
         for (i in result.weapons['1h_melee']){
             weapon = result.weapons['1h_melee'][i]
-            row = '<tr><td>'+weapon.name+'</td><td><input id="weapon_prob_'+weapon.id+'" class="new_weapon data number" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="'+weapon.id+'" item_type="et_weapon_prob" value="'+weapon.probability+'" /></td></tr>'
+            row = '<tr><td>'+weapon.name+'</td><td><input id="weapon_prob_'+weapon.id+'" class="new_weapon data number" type="number" min="0" max="9999" parent_id="{{ cs.id }}" item_id="'+weapon.id+'" item_type="et_weapon_prob" value="'+weapon.probability+'" /></td></tr>'
             $('#1h_melee').append(row);
         }
         for (i in result.weapons['2h_melee']){
             weapon = result.weapons['2h_melee'][i]
-            row = '<tr><td>'+weapon.name+'</td><td><input id="weapon_prob_'+weapon.id+'" class="new_weapon data number" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="'+weapon.id+'" item_type="et_weapon_prob" value="'+weapon.probability+'" /></td></tr>'
+            row = '<tr><td>'+weapon.name+'</td><td><input id="weapon_prob_'+weapon.id+'" class="new_weapon data number" type="number" min="0" max="9999" parent_id="{{ cs.id }}" item_id="'+weapon.id+'" item_type="et_weapon_prob" value="'+weapon.probability+'" /></td></tr>'
             $('#2h_melee').append(row);
         }
         for (var i in result.weapons.ranged){
             weapon = result.weapons.ranged[i]
-            row = '<tr><td>'+weapon.name+'</td><td><input id="weapon_prob_'+weapon.id+'" class="new_weapon data number" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="'+weapon.id+'" item_type="et_weapon_prob" value="'+weapon.probability+'" /></td></tr>'
+            row = '<tr><td>'+weapon.name+'</td><td><input id="weapon_prob_'+weapon.id+'" class="new_weapon data number" type="number" min="0" max="9999" parent_id="{{ cs.id }}" item_id="'+weapon.id+'" item_type="et_weapon_prob" value="'+weapon.probability+'" /></td></tr>'
             $('#ranged').append(row);
         }
         for (i in result.weapons['shield']){
             weapon = result.weapons['shield'][i]
-            row = '<tr><td>'+weapon.name+'</td><td><input id="weapon_prob_'+weapon.id+'" class="new_weapon data number" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="'+weapon.id+'" item_type="et_weapon_prob" value="'+weapon.probability+'" /></td></tr>'
+            row = '<tr><td>'+weapon.name+'</td><td><input id="weapon_prob_'+weapon.id+'" class="new_weapon data number" type="number" min="0" max="9999" parent_id="{{ cs.id }}" item_id="'+weapon.id+'" item_type="et_weapon_prob" value="'+weapon.probability+'" /></td></tr>'
             $('#shield').append(row);
         }
         $('.new_weapon:input[type=number]').blur(function(event){
@@ -72,7 +72,7 @@ $('.weapon_selector').click(function(event){
         {% for weapon in cs.1h_melee %}
         <tr>
             <td>{{ weapon.name }}</td>
-            <td><input id="weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
+            <td><input id="weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="9999" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
         </tr>
         {% endfor %}
     </table>
@@ -87,7 +87,7 @@ $('.weapon_selector').click(function(event){
         {% for weapon in cs.2h_melee %}
         <tr>
             <td>{{ weapon.name }}</td>
-            <td><input id="weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
+            <td><input id="weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="9999" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
         </tr>
         {% endfor %}
     </table>
@@ -102,7 +102,7 @@ $('.weapon_selector').click(function(event){
         {% for weapon in cs.ranged %}
         <tr>
             <td>{{ weapon.name }}</td>
-            <td><input id="weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
+            <td><input id="weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="9999" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
         </tr>
         {% endfor %}
     </table>
@@ -117,7 +117,7 @@ $('.weapon_selector').click(function(event){
         {% for weapon in cs.shield %}
         <tr>
             <td>{{ weapon.name }}</td>
-            <td><input id="weapon_{{weapon.id}}" class="data number" type="number" min="0" max="100" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
+            <td><input id="weapon_{{weapon.id}}" class="data number" type="number" min="0" max="9999" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
         </tr>
         {% endfor %}
     </table>
@@ -181,7 +181,7 @@ $('.weapon_selector').click(function(event){
         <td class="ap_hp"{% if weapon.natural_weapon %}style="display: none;"{% endif %}><input id="custom_weapon_ap_{{weapon.id}}" class="data number" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_ap" value="{{weapon.ap}}"></td>
         <td class="ap_hp" {% if weapon.natural_weapon %}style="display: none;"{% endif %}><input id="custom_weapon_hp_{{weapon.id}}" class="data number" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_hp" value="{{weapon.hp}}"></td>
         <td class="ap_hp" colspan="2" {% if not weapon.natural_weapon %}style="display: none;"{% endif %}><input id="custom_weapon_ap_hp_as_per_{{weapon.id}}" class="data" type="text" size="7" item_id="{{weapon.id}}" item_type="et_custom_weapon_ap_hp_as_per" value="{{ weapon.ap_hp_as_per }}" /></td>
-        <td><input id="custom_weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_prob" value="{{ weapon.probability }}" /></td>
+        <td><input id="custom_weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="9999" item_id="{{weapon.id}}" item_type="et_custom_weapon_prob" value="{{ weapon.probability }}" /></td>
         <td><img src="/rq_static/minus.png" width="23" height="23" class="del_item" item_id="{{ weapon.id }}" item_type="custom_weapon"/></td>
     </tr>
     {% endfor %}
