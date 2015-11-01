@@ -5,49 +5,6 @@ function submit(id, type, input_object, value, parent_id){
     })(value, id, type, input_object);
 }
 
-function submit_callback(result, input_object){
-    if (result.success){
-        $('#commit_result').html('Save successful');
-        animate_background(input_object, true);
-    } else {
-        if (input_object && input_object.type == 'checkbox'){
-            $(input_object).prop('checked', result.original_value);
-        } else {
-            $(input_object).val(result.original_value);
-            animate_background(input_object, false);
-        }
-        console.log(result.error)
-        console.log(result.message);
-    }
-}
-
-function bind_change_listeners(event){
-	var original_value = $(event.target).data("default_value");
-	if (event.target.type == 'checkbox') {
-		var new_value = event.target.checked;
-	} else {
-		var new_value = $(event.target).val();
-	}
-	if (new_value != original_value){
-		var item_id = $(event.target).attr('item_id');
-		var parent_id = $(event.target).attr('parent_id');
-		var item_type = $(event.target).attr('item_type');
-		submit(item_id, item_type, event.target, new_value, parent_id)
-	}
-}
-
-function animate_background(selector, success){
-	var item = $(selector);
-    var color;
-    if (success) {
-        color = 'green';
-    } else {
-        color = 'red';
-    }
-	item.css('background', color)
-	item.animate({backgroundColor: 'white'}, 3000);
-}
-
 function add_custom_skill(event){
     var et_id = $(event.target).attr('et_id');
     Dajaxice.enemygen.add_custom_skill(refresh_page, {'et_id': et_id})
@@ -155,10 +112,6 @@ function apply_notes_to_templates(event){
     Dajaxice.enemygen.apply_notes_to_templates(apply_notes_to_templates_callback, {'race_id': race_id, 'notes': notes});
 }
 
-function refresh_page(result){
-    location.reload();
-}
-
 function apply_notes_to_templates_callback(result){
     if (result.success){
         $('#apply_notes_to_templates_confirmation').show();
@@ -168,24 +121,9 @@ function apply_notes_to_templates_callback(result){
     }
 }
 
-function toggle_star_callback(result, target){
-    var target = $(target);
-    if (result.success){
-        if (target.attr('src') === '/rq_static/images/star_filled.png'){
-            target.attr('src', '/rq_static/images/star_empty.png');
-        } else {
-            target.attr('src', '/rq_static/images/star_filled.png');
-        }
-    }
-}
-
 function toggle_star(event){
     var et_id = $(event.target).attr('et_id');
     Dajaxice.enemygen.toggle_star(function(result){toggle_star_callback(result, event.target)}, {'et_id': et_id});
-}
-
-function capitalize(string){
-    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function search_callback(result){
@@ -299,51 +237,6 @@ function set_template_list_height(){
     $('#enemy_template_list_container').css('height', template_list_height());
 }
 
-function initialize_enemy_list(){
-    $('#temp-enemy_template_list').remove();    // In case it exists, delete the existing temp table
-    var table = new ttable('enemy_template_list'); 
-    table.sorting.enabled = true;
-    table.sorting.sortall = false;
-    table.search.enabled = true;
-    table.search.inputID = 'searchinput';
-    table.search.casesensitive = false;
-    table.style.num = false;
-    //$('img.sort-img').remove(); // Each time rendertable is called, new set of sort images are added
-    table.rendertable();
-    
-    set_template_list_height();
-    $(window).resize(function(event){
-        set_template_list_height();
-    });
-    
-    $('input.enemy_amount').keyup(bind_amount_listeners);
-    $('input.enemy_amount').change(bind_amount_listeners);
-    
-    if ($('#enemy_template_list tr').length < 2){
-        $('#enemy_template_list').hide();
-    }
-}
-
-function bind_amount_listeners(event){
-    /* Binds the listeners of for the amount fields for the dynaimically created enemy rows on home page */
-    var amount = $(event.target).val();
-    if (amount > 0) {
-        var input_id = $(event.target).attr('id');
-        var row_id = $(event.target).parent().parent().attr('id');
-        var row = $(event.target).parent().parent().remove().clone(); //tr -element
-        $('#selected_enemy_template_list').append(row);
-        // Need to delete it also from the temp table created by the sorter
-        $('table#temp-enemy_template_list').find('tr#'+row_id).remove();
-        $('#selected_enemy_template_list_container').show(0);
-        var val = $('#'+input_id).val();
-        $('#'+input_id).focus().val('').val(val);
-        set_column_width();
-        set_template_list_height();
-        $('#generate_button').removeClass('disabled');
-        $('#generate_button').prop('disabled', false);
-    }
-}
-
 $(document).ready(function(){
 	$('.data:input[type=number], .data:input[type=text], select.data, textarea.data').blur(function(event){
 		bind_change_listeners(event);
@@ -355,7 +248,6 @@ $(document).ready(function(){
 
     $('.data:input[type=number]').change(function(event){
 		bind_change_listeners(event);
-    //    $(event.target).focus();
     });
     
 	$('input.data').focus(function(event){
