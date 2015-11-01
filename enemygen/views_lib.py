@@ -286,9 +286,9 @@ def get_statistics():
     return output
 
 
-def save_as_html(context):
+def save_as_html(context, template_name):
     """ Renders the generated enemies to html and saves to disk, so that it can be converted to PDF later """
-    rendered = render_to_string('generated_enemies.html', context)
+    rendered = render_to_string(template_name, context)
     prefix = _get_html_prefix(context).encode('utf-8')
     htmlfile = NamedTemporaryFile(mode='w', prefix=prefix, suffix='.html', dir='/projects/rq_tools/temp/', delete=False)
     htmlfile.write(rendered.encode('utf-8'))

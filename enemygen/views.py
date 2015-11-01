@@ -42,7 +42,7 @@ def generate_enemies(request):
         increment = False if request.POST.get('dont_increment') else True  # Increment the number of enemies generated
         context['enemies'] = get_enemies(enemy_index, increment)
         context['single_template'] = (len(enemy_index) == 1)
-    context['generated_html'] = save_as_html(context)
+    context['generated_html'] = save_as_html(context, 'generated_enemies.html')
     return render(request, 'generated_enemies.html', context)
 
 
@@ -56,7 +56,7 @@ def generate_party(request):
     else:
         party_object = Party.objects.get(id=request.POST['party_id'])
     context.update(get_generated_party(party_object))
-    context['generated_html'] = save_as_html(context)
+    context['generated_html'] = save_as_html(context, 'generated_enemies.html')
     return render(request, 'generated_enemies.html', context)
 
 
