@@ -192,7 +192,7 @@ $(document).ready(function(){
         <td>{{ skill.name }}</td>
         <td valign="top">
             <input id="skill_include_{{skill.skill.id}}" class="data" type="checkbox" item_id="{{skill.id}}" item_type="et_skill_include" {% if skill.include %}checked="checked"{% endif %} />
-            <input id="skill_{{skill.skill.id}}" class="data" type="text" size="17" item_id="{{skill.id}}" item_type="et_skill_value" value="{{ skill.die_set }}" />
+            <input id="skill_{{skill.skill.id}}" class="data" type="text" size="10" item_id="{{skill.id}}" item_type="et_skill_value" value="{{ skill.die_set }}" />
         </td>
         {% if forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
 {% endfor %}

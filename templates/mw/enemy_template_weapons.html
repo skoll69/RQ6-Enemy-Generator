@@ -11,7 +11,7 @@
         {% for weapon in cs.1h_melee %}
         <tr>
             <td>{{ weapon.name }}</td>
-            <td><input id="weapon_die_set_{{weapon.id}}" class="data" type="text" size="6" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_die_set" value="{{ weapon.die_set }}" /></td>
+            <td><input id="weapon_die_set_{{weapon.id}}" class="data" type="text" size="4" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_die_set" value="{{ weapon.die_set }}" /></td>
             <td><input id="weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="9999" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
         </tr>
         {% endfor %}
@@ -27,7 +27,7 @@
         {% for weapon in cs.2h_melee %}
         <tr>
             <td>{{ weapon.name }}</td>
-            <td><input id="weapon_skill_{{weapon.id}}" class="data" type="text" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_die_set" value="{{ weapon.die_set }}" /></td>
+            <td><input id="weapon_skill_{{weapon.id}}" class="data" type="text" size="4" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_die_set" value="{{ weapon.die_set }}" /></td>
             <td><input id="weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="9999" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
         </tr>
         {% endfor %}
@@ -39,10 +39,11 @@
     Amount:
     <input id="et_ranged_amount_{{ cs.id }}" class="data" size="3" type="text" item_id="{{ cs.id }}" item_type="et_ranged_amount" value="{{ cs.ranged_amount }}" /><br>
     <table id="ranged" class="weapon_table">
-        <thead><tr><th>Weapon</b></th><th>Prob.</th></tr></thead>
+        <thead><tr><th>Weapon</b></th><th>Skill</th><th>Prob.</th></tr></thead>
         {% for weapon in cs.ranged %}
         <tr>
             <td>{{ weapon.name }}</td>
+            <td><input id="weapon_skill_{{weapon.id}}" class="data" type="text" size="4" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_die_set" value="{{ weapon.die_set }}" /></td>
             <td><input id="weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="9999" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
         </tr>
         {% endfor %}
@@ -54,10 +55,11 @@
     Amount:
     <input id="et_shield_amount_{{ cs.id }}" class="data" size="3" type="text" item_id="{{ cs.id }}" item_type="et_shield_amount" value="{{ cs.shield_amount }}" /><br>
     <table id="shield" class="weapon_table">
-        <thead><tr><th>Weapon</b></th><th>Prob.</th></tr></thead>
+        <thead><tr><th>Weapon</b></th><th>Skill</th><th>Prob.</th></tr></thead>
         {% for weapon in cs.shield %}
         <tr>
             <td>{{ weapon.name }}</td>
+            <td><input id="weapon_skill_{{weapon.id}}" class="data" type="text" size="4" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_die_set" value="{{ weapon.die_set }}" /></td>
             <td><input id="weapon_{{weapon.id}}" class="data number" type="number" min="0" max="9999" parent_id="{{ cs.id }}" item_id="{{weapon.id}}" item_type="et_weapon_prob" value="{{ weapon.probability }}" /></td>
         </tr>
         {% endfor %}
@@ -66,7 +68,7 @@
     
     </tr><tr><td colspan="4">
     {% if cs.customs %}
-    <h4>Custom weapons</h4>
+    <h4>Custom Attacks</h4>
     <table>
     <tr valign="bottom">
         <th>Name</th>
@@ -115,7 +117,7 @@
     {% endfor %}
     </table>
     {% endif %}
-    <button class="add_custom_weapon" cs_id="{{ cs.id }}" type="1h-melee">Add custom weapon</button>
+    <button class="add_custom_weapon" cs_id="{{ cs.id }}" type="1h-melee">Add custom attack</button>
     </td>
     
 </tr></table>

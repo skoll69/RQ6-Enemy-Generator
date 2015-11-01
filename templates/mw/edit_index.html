@@ -45,11 +45,11 @@
 
 </td><td valign="top">
     <h3>Parties</h3>
-    <div><p>Search: <input id="party_searchinput" /></p></div>
     <form action="{% url 'create_party'%}" method="post">
     {% csrf_token %}
     <input type="submit" value="Create new party">
     </form>
+    <div><p>Search: <input id="party_searchinput" /></p></div>
     <table id="party_table">
     {% for party in edit_parties %}
         <tr>

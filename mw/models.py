@@ -8,7 +8,7 @@ import ordereddict
 from django.db.models import Q
 
 WEAPON_TYPE_CHOICES = (('1h-melee', '1-h Melee'), ('2h-melee', '2-h Melee'), ('ranged', 'Ranged'), ('shield', 'Shield'))
-WEAPON_LENGTH_CHOICES = (('-', '-'), ('S', 'S'), ('M', 'M'), ('L', 'L'), ('A', 'A'),)
+WEAPON_LENGTH_CHOICES = (('-', '-'), ('T', 'T'), ('S', 'S'), ('M', 'M'), ('L', 'L'), ('A', 'A'),)
 DAMAGE_BONUS_STEPS = ((12, '-1D6'), (16, '-1D4'), (24, 'None'), (32, '+1D4'), (40, '+1D6'), (56, '+2D6'),
                       (72, '+3D6'), (88, '+4D6'), (104, '+5D6'), (120, '+6D6'), (136, '+7D6'))
 
@@ -56,7 +56,7 @@ class MWEnemyTemplate(models.Model, Printer):
         for skill in SkillAbstract.objects.all():
             es = EnemySkill(skill=skill, enemy_template=self, die_set=skill.default_value, include=skill.include)
             es.save()
-        cs = CombatStyle(name="Primary Attack", enemy_template=self)
+        cs = CombatStyle(enemy_template=self)
         cs.save()
         
     def generate(self, suffix=None, increment=False):
@@ -114,7 +114,7 @@ class MWEnemyTemplate(models.Model, Printer):
         
     def clone(self, owner):
         name = "Copy of %s" % self.name
-        new = MWEnemyTemplate(owner=owner, race=self.race, name=name)
+        new = MWEnemyTemplate(owner=owner, name=name)
         new.movement = self.movement
         new.rank = self.rank
         new.spell_amount = self.spell_amount
@@ -355,16 +355,15 @@ class CombatStyle(models.Model):
         self.save()
         
     def clone(self, et):
-        new = CombatStyle(name=self.name, die_set=self.die_set, enemy_template=et,
-                          one_h_amount=self.one_h_amount, two_h_amount=self.two_h_amount,
+        new = CombatStyle(enemy_template=et, one_h_amount=self.one_h_amount, two_h_amount=self.two_h_amount,
                           ranged_amount=self.ranged_amount, shield_amount=self.shield_amount)
         new.save()
-        for weapon in EnemyWeapon.objects.filter(combat_style=self):
-            EnemyWeapon.create(combat_style=new, weapon=weapon.weapon, probability=weapon.probability)
+        for wpn in EnemyWeapon.objects.filter(combat_style=self):
+            EnemyWeapon.create(combat_style=new, weapon=wpn.weapon, probability=wpn.probability, die_set=wpn.die_set)
         for weapon in CustomWeapon.objects.filter(combat_style=self):
             cw = CustomWeapon.create(new.id, weapon.type, weapon.name, weapon.probability)
             cw.damage = weapon.damage
-            cw.reach = weapon.reach
+            cw.length = weapon.length
             cw.hp = weapon.hp
             cw.damage_bonus = weapon.damage_bonus
             cw.save()
@@ -425,8 +424,9 @@ class EnemyWeapon(models.Model, Printer):
         return Dice(self.die_set).roll()
 
     @classmethod
-    def create(cls, combat_style, weapon, probability):
-        ew = EnemyWeapon(combat_style=combat_style, weapon=weapon, probability=probability)
+    def create(cls, combat_style, weapon, probability, die_set=None):
+        die_set = die_set or weapon.base_skill
+        ew = EnemyWeapon(combat_style=combat_style, weapon=weapon, probability=probability, die_set=die_set)
         ew.die_set = weapon.base_skill
         ew.save()
         return ew
@@ -559,7 +559,7 @@ class EnemyStat(models.Model, Printer):
 
     def set_value(self, value):
         Dice(value).roll()  # Test that the value is valid
-        self.die_set = value.lower()
+        self.die_set = value.upper()
         self.save()
 
 

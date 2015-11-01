@@ -197,9 +197,11 @@ def weapons(combat_style):
             try:
                 ew = m.EnemyWeapon.objects.get(weapon=weapon, combat_style=combat_style)
                 prob = ew.probability
+                skill = ew.die_set
             except m.EnemyWeapon.DoesNotExist:
                 prob = 0
-            out[typeout].append({'id': weapon.id, 'name': weapon.name, 'probability': prob, 'die_set': ew.die_set})
+                skill = weapon.base_skill
+            out[typeout].append({'id': weapon.id, 'name': weapon.name, 'probability': prob, 'die_set': skill})
     return out
 
 

@@ -208,19 +208,19 @@ def submit(request, value, id, object, parent_id=None):
                 original_value = cs.die_set
         elif object == 'et_one_h_amount':
             cs = m.CombatStyle.objects.get(id=id, enemy_template__owner=request.user)
-            cs.one_h_amount = value.lower()
+            cs.one_h_amount = value
             cs.save()
         elif object == 'et_two_h_amount':
             cs = m.CombatStyle.objects.get(id=id, enemy_template__owner=request.user)
-            cs.two_h_amount = value.lower()
+            cs.two_h_amount = value
             cs.save()
         elif object == 'et_ranged_amount':
             cs = m.CombatStyle.objects.get(id=id, enemy_template__owner=request.user)
-            cs.ranged_amount = value.lower()
+            cs.ranged_amount = value
             cs.save()
         elif object == 'et_shield_amount':
             cs = m.CombatStyle.objects.get(id=id, enemy_template__owner=request.user)
-            cs.shield_amount = value.lower()
+            cs.shield_amount = value
             cs.save()
         elif object == 'et_weapon_prob':
             we = m.Weapon.objects.get(id=id)

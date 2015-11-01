@@ -186,7 +186,7 @@ div#png_export{
             {% for stat in enemy.get_stats %}
                 <tr>
                     <td class="{% if forloop.counter|divisibleby:2 %}evenrow{% else %}oddrow{% endif %}">
-                        {{ stat.name }}:&nbsp;{{ stat.value }}
+                        {% if stat.value != 0 %}{{ stat.name }}:&nbsp;{{ stat.value }}{% endif %}
                     </td>
                 </tr>
             {% endfor %}
@@ -197,7 +197,7 @@ div#png_export{
             {% for stat in enemy.get_stats %}
                 <tr>
                     <td class="{% if forloop.counter|divisibleby:2 %}evenrow{% else %}oddrow{% endif %}">
-                        {{ stat.x5 }}%
+                        {% if stat.value != 0 %}{{ stat.x5 }}%{% endif %}
                     </td>
                 </tr>
             {% endfor %}
@@ -242,11 +242,7 @@ div#png_export{
                     <td>{{ weapon.length }}</td>
                     <td>{{ weapon.range }}</td>
                     <td>
-                        {{ weapon.damage }}
-                        {% if enemy.attributes.damage_bonus != 'None' %}
-                            {% if weapon.damage_bonus == 'full' %}{{ enemy.attributes.damage_bonus }}{% endif %}
-                            {% if weapon.damage_bonus == 'half' %}{{ enemy.attributes.damage_bonus}}/2{% endif %}
-                        {% endif %}
+                        {{ weapon.damage }}{% if enemy.attributes.damage_bonus != 'None' %}{% if weapon.damage_bonus == 'full' %}{{ enemy.attributes.damage_bonus }}{% endif %}{% if weapon.damage_bonus == 'half' %}{{ enemy.attributes.damage_bonus}}/2{% endif %}{% endif %}
                     </td>
                     <td>{{ weapon.hp }}</td>
                     <td>{% if weapon.parry %}Y{% else %}N{% endif %}</td>
@@ -257,7 +253,7 @@ div#png_export{
     {% endfor %}
 </span>
 
-{% if notes %}
+{% if enemy.notes %}
     <span class="title"><br>Notes:</span>
     <span id="notes_{{ forloop.counter }}" class="item_list editable" contenteditable>{{ enemy.notes|markdown }}</span>
 {% endif %}

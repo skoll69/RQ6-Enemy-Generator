@@ -79,7 +79,7 @@
 <table class="read_only"><tr>
 {% for skill in et.included_skills %}
     <th>{{ skill.name }}</th>
-    <td>{{ skill.die_set }}</td>
+    <td>{{ skill.die_set }}%</td>
     {% if forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
 {% endfor %}
 </tr></table>
