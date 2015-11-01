@@ -1,0 +1,280 @@
+{% load url from future %}
+{% load markdown %}
+{% load dajaxice_templatetags %}
+
+<html>
+<head>
+<title>MW: {% if party %}{{ party.name }}{% else %}{{ enemies.0.name }}{% endif %}</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+{% dajaxice_js_import %}
+
+<style type="text/css">
+body, table{
+    font-size: 12px;
+}
+
+.nowrap{
+    white-space: nowrap;
+}
+
+.party_name{
+    font-weight: bold;
+    font-size: 16px;
+    font-family: sans-serif;
+    text-decoration: underline;
+}
+
+.template_name{
+    font-weight: bold;
+    width: 94%;
+    text-align: left;
+}
+
+div.row_container{
+    width: 880px;
+    position: relative;
+    page-break-inside: avoid;
+    padding-bottom: 50px;
+    vertical-align: top;
+}
+
+div.enemy_container{
+    margin-top: 15px;
+    margin-right: 0px;
+    width: 420px;
+    display: inline-block;
+    page-break-inside: avoid;
+    vertical-align: top;
+}
+
+.enemy_table{
+    background: white;
+    font-family: Serif;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.enemy_table td, th{
+    font-size: 12px;
+}
+
+.inner_enemy_table{
+    border-collapse: collapse;
+}
+
+table#attributes{
+    max-width: 240px;
+}
+
+.inner_enemy_table td{
+    padding: 2px;
+}
+
+.toprow{
+    background: #555;
+    color: white;
+}
+.evenrow{
+    background: #CCC;
+    line-height: 15px;
+}
+
+.oddrow{
+    line-height: 15px;
+}
+
+.title{
+    font-weight: bold;
+}
+
+.spirit_name{
+    text-decoration: underline;
+}
+
+.item_list{
+    font-style: italic;
+}
+
+table.weapon_table{
+    border-spacing: 0px;
+}
+
+table.weapon_table tr td{
+    font-size: 12px;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+a:hover{
+    text-decoration: underline;
+}
+
+.page_break{
+    page-break-after: always;
+}
+
+div#pdf_export{
+    position: absolute;
+    top: 1px;
+    left: 700px;
+    z-index: 3;
+}
+
+div#png_export{
+    position: absolute;
+    top: 1px;
+    left: 600px;
+    z-index: 3;
+}
+
+@media print{
+    div#pdf_export, div#png_export{
+        display: none;
+    }
+    .template_link{
+        display: None;
+    }
+}
+
+</style>
+</head>
+<body>
+{% if party %}
+<span class="party_name"><a href="{% url 'party' party.id %}">{{ party.name }}</a></span>
+{% endif %}
+
+{% if party.notes %}
+    <p><b>Notes:</b> <span id="party_notes" class="editable" contenteditable>{{ party.notes|markdown }}</span></p>
+{% endif %}
+
+{% if generated_html %}
+<div id="pdf_export">
+<form action="{% url 'pdf_export' %}" method="GET">
+<input type="hidden" name="generated_html" value="{{ generated_html }}">
+<input type="hidden" name="action" value="pdf_export">
+<input type="submit" value="PDF Export">
+</form>
+</div>
+<div id="png_export">
+<form action="{% url 'png_export' %}" method="GET" target="_blank">
+<input type="hidden" name="generated_html" value="{{ generated_html }}">
+<input type="hidden" name="action" value="png_export">
+<input type="submit" value="PNG Export">
+</form>
+</div>
+{% endif %}
+
+<div id="enemies">
+<div class="row_container">
+
+{% for enemy in enemies %}
+
+<div class="enemy_container">
+<table class="enemy_table">
+    <tr><td colspan="3">
+        <span id="enemy_{{ forloop.counter }}" class="template_name editable" contenteditable>{{ enemy.name }}</span>
+        {% if generated_html %}
+        <a href="{% url 'enemy_template' enemy.et.id %}"><img class="template_link" src="/rq_static/images/link.png" height="12" width="12" /></a>
+        {% endif %}
+    </td></tr>
+    <tr><td valign="top">
+        <table class="inner_enemy_table" id="characteristics">
+            <tr class="toprow"><th>Chars</th></tr>
+            {% for stat in enemy.get_stats %}
+                <tr>
+                    <td class="{% if forloop.counter|divisibleby:2 %}evenrow{% else %}oddrow{% endif %}">
+                        {{ stat.name }}:&nbsp;{{ stat.value }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </td><td valign="top">
+        <table class="inner_enemy_table" id="char_rolls">
+            <tr class="toprow"><th>Char rolls</th></tr>
+            {% for stat in enemy.get_stats %}
+                <tr>
+                    <td class="{% if forloop.counter|divisibleby:2 %}evenrow{% else %}oddrow{% endif %}">
+                        {{ stat.x5 }}%
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </td><td valign="top">
+        <table class="inner_enemy_table" id="attributes">
+            <tr class="toprow"> <th colspan="2">Attributes</th></tr>
+            <tr class="oddrow"><td>Movement</td>            <td>{{ enemy.attributes.movement }}</td></tr>
+            <tr class="evenrow"><td>Hit Points</td>         <td>{{ enemy.attributes.hit_points }}</td></tr>
+            <tr class="oddrow"><td>Damage&nbsp;Bonus</td>   <td>{{ enemy.attributes.damage_bonus }}</td></tr>
+            <tr class="evenrow"> <td>Armor</td>             <td>{{ enemy.attributes.armor }}</td></tr>
+            <tr class="oddrow"> <td>Magic&nbsp;Points</td>  <td>{{ enemy.attributes.magic_points }}</td></tr>
+            <tr class="evenrow"> <td>&nbsp;</td>   <td>&nbsp;</td></tr>
+        </table>
+    </td></tr>
+</table>
+
+<span class="title">Skills:</span><span class="item_list">
+    {% for skill in enemy.skills %}
+        {{ skill.name }} {{skill.value}}%{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</span><br>
+
+{% if enemy.spells %}
+    <span class="title">Spells:</span><span class="item_list">
+        {% for spell in enemy.spells %}
+            {{ spell.name }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </span><br>
+{% endif %}
+
+<br>
+<span class="item_list">
+    {% for cs in enemy.combat_styles %}
+        {% if cs.weapons %}
+        <table class="weapon_table">
+            <tr><th align="left">Attack</th><th align="left">Skill</th><th align="left">Lth</th><th align="left">Rng</th><th align="left">Dmg</th><th align="left">HP</th><th align="left">Parry</th></tr>
+            {% for weapon in cs.weapons %}
+                <tr>
+                    <td>{{ weapon.name }}{% if weapon.type == '2h-melee' %} (2h){% endif %}</td>
+                    <td>{{ weapon.roll }}%</td>
+                    <td>{{ weapon.length }}</td>
+                    <td>{{ weapon.range }}</td>
+                    <td>
+                        {{ weapon.damage }}
+                        {% if enemy.attributes.damage_bonus != 'None' %}
+                            {% if weapon.damage_bonus == 'full' %}{{ enemy.attributes.damage_bonus }}{% endif %}
+                            {% if weapon.damage_bonus == 'half' %}{{ enemy.attributes.damage_bonus}}/2{% endif %}
+                        {% endif %}
+                    </td>
+                    <td>{{ weapon.hp }}</td>
+                    <td>{% if weapon.parry %}Y{% else %}N{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    {% endfor %}
+</span>
+
+{% if notes %}
+    <span class="title"><br>Notes:</span>
+    <span id="notes_{{ forloop.counter }}" class="item_list editable" contenteditable>{{ enemy.notes|markdown }}</span>
+{% endif %}
+
+</div>
+{% if not forloop.first and not forloop.last and forloop.counter|divisibleby:"2" %}</div><div class="row_container">{% endif %}
+{% endfor %}
+</div>
+
+</div>
+
+<script>
+    $('.editable').blur(function(){
+        var data = {'value': $(this).html(), 'id': $(this).attr('id'), 'html_file': "{{ generated_html }}"}
+        Dajaxice.enemygen.change_template(function(result){}, data);
+    });
+</script>
+
+</body>
+</html>

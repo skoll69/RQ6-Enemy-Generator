@@ -1,0 +1,84 @@
+{% extends "mw/base.html" %}
+{% load url from future %}
+
+{% block content %}
+
+<table><tr><td valign="top">
+    <h3>Enemy Templates</h3>
+
+    <form action="{% url 'create_enemy_template'%}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Create new template">
+    </form>
+
+    <div><p>Search: <input id="template_searchinput" /></p></div>
+    
+    {% if enemy_templates %}
+    <table id="my_enemy_template_list" style="min-width: 430px;">
+    <thead><tr>
+        <th></th>
+        <th class="sort-alpha">Template name</th>
+        <th class="sort-alpha">Rank</th>
+    </tr></thead>
+    {% for et in enemy_templates %}
+        <tr>
+            <td style="height: 22px; width: 22px; position: relative;">
+                {% if et.starred %}
+                    <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_filled.png" style="position: absolute; top: 0px;"/>
+                {% else %}
+                    <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_empty.png" style="position: absolute; top: 0px;"/>
+                {% endif %}
+            </td>
+            <td><a class="edit_item" href="{% url 'enemy_template' et.id %}">{{ et.name }}</a>{% if not et.published %} *{% endif %}</td>
+            <td>
+                {% if et.rank = 1 %}Rubble{% endif %}
+                {% if et.rank = 2 %}Novice{% endif %}
+                {% if et.rank = 3 %}Skilled{% endif %}
+                {% if et.rank = 4 %}Veteran{% endif %}
+                {% if et.rank = 5 %}Master{% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endif %}
+</td><td width="10">
+
+</td><td valign="top">
+    <h3>Parties</h3>
+    <div><p>Search: <input id="party_searchinput" /></p></div>
+    <form action="{% url 'create_party'%}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Create new party">
+    </form>
+    <table id="party_table">
+    {% for party in edit_parties %}
+        <tr>
+            <td><a class="edit_item" href="{% url 'party' party.id %}">{{ party.name }}</a>{% if not party.published %} *{% endif %}</td>
+        </tr>
+    {% endfor %}
+    </table>
+</td></tr></table>
+<p>* Unpublished</p>
+
+
+<script>
+$(document).ready(function(){
+    var table = new ttable('my_enemy_template_list'); 
+    table.sorting.enabled = true;
+    table.sorting.sortall = false;
+    table.search.enabled = true;
+    table.search.inputID = 'template_searchinput';
+    table.search.casesensitive = false;
+    table.style.num = false;
+    table.rendertable();
+    
+    var table = new ttable('party_table');
+    table.search.enabled = true;
+    table.search.inputID = 'party_searchinput';
+    table.search.casesensitive = false;
+    table.style.num = false;
+    table.rendertable();
+});
+</script>
+
+{% endblock %}

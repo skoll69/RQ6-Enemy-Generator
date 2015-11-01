@@ -1,88 +1,97 @@
 
 var Dajaxice = {
 
-    
-    
-
-    
-
-    
     enemygen: {
     
     del_item: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.del_item', 'POST', callback_function, argv, custom_settings);
     },
-
     apply_notes_to_templates: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.apply_notes_to_templates', 'POST', callback_function, argv, custom_settings);
     },
-
     add_hit_location: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.add_hit_location', 'POST', callback_function, argv, custom_settings);
     },
-
     add_additional_feature: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.add_additional_feature', 'POST', callback_function, argv, custom_settings);
     },
-
     change_template: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.change_template', 'POST', callback_function, argv, custom_settings);
     },
-
     add_custom_spell: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.add_custom_spell', 'POST', callback_function, argv, custom_settings);
     },
-
     add_template_to_party: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.add_template_to_party', 'POST', callback_function, argv, custom_settings);
     },
-
     add_spirit: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.add_spirit', 'POST', callback_function, argv, custom_settings);
     },
-
     add_cult: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.add_cult', 'POST', callback_function, argv, custom_settings);
     },
-
     add_custom_skill: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.add_custom_skill', 'POST', callback_function, argv, custom_settings);
     },
-
     add_custom_weapon: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.add_custom_weapon', 'POST', callback_function, argv, custom_settings);
     },
-
     add_nonrandom_feature: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.add_nonrandom_feature', 'POST', callback_function, argv, custom_settings);
     },
-
     toggle_star: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.toggle_star', 'POST', callback_function, argv, custom_settings);
     },
-
     search: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.search', 'GET', callback_function, argv, custom_settings);
     },
-
     get_weapons: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.get_weapons', 'GET', callback_function, argv, custom_settings);
     },
-
     get_feature_list_items: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.get_feature_list_items', 'GET', callback_function, argv, custom_settings);
     },
-
     submit: function(callback_function, argv, custom_settings){
         return Dajaxice.call('enemygen.submit', 'POST', callback_function, argv, custom_settings);
     }
 
+    },
 
-    
-    
+
+    mw: {
+
+    del_item: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('mw.del_item', 'POST', callback_function, argv, custom_settings);
+    },
+    change_template: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('mw.change_template', 'POST', callback_function, argv, custom_settings);
+    },
+    add_custom_spell: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('mw.add_custom_spell', 'POST', callback_function, argv, custom_settings);
+    },
+    add_template_to_party: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('mw.add_template_to_party', 'POST', callback_function, argv, custom_settings);
+    },
+    add_custom_skill: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('mw.add_custom_skill', 'POST', callback_function, argv, custom_settings);
+    },
+    add_custom_weapon: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('mw.add_custom_weapon', 'POST', callback_function, argv, custom_settings);
+    },
+    toggle_star: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('mw.toggle_star', 'POST', callback_function, argv, custom_settings);
+    },
+    search: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('mw.search', 'GET', callback_function, argv, custom_settings);
+    },
+    get_weapons: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('mw.get_weapons', 'GET', callback_function, argv, custom_settings);
+    },
+    submit: function(callback_function, argv, custom_settings){
+        return Dajaxice.call('mw.submit', 'POST', callback_function, argv, custom_settings);
     }
-    
-,
+
+    },
     
 
     get_cookie: function(name)

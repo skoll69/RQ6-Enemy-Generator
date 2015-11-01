@@ -1,0 +1,31 @@
+{% extends "mw/base.html" %}
+{% load url from future %}
+
+{% block content %}
+<div id="et_filter_container">
+    Filter:
+    <form action="{% url 'set_filter' %}" method="post" style="display: inline-block;">
+    <input type="hidden" name="coming_from" value="{{request.path}}">
+    {% csrf_token %}
+    <select name="filter" onchange="this.form.submit()">
+            <option value="None" {% if filter == 'None' %}selected="selected"{% endif %}>None</option>
+            <option value="Starred" {% if filter == 'Starred' %}selected="selected"{% endif %}>Starred</option>
+        {% for tag in all_et_tags %}
+            <option value="{{ tag.name }}" {% if tag.name == filter %}selected="selected"{% endif %}>{{ tag }}</option>
+        {% endfor %}
+    </select>
+    </form>
+</div>
+
+Search: <input id="searchinput" /> |<form style="display: inline;" action="{% url 'generate_enemies' %}" method="post" target="_blank">
+     <input id="generate_button" type="submit" disabled class="disabled" name="generate" value="Generate"> | <input type="submit" name="lucky" value="Do you feel lucky?">
+    {% csrf_token %}
+    <div id="selected_enemy_template_list_container" style="display:none;">
+        <table id="selected_enemy_template_list">
+        {% include 'mw/enemy_list_table_head.html' %}
+        </table>
+        <hr>
+    </div>
+    {% include 'mw/enemy_template_list.html' %}
+</form>
+{% endblock %}

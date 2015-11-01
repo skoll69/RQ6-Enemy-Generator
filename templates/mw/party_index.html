@@ -1,0 +1,83 @@
+{% extends "mw/base.html" %}
+{% load url from future %}
+
+{% block content %}
+<div id="et_filter_container">
+    Filter:
+    <form action="{% url 'set_party_filter' %}" method="post" style="display: inline-block;">
+    <input type="hidden" name="coming_from" value="{{request.path}}">
+    {% csrf_token %}
+    <select name="party_filter" onchange="this.form.submit()">
+            <option value="None" {% if filter == 'None' %}selected="selected"{% endif %}>None</option>
+        {% for tag in all_party_tags %}
+            <option value="{{ tag.name }}" {% if tag.name == party_filter %}selected="selected"{% endif %}>{{ tag }}</option>
+        {% endfor %}
+    </select>
+    </form>
+</div>
+
+<div>
+    Type to search: <input id="searchinput" /> | <form style="display: inline-block;" action="{% url 'generate_party' %}" method="post" target="_blank">
+        {% csrf_token %}
+        <input type="submit" name="lucky" value="Do you feel lucky?">
+    </form>
+</div>
+
+
+<div id="party_list_container">
+<table id="party_list" class="index_list">
+    <thead><tr>
+        <th class="sort-alpha">Party</th>
+        <td></td>
+        <th class="sort-alpha">Creator</th>
+        <th class="sort-alpha">Tags</th>
+    </tr></thead>
+    {% for p in parties %}
+        <tr>
+            <td><a class="edit_item" href="{% url 'party' p.id %}">{{ p.name }}</a></td>
+            <td>
+                <form action="{% url 'generate_party' %}" method="post" target="_blank">
+                    <input type="hidden" name="party_id" value="{{ p.id }}">
+                    {% csrf_token %}
+                    <input type="submit" name="generate" class="party_submit" value="Generate">
+                </form>
+            </td>
+            <td>{{ p.owner }}</td>
+            <td><div id="index_tag_container">
+                {% for tag in p.get_tags %}<div class="small_tag">{{tag}}</div>{% endfor %}
+            </div></td>
+        </tr>
+    {% endfor %}
+</table>
+</div>
+
+<br><br>
+
+<script>
+function party_list_height(){
+    list_container_height = $(window).height() - 249
+    if (list_container_height > $('#party_list').height()){
+        list_container_height = $('#party_list').height()
+    }
+    return list_container_height;
+
+}
+
+$(document).ready(function(){
+    var table = new ttable('party_list'); 
+    table.sorting.enabled = true;
+    table.sorting.sortall = false;
+    table.search.enabled = true;
+    table.search.inputID = 'searchinput';
+    table.search.casesensitive = false;
+    table.style.num = false;
+    table.rendertable();
+    
+    $('#party_list_container').css('height', party_list_height());
+    $(window).resize(function(event){
+        $('#party_list_container').css('height', party_list_height());
+    })
+});
+</script>
+
+{% endblock %}

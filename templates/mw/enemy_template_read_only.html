@@ -1,0 +1,160 @@
+{% extends "mw/base.html" %}
+{% load url from future %}
+
+{% block title %}RQ: {{ et.name }}{% endblock %}
+
+{% block content %}
+
+{% if user.username %}
+<div id="clone_template_container">
+<form action="{% url 'clone_template' et.id %}" method="post">
+{% csrf_token %}
+<input id="clone_template" type="submit" value="Clone" />
+</form>
+</div>
+{% endif %}
+
+<div id="generate_enemy_container">
+<form action="{% url 'generate_enemies' %}" method="post" target="generated">
+{% csrf_token %}
+<input name="enemy_template_id_{{et.id}}" type="hidden" value="6">
+<input style="width: 140px;" type="submit" value="Generate" />
+</form>
+</div>
+
+<h3 style="display: inline;">
+    {{ et.name }}
+    {% if et.starred %}
+        <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_filled.png" />
+    {% else %}
+        <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_empty.png" {% if not user.is_authenticated %}title="Log in to Star favorites"{% endif %} />
+    {% endif %}
+</h3>
+<span class="generated_amount">(Generated {{ et.generated }} times)</span>
+
+<table><tr>
+    <th>Namelist</th>
+    <td>{% if et.namelist %}{{ et.namelist.name }} (<a href="{% url 'feature_items' et.namelist.id %}">View names</a>){% else %}None{% endif %}</td>
+</tr><tr>
+    <th>Tags</th>
+    <td><div id="tag_container">
+        {% for tag in et.get_tags %}<div class="tag">{{ tag }}</div>{% endfor %}
+        </div>
+    </td>
+</tr><tr>
+    <th>Rank</th>
+    <td>{{ et.get_rank_display }}</td>
+</tr><tr>
+    <th>Notes</th>
+    <td>{{ et.notes }}</td>
+</tr><tr>
+    <th>Creator</th><td>{{ et.owner.username }}</td>
+</tr></table>
+
+<table id="stats_and_hp"><tr><td valign="top">
+<table>
+<tr><th colspan="2">Stats</th></tr>
+{% for stat in et.stats %}
+    <tr>
+        <td>{{ stat.name }}</td>
+        <td>{{ stat.die_set }}</td>
+    </tr>
+{% endfor %}
+</table>
+</td><td valign="top">
+<table>
+<tr><th colspan="2">Attributes</th></tr>
+<tr>
+    <td>Movement</td>
+    <td>{{ et.movement }}</td>
+</tr>
+<tr>
+    <td>Armor</td>
+    <td>{{ et.armor }}</td>
+</tr>
+</table>
+</td></tr></table>
+
+<h3>Skills</h3>
+<table class="read_only"><tr>
+{% for skill in et.included_skills %}
+    <th>{{ skill.name }}</th>
+    <td>{{ skill.die_set }}</td>
+    {% if forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
+{% endfor %}
+</tr></table>
+
+{% if et.included_custom_skills %}
+<h3>Custom skills</h3>
+<table class="read_only"><tr>
+{% for skill in et.included_custom_skills %}
+    <th>{{ skill.name }}</th>
+    <td>{{ skill.die_set }}</td>
+    {% if forloop.counter|divisibleby:"3" %}</tr><tr>{% endif %}
+{% endfor %}
+</tr></table>
+{% endif %}
+
+<h3>Attacks</h3>
+{% for cs in et.combat_styles %}
+<table><tr><td valign="top">
+<h4>1-handed weapons</h4>
+<b>Amount: {{cs.one_h_amount}}</b>
+<table>
+    <tr><th>Attack</th><th>Skill</th><th>Prob.</th></tr>
+    {% for weapon in cs.one_h_options %}
+    <tr><td>{{ weapon.name }}</td><td>{{ weapon.die_set }}%</td><td>{{ weapon.probability }}</td></tr>
+    {% endfor %}
+</table>
+</td>
+
+<td valign="top">
+<h4>2-handed weapons</h4>
+<b>Amount: {{cs.two_h_amount}}</b>
+<table>
+    <tr><th>Attack</th><th>Skill</th><th>Prob.</th></tr>
+    {% for weapon in cs.two_h_options %}
+    <tr><td>{{ weapon.name }}</td><td>{{ weapon.die_set }}%</td><td>{{ weapon.probability }}</td></tr>
+    {% endfor %}
+</table>
+</td>
+
+<td valign="top">
+<h4>Ranged weapons</h4>
+<b>Amount: {{cs.ranged_amount}}</b>
+<table>
+    <tr><th>Attack</th><th>Skill</th><th>Prob.</th></tr>
+    {% for weapon in cs.ranged_options %}
+    <tr><td>{{ weapon.name }}</td><td>{{ weapon.die_set }}%</td><td>{{ weapon.probability }}</td></tr>
+    {% endfor %}
+</table>
+</td>
+
+<td valign="top">
+<h4>Shields</h4>
+<b>Amount: {{cs.shield_amount}}</b>
+<table>
+    <tr><th>Attack</th><th>Skill</th><th>Prob.</th></tr>
+    {% for weapon in cs.shield_options %}
+    <tr><td>{{ weapon.name }}</td><td>{{ weapon.die_set }}%</td><td>{{ weapon.probability }}</td></tr>
+    {% endfor %}
+</table>
+</td></tr></table>
+
+{% endfor %}
+<br>
+
+{% if et.spells %}
+<h3>Spells</h3>
+Amount: {{ et.spell_amount }}
+<table><tr>
+<tr><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th><th>Spell</th><th>Prob.&nbsp;&nbsp;&nbsp;</th></tr>
+{% for spell in et.spells %}
+    <td>{{ spell.name }} {{ spell.detail_text }}</td>
+    <td>{{ spell.probability }}</td>
+    {% if not forloop.first and forloop.counter|divisibleby:"4" %}</tr><tr>{% endif %}
+{% endfor %}
+</tr></table>
+{% endif %}
+
+{% endblock %}
