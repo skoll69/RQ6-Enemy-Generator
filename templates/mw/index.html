@@ -4,7 +4,7 @@
 {% block content %}
 <div id="et_filter_container">
     Filter:
-    <form action="{% url 'set_filter' %}" method="post" style="display: inline-block;">
+    <form action="{% url 'mw_set_filter' %}" method="post" style="display: inline-block;">
     <input type="hidden" name="coming_from" value="{{request.path}}">
     {% csrf_token %}
     <select name="filter" onchange="this.form.submit()">
@@ -17,7 +17,7 @@
     </form>
 </div>
 
-Search: <input id="searchinput" /> |<form style="display: inline;" action="{% url 'generate_enemies' %}" method="post" target="_blank">
+Search: <input id="searchinput" /> |<form style="display: inline;" action="{% url 'mw_generate_enemies' %}" method="post" target="_blank">
      <input id="generate_button" type="submit" disabled class="disabled" name="generate" value="Generate"> | <input type="submit" name="lucky" value="Do you feel lucky?">
     {% csrf_token %}
     <div id="selected_enemy_template_list_container" style="display:none;">

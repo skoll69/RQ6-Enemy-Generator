@@ -6,7 +6,7 @@
 <table><tr><td valign="top">
     <h3>Enemy Templates</h3>
 
-    <form action="{% url 'create_enemy_template'%}" method="post">
+    <form action="{% url 'mw_create_enemy_template'%}" method="post">
     {% csrf_token %}
     <input type="submit" value="Create new template">
     </form>
@@ -29,7 +29,7 @@
                     <img et_id={{ et.id }} class="star" height="22" width="22" src="/rq_static/images/star_empty.png" style="position: absolute; top: 0px;"/>
                 {% endif %}
             </td>
-            <td><a class="edit_item" href="{% url 'enemy_template' et.id %}">{{ et.name }}</a>{% if not et.published %} *{% endif %}</td>
+            <td><a class="edit_item" href="{% url 'mw_enemy_template' et.id %}">{{ et.name }}</a>{% if not et.published %} *{% endif %}</td>
             <td>
                 {% if et.rank = 1 %}Rubble{% endif %}
                 {% if et.rank = 2 %}Novice{% endif %}
@@ -45,7 +45,7 @@
 
 </td><td valign="top">
     <h3>Parties</h3>
-    <form action="{% url 'create_party'%}" method="post">
+    <form action="{% url 'mw_create_party'%}" method="post">
     {% csrf_token %}
     <input type="submit" value="Create new party">
     </form>
@@ -53,7 +53,7 @@
     <table id="party_table">
     {% for party in edit_parties %}
         <tr>
-            <td><a class="edit_item" href="{% url 'party' party.id %}">{{ party.name }}</a>{% if not party.published %} *{% endif %}</td>
+            <td><a class="edit_item" href="{% url 'mw_party' party.id %}">{{ party.name }}</a>{% if not party.published %} *{% endif %}</td>
         </tr>
     {% endfor %}
     </table>

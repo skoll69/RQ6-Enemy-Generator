@@ -16,7 +16,7 @@
 <table>
 <tr><th>Template</th><th>Times Generated</th></tr>
 {% for template in statistics.templates %}
-<tr><td><a href="{% url 'enemy_template' template.id %}">{{template.name}}</a></td><td>{{template.generated}}</td></tr>
+<tr><td><a href="{% url 'mw_enemy_template' template.id %}">{{template.name}}</a></td><td>{{template.generated}}</td></tr>
 {% endfor %}
 </table>
 

@@ -6,7 +6,7 @@
 {% if party %}
     <h4>Confirm delete party</h4>
     <p>Are you sure you want to delete the party {{ party.name }} (id: {{ party.id }})?</p>
-    <form action="{% url 'delete_party' party.id %}" method="post">
+    <form action="{% url 'mw_delete_party' party.id %}" method="post">
     {% csrf_token %}
     <p>
         <input type="submit" name="answer" class="my_button" value="Yes">

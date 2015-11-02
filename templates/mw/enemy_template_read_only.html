@@ -7,7 +7,7 @@
 
 {% if user.username %}
 <div id="clone_template_container">
-<form action="{% url 'clone_template' et.id %}" method="post">
+<form action="{% url 'mw_clone_template' et.id %}" method="post">
 {% csrf_token %}
 <input id="clone_template" type="submit" value="Clone" />
 </form>
@@ -15,7 +15,7 @@
 {% endif %}
 
 <div id="generate_enemy_container">
-<form action="{% url 'generate_enemies' %}" method="post" target="generated">
+<form action="{% url 'mw_generate_enemies' %}" method="post" target="generated">
 {% csrf_token %}
 <input name="enemy_template_id_{{et.id}}" type="hidden" value="6">
 <input style="width: 140px;" type="submit" value="Generate" />

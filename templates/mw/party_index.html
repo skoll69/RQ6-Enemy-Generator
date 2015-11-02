@@ -4,7 +4,7 @@
 {% block content %}
 <div id="et_filter_container">
     Filter:
-    <form action="{% url 'set_party_filter' %}" method="post" style="display: inline-block;">
+    <form action="{% url 'mw_set_party_filter' %}" method="post" style="display: inline-block;">
     <input type="hidden" name="coming_from" value="{{request.path}}">
     {% csrf_token %}
     <select name="party_filter" onchange="this.form.submit()">
@@ -17,7 +17,7 @@
 </div>
 
 <div>
-    Type to search: <input id="searchinput" /> | <form style="display: inline-block;" action="{% url 'generate_party' %}" method="post" target="_blank">
+    Type to search: <input id="searchinput" /> | <form style="display: inline-block;" action="{% url 'mw_generate_party' %}" method="post" target="_blank">
         {% csrf_token %}
         <input type="submit" name="lucky" value="Do you feel lucky?">
     </form>
@@ -34,9 +34,9 @@
     </tr></thead>
     {% for p in parties %}
         <tr>
-            <td><a class="edit_item" href="{% url 'party' p.id %}">{{ p.name }}</a></td>
+            <td><a class="edit_item" href="{% url 'mw_party' p.id %}">{{ p.name }}</a></td>
             <td>
-                <form action="{% url 'generate_party' %}" method="post" target="_blank">
+                <form action="{% url 'mw_generate_party' %}" method="post" target="_blank">
                     <input type="hidden" name="party_id" value="{{ p.id }}">
                     {% csrf_token %}
                     <input type="submit" name="generate" class="party_submit" value="Generate">

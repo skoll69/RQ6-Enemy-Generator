@@ -36,15 +36,15 @@
 {% if not templates %}
     <div id="getting_started">
         <h2>Getting started</h2>
-        <p>Use the Search functionality to find templates or browse the <a href="{% url 'index' %}">full template list</a>.</p>
+        <p>Use the Search functionality to find templates or browse the <a href="{% url 'mw_index' %}">full template list</a>.</p>
         <p>To generate enemies, enter amount and hit Generate.</p>
         {% if user.is_authenticated %}
-        <p>Create your own templates on <a href="{% url 'edit_index' %}">My Content</a> -page.</p>
+        <p>Create your own templates on <a href="{% url 'mw_edit_index' %}">My Content</a> -page.</p>
         <p>Star your favorite templates to see them on this starting page.</p>
         {% else %}
         <p><a href="/rq_tools/accounts/register/">Register</a> and <a href="{% url 'auth_login' %}">log in</a> to create your own templates!</p>
         {% endif %}
-        <p>Visit <a href="{% url 'instructions' %}">Help</a> for more info.</p>
+        <p>Visit <a href="{% url 'mw_instructions' %}">Help</a> for more info.</p>
     </div>
 {% endif %}
 <div id="searching">

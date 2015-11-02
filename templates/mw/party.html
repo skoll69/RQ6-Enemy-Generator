@@ -52,20 +52,20 @@ $(document).ready(function(){
 });
 </script>
 
-<form action="{% url 'delete_party' party.id %}" method="post">
+<form action="{% url 'mw_delete_party' party.id %}" method="post">
 {% csrf_token %}
 <div id="delete_party_container"><input id="delete_party" type="submit" value="Delete party" /></div>
 </form>
 
 <div id="clone_party_container">
-<form action="{% url 'clone_party' party.id %}" method="post">
+<form action="{% url 'mw_clone_party' party.id %}" method="post">
 {% csrf_token %}
 <input id="clone_party" type="submit" value="Clone" />
 </form>
 </div>
 
 <div id="generate_party_container">
-<form action="{% url 'generate_party' %}" method="post" target="_blank">
+<form action="{% url 'mw_generate_party' %}" method="post" target="_blank">
 {% csrf_token %}
 <input name="party_id" type="hidden" value="{{ party.id }}">
 <input style="width: 140px;" type="submit" value="Generate" />
@@ -105,7 +105,7 @@ $(document).ready(function(){
 <tr><th>Template</th><th>Amount</th></tr>
 {% for ts in party.template_specs %}
     <tr>
-        <td><a href="{% url 'enemy_template' ts.template.id %}">{{ ts.template.name }}</a></td>
+        <td><a href="{% url 'mw_enemy_template' ts.template.id %}">{{ ts.template.name }}</a></td>
         <td><input id="party_ts_{{ts.id}}" class="data" type="text" size="6" item_type="party_template_amount" parent_id="{{ party.id }}" item_id="{{ ts.template.id }}" value="{{ ts.amount }}"></td>
         <td><img src="/rq_static/minus.png" width="23" height="23" class="del_item" item_id="{{ ts.id }}" item_type="party_template_spec" /></td>
     </tr>

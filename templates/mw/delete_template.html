@@ -6,7 +6,7 @@
 {% if et %}
     <h4>Confirm delete template</h4>
     <p>Are you sure you want to delete the template {{ et.name }}?</p>
-    <form action="{% url 'delete_template' et.id %}" method="post">
+    <form action="{% url 'mw_delete_template' et.id %}" method="post">
     {% csrf_token %}
     <p>
         <input type="submit" name="answer" class="my_button" value="Yes">

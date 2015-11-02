@@ -143,7 +143,7 @@ div#png_export{
 </head>
 <body>
 {% if party %}
-<span class="party_name"><a href="{% url 'party' party.id %}">{{ party.name }}</a></span>
+<span class="party_name"><a href="{% url 'mw_party' party.id %}">{{ party.name }}</a></span>
 {% endif %}
 
 {% if party.notes %}
@@ -152,14 +152,14 @@ div#png_export{
 
 {% if generated_html %}
 <div id="pdf_export">
-<form action="{% url 'pdf_export' %}" method="GET">
+<form action="{% url 'mw_pdf_export' %}" method="GET">
 <input type="hidden" name="generated_html" value="{{ generated_html }}">
 <input type="hidden" name="action" value="pdf_export">
 <input type="submit" value="PDF Export">
 </form>
 </div>
 <div id="png_export">
-<form action="{% url 'png_export' %}" method="GET" target="_blank">
+<form action="{% url 'mw_png_export' %}" method="GET" target="_blank">
 <input type="hidden" name="generated_html" value="{{ generated_html }}">
 <input type="hidden" name="action" value="png_export">
 <input type="submit" value="PNG Export">
@@ -177,7 +177,7 @@ div#png_export{
     <tr><td colspan="3">
         <span id="enemy_{{ forloop.counter }}" class="template_name editable" contenteditable>{{ enemy.name }}</span>
         {% if generated_html %}
-        <a href="{% url 'enemy_template' enemy.et.id %}"><img class="template_link" src="/rq_static/images/link.png" height="12" width="12" /></a>
+        <a href="{% url 'mw_enemy_template' enemy.et.id %}"><img class="template_link" src="/rq_static/images/link.png" height="12" width="12" /></a>
         {% endif %}
     </td></tr>
     <tr><td valign="top">
