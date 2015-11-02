@@ -197,7 +197,7 @@ div#png_export{
             {% for stat in enemy.get_stats %}
                 <tr>
                     <td class="{% if forloop.counter|divisibleby:2 %}evenrow{% else %}oddrow{% endif %}">
-                        {% if stat.value != 0 %}{{ stat.x5 }}%{% endif %}
+                        {% if stat.value != 0 %}{{ stat.x5 }}{% endif %}
                     </td>
                 </tr>
             {% endfor %}
@@ -205,12 +205,12 @@ div#png_export{
     </td><td valign="top">
         <table class="inner_enemy_table" id="attributes">
             <tr class="toprow"> <th colspan="2">Attributes</th></tr>
-            <tr class="oddrow"><td>Movement</td>            <td>{{ enemy.attributes.movement }}</td></tr>
+            <tr class="oddrow"> <td>Movement</td>           <td>{{ enemy.attributes.movement }}</td></tr>
             <tr class="evenrow"><td>Hit Points</td>         <td>{{ enemy.attributes.hit_points }}</td></tr>
-            <tr class="oddrow"><td>Damage&nbsp;Bonus</td>   <td>{{ enemy.attributes.damage_bonus }}</td></tr>
-            <tr class="evenrow"> <td>Armor</td>             <td>{{ enemy.attributes.armor }}</td></tr>
-            <tr class="oddrow"> <td>Magic&nbsp;Points</td>  <td>{{ enemy.attributes.magic_points }}</td></tr>
-            <tr class="evenrow"> <td>&nbsp;</td>   <td>&nbsp;</td></tr>
+            <tr class="oddrow"> <td>Damage&nbsp;Bonus</td>  <td>{{ enemy.attributes.damage_bonus }}</td></tr>
+            <tr class="evenrow"><td>Armor</td>              <td>{{ enemy.attributes.armor }}</td></tr>
+            <tr class="oddrow"> <td>Major Wound</td>        <td>{{ enemy.attributes.major_wound}}</td></tr>
+            <tr class="evenrow"> <td>Magic&nbsp;Points</td> <td>{{ enemy.attributes.magic_points }}</td></tr>
         </table>
     </td></tr>
 </table>

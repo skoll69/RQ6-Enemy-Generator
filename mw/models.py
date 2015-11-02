@@ -5,6 +5,7 @@ from enemygen.enemygen_lib import replace_die_set, select_random_items
 from enemygen.dice import Dice
 from taggit.managers import TaggableManager
 import ordereddict
+import math
 from django.db.models import Q
 
 WEAPON_TYPE_CHOICES = (('1h-melee', '1-h Melee'), ('2h-melee', '2-h Melee'), ('ranged', 'Ranged'), ('shield', 'Shield'))
@@ -669,7 +670,8 @@ class _Enemy(object):
     def _add_stats(self):
         for stat in self.et.stats:
             self.stats[stat.name] = stat.roll()
-            self.stats_list.append({'name': stat.name, 'value': self.stats[stat.name], 'x5': self.stats[stat.name]*5})
+            x5 = '-' if stat.name == 'SIZ' else str(self.stats[stat.name]*5) + '%'
+            self.stats_list.append({'name': stat.name, 'value': self.stats[stat.name], 'x5': x5})
 
     def _add_skills(self):
         for skill in self.et.skills:
@@ -706,7 +708,8 @@ class _Enemy(object):
         self.attributes['magic_points'] = self.stats['POW']
         self.attributes['armor'] = self.et.armor
         self.attributes['movement'] = self.et.movement
-        self.attributes['hit_points'] = self.stats['CON'] + self.stats['SIZ']
+        self.attributes['hit_points'] = int(math.ceil((self.stats['CON'] + self.stats['SIZ']) /2.0))
+        self.attributes['major_wound'] = int(math.ceil(self.attributes['hit_points'] / 2.0))
 
     def _calculate_damage_bonus(self, strength, siz):
         if strength == 0 or siz == 0:
