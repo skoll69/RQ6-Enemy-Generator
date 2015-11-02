@@ -137,11 +137,11 @@ $(document).ready(function(){
     <th>Rank</th>
     <td>
         <select id="et_rank_{{ et.id }}" class="data" item_id="{{ et.id }}" item_type="et_rank">
-            <option value="1" {% if et.rank == 1 %}selected="selected"{% endif %}>Rabble</option>
-            <option value="2" {% if et.rank == 2 %}selected="selected"{% endif %}>Novice</option>
-            <option value="3" {% if et.rank == 3 %}selected="selected"{% endif %}>Skilled</option>
-            <option value="4" {% if et.rank == 4 %}selected="selected"{% endif %}>Veteran</option>
-            <option value="5" {% if et.rank == 5 %}selected="selected"{% endif %}>Master</option>
+            <option value="1" {% if et.rank == 1 %}selected="selected"{% endif %}>Minor</option>
+            <option value="2" {% if et.rank == 2 %}selected="selected"{% endif %}>Average</option>
+            <option value="3" {% if et.rank == 3 %}selected="selected"{% endif %}>Experienced</option>
+            <option value="4" {% if et.rank == 4 %}selected="selected"{% endif %}>Heroic</option>
+            <option value="5" {% if et.rank == 5 %}selected="selected"{% endif %}>Epic</option>
         </select>
     </td>
 </tr><tr>

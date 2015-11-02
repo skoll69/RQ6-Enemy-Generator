@@ -30,7 +30,7 @@ class MWEnemyTemplate(models.Model, Printer):
     generated = models.IntegerField(default=0)
     used = models.IntegerField(default=0)
     published = models.BooleanField(default=False)
-    rank_choices = ((1, 'Rabble'), (2, 'Novice'), (3, 'Skilled'), (4, 'Veteran'), (5, 'Master'))
+    rank_choices = ((1, 'Minor'), (2, 'Average'), (3, 'Experienced'), (4, 'Heroic'), (5, 'Epic'))
     rank = models.SmallIntegerField(max_length=30, default=2, choices=rank_choices)
     movement = models.CharField(max_length=50, default=6)
     notes = models.TextField(default='', null=True, blank=True)
