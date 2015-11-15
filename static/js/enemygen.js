@@ -336,7 +336,9 @@ $(document).ready(function(){
         if(e.keyCode == 13) search();   // Enter
     });
     
-    initialize_enemy_list();
+    if($('#enemy_template_list').length){
+        initialize_enemy_list();
+    }
     $('input#search').focus();
     
     $('.natural_weapon').change(function(event){
