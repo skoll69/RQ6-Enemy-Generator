@@ -286,6 +286,10 @@ def submit(request, value, id, object, parent_id=None):
             cw = m.CustomWeapon.objects.get(id=id)
             cw.length = value
             cw.save()
+        elif object == 'et_custom_weapon_parry':
+            cw = m.CustomWeapon.objects.get(id=id)
+            cw.parry = to_bool(value)
+            cw.save()
         elif object == 'et_custom_weapon_range':
             cw = m.CustomWeapon.objects.get(id=id)
             cw.range = value

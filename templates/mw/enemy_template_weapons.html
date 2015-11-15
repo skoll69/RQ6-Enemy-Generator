@@ -76,6 +76,7 @@
         <th>Type</th>
         <th>Damage</th>
         <th>Length</th>
+        <th>Parry</th>
         <th>Range</th>
         <th>Dmg<br>bonus</th>
         <th>HP</th>
@@ -102,6 +103,7 @@
                 <option value="L" {% if weapon.length == 'L' %}selected="selected"{% endif %}>L</option>
             </select>
         </td>
+        <td><input id="custom_weapon_parry_{{weapon.id}}" class="data" type="checkbox" item_id="{{weapon.id}}" item_type="et_custom_weapon_parry" {% if weapon.parry %}checked="checked"{% endif %}></td>
         <td><input id="custom_weapon_range_{{weapon.id}}" class="data" type="text" size="6" item_id="{{weapon.id}}" item_type="et_custom_weapon_range" value="{{weapon.range}}"></td>
         <td>
             <select id="custom_weapon_dambon_{{weapon.id}}" class="data" item_id="{{ weapon.id }}" item_type="et_custom_weapon_damage_bonus">
