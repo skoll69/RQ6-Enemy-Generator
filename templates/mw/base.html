@@ -7,7 +7,9 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js"></script>
     <script src="/rq_static/js/complete.ly.1.0.1.js?v=1"></script>
-    <script src="/rq_static/js/tquery/core.js?v=1"></script>
+    {% if 'template' not in request.path %}
+        <script src="/rq_static/js/tquery/core.js?v=1"></script>
+    {% endif %}
     <script src="/rq_static/js/helpers.js?v=0"></script>
     <script src="/rq_static/js/mw_enemygen.js?v=11"></script>
     <script src="/rq_static/dajaxice/dajaxice.core.js?v=4"></script>
