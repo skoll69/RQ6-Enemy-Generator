@@ -45,7 +45,7 @@ def get_party_context(party):
 
 
 def get_enemy_templates(filtr, user):
-    published_templates = m.MWEnemyTemplate.objects.filter(published=True).order_by('rank')
+    published_templates = m.MWEnemyTemplate.objects.filter(published=True)
     if filtr and filtr not in ('None', 'Starred'):
         templates = list(published_templates.filter(tags__name__in=[filtr, ]))
     elif filtr == 'Starred':
@@ -54,7 +54,7 @@ def get_enemy_templates(filtr, user):
         templates = list(published_templates)
     if user.is_authenticated():
         # Add the unpublished templates of the logged-in user
-        unpubl = m.MWEnemyTemplate.objects.filter(published=False, owner=user).order_by('rank')
+        unpubl = m.MWEnemyTemplate.objects.filter(published=False, owner=user)
         if filtr:
             templates.extend(list(unpubl.filter(tags__name__in=[filtr, ])))
         else:
