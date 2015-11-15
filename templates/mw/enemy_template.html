@@ -7,7 +7,7 @@
 
 <script>
 $(document).ready(function(){
-    document.getElementsByTagName('html')[0].addEventListener('keypress', function(event) {
+    document.getElementById('tag_container').addEventListener('keypress', function(event) {
         if (event.keyCode == 13) { event.preventDefault(); }
     })
     var cly = completely(document.getElementById('et_newtag'), {
