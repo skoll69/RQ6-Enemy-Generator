@@ -1,8 +1,10 @@
-'''
+"""
 Handles dice.
-'''
+"""
 
-import random, re
+import random
+import re
+
 
 class Dice:
     def __init__(self, dice_set):
@@ -30,9 +32,10 @@ class Dice:
         return output
 
     def _dissect(self):
-        ''' Analyses the input string and splits it into dice roll components.
+        """ Analyses the input string and splits it into dice roll components.
             Simple ints's will stay simple int's, dice are split into tuples of 
-            two int's. For excample 10+D6 should result in [10, (1,6,1)]'''
+            two int's. For excample 10+D6 should result in [10, (1,6,1)]
+        """
         raw_components = re.findall(r"[\+\-]?[\w']+", self.dice_set)
         fin_components = []
         for comp in raw_components:
@@ -43,8 +46,9 @@ class Dice:
             fin_components.append(comp)
         return fin_components
 
+
 def _die_to_tuple(die):
-    ''' Takes a string representing a die (e.g. D6 or 3d8) as input.
+    """ Takes a string representing a die (e.g. D6 or 3d8) as input.
         Gives out a tuple of three int's, where 
         output[0] is the starting range 
         output[1] is the end range and
@@ -53,16 +57,18 @@ def _die_to_tuple(die):
           1D6: (1,6,1)
           3D8: (1,8,3)
           -2D10: (-10,-1,2)
-        '''
+    """
     die = die.upper()
     negative = False
     multiplier = 1
-    if die[0] == '-': negative = True
+    if die[0] == '-':
+        negative = True
     die = die.replace('-', '')
     die = die.replace('+', '')
     try:    # Check if the first character is a number, e.g. 3D6
         multiplier, die = die.split('D')
-        if multiplier == '': multiplier = 1
+        if multiplier == '':
+            multiplier = 1
         multiplier = int(multiplier)
     except ValueError:
         pass
@@ -72,4 +78,3 @@ def _die_to_tuple(die):
     else:
         output = (1, die, multiplier)
     return output
-    
