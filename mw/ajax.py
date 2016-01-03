@@ -125,7 +125,7 @@ def submit(request, value, id, object, parent_id=None):
             es = m.EnemySkill.objects.get(id=id)
             original_value = es.die_set
             try:
-                es.set_value(value.upper())
+                value = es.set_value(value)
             except ValueError:
                 success = False
                 message = '%s is not a valid die value.' % value
@@ -138,7 +138,7 @@ def submit(request, value, id, object, parent_id=None):
         elif object == 'et_custom_skill_value':
             cs = m.CustomSkill.objects.get(id=id)
             try:
-                cs.set_value(value.upper())
+                value = cs.set_value(value)
             except ValueError:
                 original_value = cs.die_set
                 success = False
@@ -346,7 +346,8 @@ def submit(request, value, id, object, parent_id=None):
             et = m.MWEnemyTemplate.objects.get(id=id, owner=request.user)
             et.tags.remove(value.capitalize())
 
-        return json.dumps({'success': success, 'message': message, 'original_value': original_value})
+        return json.dumps({'success': success, 'message': message,
+                           'value': value, 'original_value': original_value})
     except Exception as e:
         logger.error(str(e))
         return json.dumps({'error': str(e)})

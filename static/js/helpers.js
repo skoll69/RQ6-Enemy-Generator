@@ -2,6 +2,7 @@ function submit_callback(result, input_object){
     if (result.success){
         $('#commit_result').html('Save successful');
         animate_background(input_object, true);
+        $(input_object).val(result.value);
     } else {
         if (input_object && input_object.type == 'checkbox'){
             $(input_object).prop('checked', result.original_value);

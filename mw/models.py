@@ -2,7 +2,7 @@ from enemygen.models import AdditionalFeatureList
 from django.db import models
 from django.contrib.auth.models import User
 from enemygen.enemygen_lib import replace_die_set, select_random_items
-from enemygen.dice import Dice
+from enemygen.dice import Dice, clean
 from taggit.managers import TaggableManager
 import ordereddict
 import math
@@ -501,10 +501,12 @@ class EnemySkill(models.Model, Printer):
         
     def set_value(self, value):
         replace = {'STR': 0, 'SIZ': 0, 'CON': 0, 'INT': 0, 'DEX': 0, 'POW': 0, 'APP': 0}
+        value = clean(value)
         temp_value = replace_die_set(value, replace)
         Dice(temp_value).roll()
-        self.die_set = value.upper()
+        self.die_set = value
         self.save()
+        return value
 
 
 class CustomSkill(models.Model, Printer):
@@ -521,10 +523,12 @@ class CustomSkill(models.Model, Printer):
         
     def set_value(self, value):
         replace = {'STR': 0, 'SIZ': 0, 'CON': 0, 'INT': 0, 'DEX': 0, 'POW': 0, 'APP': 0}
+        value = clean(value)
         temp_value = replace_die_set(value, replace)
         Dice(temp_value).roll()
-        self.die_set = value.upper()
+        self.die_set = value
         self.save()
+        return value
         
     @classmethod
     def create(cls, et_id):

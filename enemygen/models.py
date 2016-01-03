@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from enemygen_lib import ValidationError, replace_die_set, select_random_items
-from dice import Dice
+from dice import Dice, clean
 from taggit.managers import TaggableManager
 import ordereddict
 import random
@@ -497,15 +497,12 @@ class EnemyTemplate(models.Model, Printer):
             bonus = '+' + bonus
             
         for skill in self.raw_skills:
-            skill.die_set = skill.die_set + bonus
-            skill.save()
+            skill.set_value(skill.die_set + bonus)
         for skill in self.custom_skills:
-            skill.die_set = skill.die_set + bonus
-            skill.save()
+            skill.set_value(skill.die_set + bonus)
         for combat_style in self.combat_styles:
-            combat_style.die_set = combat_style.die_set + bonus
-            combat_style.save()
-            
+            combat_style.set_value(combat_style.die_set + bonus)
+
     def is_starred(self, user):
         if user.is_authenticated():
             try:
@@ -730,11 +727,12 @@ class CombatStyle(models.Model):
         
     def set_value(self, value):
         replace = {'STR': 0, 'SIZ': 0, 'CON': 0, 'INT': 0, 'DEX': 0, 'POW': 0, 'CHA': 0}
-        value = value.upper()
+        value = clean(value)
         temp_value = replace_die_set(value, replace)
         Dice(temp_value).roll()
         self.die_set = value
         self.save()
+        return value
         
     def clone(self, et):
         new = CombatStyle(name=self.name, die_set=self.die_set, enemy_template=et,
@@ -901,10 +899,12 @@ class EnemySkill(models.Model, Printer):
         
     def set_value(self, value):
         replace = {'STR': 0, 'SIZ': 0, 'CON': 0, 'INT': 0, 'DEX': 0, 'POW': 0, 'CHA': 0}
+        value = clean(value)
         temp_value = replace_die_set(value, replace)
         Dice(temp_value).roll()
-        self.die_set = value.upper()
+        self.die_set = value
         self.save()
+        return value
 
 
 class CustomSkill(models.Model, Printer):
@@ -921,10 +921,12 @@ class CustomSkill(models.Model, Printer):
         
     def set_value(self, value):
         replace = {'STR': 0, 'SIZ': 0, 'CON': 0, 'INT': 0, 'DEX': 0, 'POW': 0, 'CHA': 0}
+        value = clean(value)
         temp_value = replace_die_set(value, replace)
         Dice(temp_value).roll()
-        self.die_set = value.upper()
+        self.die_set = value
         self.save()
+        return value
         
     @classmethod
     def create(cls, et_id):
