@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 
 import ordereddict
 
-from dice import Dice, _die_to_tuple
+from dice import Dice, _die_to_tuple, clean
 
 from models import EnemyTemplate, _Enemy, Ruleset, StatAbstract, Race, SpellAbstract
 from models import EnemyStat, EnemySkill, SkillAbstract, EnemySpell
@@ -77,6 +77,25 @@ class TestDice(TestCase):
         self.assertEquals(Dice('5D100+13').max_roll(), 513)
         self.assertEquals(Dice('5D100-D100').max_roll(), 499)
         self.assertEquals(Dice('12D6').max_roll(), 72)
+
+
+    def test_5_clean(self):
+        self.assertEqual(clean('D6'), '1d6')
+        self.assertEqual(clean('DEX+D6'), 'DEX+1d6')
+        self.assertEqual(clean('D6+-D4'), '1d6-1d4')
+        self.assertEqual(clean('DEX+STR+2D10+D6-D4'), 'DEX+STR+2d10+1d6-1d4')
+        self.assertEqual(clean('DEX-STR'), 'DEX-STR')
+        self.assertEqual(clean('POW+POW+POW'), 'POW+POW+POW')
+        self.assertEqual(clean('POW+POW-POW'), 'POW')
+        self.assertEqual(clean('POW+2D10-2D10'), 'POW')
+        self.assertEqual(clean('POW+3D10-2d10'), 'POW+1d10')
+        self.assertEqual(clean('DEX+STR+DEX'), 'DEX+DEX+STR')
+        self.assertEqual(clean('DEX+d10+d20+1d10+d6+2d10'), 'DEX+4d10+1d20+1d6')
+        self.assertEqual(clean('DEX+10+d10+20'), 'DEX+1d10+30')
+        self.assertEqual(clean('DEX+10+d10+10'), 'DEX+1d10+20')
+        self.assertEqual(clean('DEX+10+d10-20'), 'DEX+1d10-10')
+        self.assertEqual(clean('DEX+10+d10-5-5'), 'DEX+1d10')
+        self.assertEqual(clean('STR+DEX+20+5D10+-4D10+2D10+-4D10+2D10'), 'STR+DEX+1d10+20')
 
 
 class TestEnemyTemplate(TestCase):
