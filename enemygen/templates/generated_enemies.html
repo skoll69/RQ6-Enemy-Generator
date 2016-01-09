@@ -29,6 +29,9 @@ body, table{
     width: 94%;
     text-align: left;
 }
+.top_note{
+    width: 580;
+}
 
 div.row_container{
     width: 880px;
@@ -146,7 +149,7 @@ div#png_export{
 <span class="party_name"><a href="{% url 'party' party.id %}">{{ party.name }}</a></span>
 {% endif %}
 
-<div> <!-- Party additional Features -->
+<div class="top_note"> <!-- Party additional Features -->
 {% if party_additional_features %}
     <b><u>Party features:</u></b><br>
     {% for feature in party_additional_features %}
@@ -158,11 +161,14 @@ div#png_export{
 </div>
 
 {% if party.notes %}
-    <p><b>Notes:</b> <span id="party_notes" class="editable" contenteditable>{{ party.notes|markdown }}</span></p>
+    <div class="top_note"><b>Notes:</b>
+        <span id="party_notes" class="editable" contenteditable>{{ party.notes|markdown }}</span>
+    </div>
 {% endif %}
 
-{% if single_template and enemies.0.additional_features %}
-    <div> <!-- Additional Features -->
+{% if single_template %}
+    {% if enemies.0.additional_features %}
+    <div class="top_note"> <!-- Additional Features -->
         <b><u>All creatures have the following features:</u></b><br>
         {% for feature in enemies.0.additional_features %}
             {% if feature.non_random %}
@@ -172,9 +178,12 @@ div#png_export{
             {% endif %}
         {% endfor %}
     </div>
+    {% endif %}
     {% if enemies.0.notes %}
+    <div class="top_note">
         <span class="title">Notes:</span>
-        <span id="notes" class="item_list editable" contenteditable>{{ enemies.0.notes|markdown }}</span>
+        <span id="notes" class="top_note item_list editable" contenteditable>{{ enemies.0.notes|markdown }}</span>
+    </div>
     {% endif %}
 {% endif %}
 
@@ -330,7 +339,7 @@ div#png_export{
 {% endif %}
 </div>
 
-{% if enemy.notes and not single_template%}
+{% if enemy.notes and not single_template %}
 <span class="title">Notes:</span>
 <span id="notes_{{ forloop.counter }}" class="item_list editable" contenteditable>{{ enemy.notes|markdown }}</span>
 {% endif %}
