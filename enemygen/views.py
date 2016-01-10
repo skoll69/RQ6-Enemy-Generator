@@ -9,6 +9,7 @@ from enemygen.views_lib import generate_pdf, get_filter, get_party_templates, sa
 from enemygen.views_lib import get_party_context, get_enemies_lucky, get_party_filter, determine_enemies, as_json
 
 import os
+import json
 
 
 def index(request):
@@ -16,6 +17,15 @@ def index(request):
     context['templates'] = get_enemy_templates(get_filter(request), request.user)
     return render(request, 'index.html', context)
 
+
+def index_json(request):
+    out = []
+    for et in get_enemy_templates(get_filter(request), request.user):
+        out.append({
+            'name': et.name, 'race': et.race.name, 'rank': et.rank, 'owner': et.owner.username,
+            'tags': et.get_tags(), 'id': et.id
+        })
+    return HttpResponse(json.dumps(out), content_type="application/json")
 
 def home(request):
     context = get_context(request)
