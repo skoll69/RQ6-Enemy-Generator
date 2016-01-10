@@ -6,7 +6,7 @@ from enemygen.models import EnemyTemplate, Race, Party, ChangeLog, AdditionalFea
 from enemygen.views_lib import get_ruleset, get_context, get_et_context, get_enemies, get_generated_party
 from enemygen.views_lib import get_enemy_templates, is_race_admin, get_statistics, get_random_party
 from enemygen.views_lib import generate_pdf, get_filter, get_party_templates, save_as_html, generate_pngs
-from enemygen.views_lib import get_party_context, get_enemies_lucky, get_party_filter, determine_enemies
+from enemygen.views_lib import get_party_context, get_enemies_lucky, get_party_filter, determine_enemies, as_json
 
 import os
 
@@ -44,6 +44,22 @@ def generate_enemies(request):
         context['single_template'] = (len(enemy_index) == 1)
     context['generated_html'] = save_as_html(context, 'generated_enemies.html')
     return render(request, 'generated_enemies.html', context)
+
+
+def generate_enemies_json(request):
+    template_id = request.GET.get('id', None)
+    if not template_id:
+        return redirect('home')
+    amount = request.GET.get('amount', 1)
+    try:
+        amount = int(amount)
+    except ValueError:
+        amount = 1
+    et = get_object_or_404(EnemyTemplate, id=template_id)
+    enemy_index = ((et, int(amount)),)
+    enemies = get_enemies(enemy_index, True)
+    enemies_json = as_json(enemies)
+    return HttpResponse(enemies_json, content_type="application/json")
 
 
 def generate_party(request):

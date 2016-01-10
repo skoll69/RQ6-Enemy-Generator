@@ -11,6 +11,7 @@ from tempfile import NamedTemporaryFile
 import os
 import random
 import datetime
+import json
 
 HTML_TO_PNG_COMMAND = 'wkhtmltoimage.sh --crop-w 430 "%s" "%s" > /projects/rq_tools/png.log 2>&1'
 HTML_TO_PDF_COMMAND = 'wkhtmltopdf.sh --enable-forms "%s" "%s" > /projects/rq_tools/pdf.log 2>&1'
@@ -114,7 +115,6 @@ def determine_enemies(post):
             index.append((et, amount))
     index.sort(key=lambda tup: tup[0].rank, reverse=True)
     return index
-
 
 
 def get_enemies(index, increment):
@@ -334,3 +334,33 @@ def generate_pngs(html_path):
         os.system(HTML_TO_PNG_COMMAND % (htmlfile.name, png_name))
         pngs.append(png_name)
     return pngs
+
+
+def as_json(enemies):
+    """ Input: A list of generated enemies. Output: The enemies as a json string """
+    out = []
+    for e in enemies:
+        out.append(_as_json(e))
+    return json.dumps(out)
+
+def _as_json(e):
+    return {
+        'name': e.name,
+        'cult_rank': e.cult_rank,
+        'stats': [{s['name']: s['value']} for s in e.stats_list],
+        'skills': [{s['name']: s['value']} for s in e.skills],
+        'folk_spells': [s.name for s in e.folk_spells],
+        'theism_spells': [s.name for s in e.theism_spells],
+        'sorcery_spells': [s.name for s in e.sorcery_spells],
+        'mysticism_spells': [s.name for s in e.mysticism_spells],
+        'hit_locations': [{'name': hl['name'], 'range': hl['range'], 'hp': hl['hp'], 'ap': hl['ap']} for hl in e.hit_locations],
+        'combat_styles': [{'weapons': [{'name': w.name, 'damage': w.damage, 'ap': w.ap, 'hp': w.hp, 'size': w.size,
+                                        'add_damage_modifier': w.damage_modifier, 'reach': w.reach,
+                                        'effects': w.special_effects, 'range': w.range, 'type': w.type} for w in cs['weapons']],
+                           'name': cs['name'], 'value': cs['value'], } for cs in e.combat_styles],
+        'attributes': e.attributes,
+        'notes': e.notes,
+        'features': ['%s: %s' % (f.feature_list.name, f.name) for f in e.additional_features],
+        'cults': [c.name for c in e.cults],
+        'spirits': [_as_json(s) for s in e.spirits]
+    }

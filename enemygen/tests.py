@@ -16,7 +16,8 @@ from models import EnemyStat, EnemySkill, SkillAbstract, EnemySpell
 from models import CombatStyle, Weapon
 
 from enemygen_lib import select_random_item, replace_die_set
-
+from views_lib import as_json
+import json
 
 class TestDice(TestCase):
     def test_1_die_to_tuple(self):
@@ -362,6 +363,21 @@ class TestMisc(TestCase):
         self.assertEquals(random_spell, spells[2])
 
 
+class TestJson(TestCase):
+    fixtures = ('enemygen_testdata.json',)
+
+    def test_enemy_as_json(self):
+        et = get_enemy_template()
+        _add_magic(et)
+        enemy = _Enemy(et).generate()
+        ejson = as_json([enemy])
+        edict = json.loads(ejson)
+        self.assertEqual(edict[0]['folk_spells'][0], 'Bladesharp')
+        self.assertEqual(edict[0]['combat_styles'][0]['name'], 'Primary Combat Style')
+        self.assertEqual(edict[0]['skills'][2].keys()[0], 'Endurance')
+        self.assertEqual(edict[0]['skills'][2]['Endurance'], enemy.skills_dict['Endurance'])
+
+
 def get_enemy_template():
     user = User(username='username')
     user.save()
@@ -373,3 +389,16 @@ def get_enemy_template():
         raise Exception("Race doesn't match")
     et = EnemyTemplate.create(user, ruleset, race, 'Test Template')
     return et
+
+def _add_magic(et):
+    et.folk_spell_amount = '2'
+    fm = EnemySkill.objects.get(skill__name='Folk Magic', enemy_template=et)
+    fm.include = True
+    fm.save()
+
+    sa = SpellAbstract.objects.get(name='Bladesharp')
+    es = EnemySpell(spell=sa, enemy_template=et, detail=sa.default_detail, probability=1)
+    es.save()
+    sa = SpellAbstract.objects.get(name='Calm')
+    es = EnemySpell(spell=sa, enemy_template=et, detail=sa.default_detail, probability=1)
+    es.save()
