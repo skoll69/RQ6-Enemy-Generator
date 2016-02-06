@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 from enemygen.models import EnemyTemplate, Race, Party, ChangeLog, AdditionalFeatureList
 from enemygen.views_lib import get_ruleset, get_context, get_et_context, get_enemies, get_generated_party
@@ -16,6 +17,21 @@ def index(request):
     context = get_context(request)
     context['templates'] = get_enemy_templates(get_filter(request), request.user)
     return render(request, 'index.html', context)
+
+
+def simple_index(request):
+    context = get_context(request)
+    if request.user.is_authenticated():
+        templates = EnemyTemplate.objects.filter(owner=request.user)
+        paginator = Paginator(templates, 200)
+        page = request.GET.get('page')
+        try:
+            context['templates'] = paginator.page(page)
+        except PageNotAnInteger:
+            context['templates'] = paginator.page(1)
+        except EmptyPage:
+            context['templates'] = paginator.page(paginator.num_pages)
+    return render(request, 'simple_index.html', context)
 
 
 def index_json(request):

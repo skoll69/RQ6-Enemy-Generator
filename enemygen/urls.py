@@ -5,6 +5,7 @@ from enemygen import views
 urlpatterns = patterns('',
     url(r'^$', views.home, name='home'),
     url(r'^enemies/$', views.index, name='index'),
+    url(r'^simple_index/$', views.simple_index),
     url(r'^index_json/$', views.index_json),
     url(r'^parties/$', views.party_index, name='party_index'),
     url(r'^party_index/$', views.party_index),  # Old one. Kept in case somebody has bookmarked it 

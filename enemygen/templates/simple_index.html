@@ -1,0 +1,64 @@
+{% load url from future %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RQ6 Encounter Generator</title>
+</head>
+<body>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if templates.has_previous %}
+            <a href="?page={{ templates.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ templates.number }} of {{ templates.paginator.num_pages }}.
+        </span>
+
+        {% if templates.has_next %}
+            <a href="?page={{ templates.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
+
+<table>
+    <tr><th>Name</th><th>Race</th><th>Rank</th><th>Cult rank</th>
+        <th>STR</th><th>CON</th><th>SIZ</th><th>DEX</th><th>INT</th><th>POW</th><th>CHA</th>
+        <th>Mov</th><th>Link</th>
+    </tr>
+{% for et in templates %}
+    <tr><td>{{ et.name }}</td><td>{{ et.race.name }}</td><td>{{ et.get_rank_display }}</td>
+        <td>{{ et.get_cult_rank_display}}</td>
+        <td>{{ et.stat_dict.STR }}</td>
+        <td>{{ et.stat_dict.CON }}</td>
+        <td>{{ et.stat_dict.SIZ }}</td>
+        <td>{{ et.stat_dict.DEX }}</td>
+        <td>{{ et.stat_dict.INT }}</td>
+        <td>{{ et.stat_dict.POW }}</td>
+        <td>{{ et.stat_dict.CHA }}</td>
+        <td>{{ et.movement }}</td>
+        <td><a href="{% url 'enemy_template' et.id %}">{% url 'enemy_template' et.id %}</a></td>
+    </tr>
+{% endfor %}
+</table>
+<br>
+<div class="pagination">
+    <span class="step-links">
+        {% if templates.has_previous %}
+            <a href="?page={{ templates.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ templates.number }} of {{ templates.paginator.num_pages }}.
+        </span>
+
+        {% if templates.has_next %}
+            <a href="?page={{ templates.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
+
+</body>
+</html>

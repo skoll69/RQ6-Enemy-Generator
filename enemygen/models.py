@@ -321,6 +321,13 @@ class EnemyTemplate(models.Model, Printer):
         return EnemyStat.objects.filter(enemy_template=self)
 
     @property
+    def stat_dict(self):
+        out = {}
+        for stat in EnemyStat.objects.filter(enemy_template=self):
+            out[stat.name] = stat.die_set
+        return out
+
+    @property
     def skills(self):
         output = []
         output.extend(list(EnemySkill.objects.filter(enemy_template=self)))
