@@ -1,7 +1,4 @@
 .idea
 *.pyc
-rq_tools/settings.py
-sql.sql
-enemygen.json
-auth.json
+mythras_eg/settings.py
 temp/
