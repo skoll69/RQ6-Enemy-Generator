@@ -1,5 +1,6 @@
 function submit(id, type, input_object, value, parent_id){
 	//Called when a field is changed
+	console.log(value + ' ' + id + ' ' + type  + ' ' + input_object );
     (function(value, id, type, input_object){
         Dajaxice.enemygen.submit(function(result) {submit_callback(result, input_object)}, {'value': value, 'id': id, 'object': type, 'parent_id': parent_id});
     })(value, id, type, input_object);

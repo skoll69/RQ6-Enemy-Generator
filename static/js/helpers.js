@@ -1,4 +1,5 @@
 function submit_callback(result, input_object){
+    console.log(result);
     if (result.success){
         $('#commit_result').html('Save successful');
         animate_background(input_object, true);

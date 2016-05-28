@@ -46,21 +46,15 @@ h4{
 #header{
     min-width: 854px;
     width: 854px;
-    font-size: 42px;
-    background: #9B6B28;
+    font-size: 50px;
+    background: black;
     margin: 10px;
-    padding: 8px;
+    padding: 0px 8px 0px 8px;
     display: inline-block;
-    text-align: left;
     font-family: Lucida Sans Unicode;
-    line-height: 51px;
-}
-
-#rq_gateway{
-    position: absolute;
-    top: -4px;
-    right: -15px;
-    border-width: 0px;
+    height: 103px;
+    vertical-align: text-top;
+    line-height: 103px;
 }
 
 #menu{

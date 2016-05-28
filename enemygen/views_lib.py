@@ -5,6 +5,7 @@ from enemygen.models import Weapon, CombatStyle, EnemyWeapon, CustomWeapon, Part
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.db.models import Q
+from django.conf import settings
 
 from bs4 import BeautifulSoup
 from tempfile import NamedTemporaryFile
@@ -12,10 +13,8 @@ import os
 import random
 import datetime
 import json
-
-HTML_TO_PNG_COMMAND = 'wkhtmltoimage.sh --crop-w 430 "%s" "%s" > /projects/rq_tools/png.log 2>&1'
-HTML_TO_PDF_COMMAND = 'wkhtmltopdf.sh --enable-forms "%s" "%s" > /projects/rq_tools/pdf.log 2>&1'
-
+from weasyprint import HTML, CSS
+from PIL import Image, ImageChops
 
 def get_filter(request):
     return request.session.get('filter', None)
@@ -290,7 +289,7 @@ def save_as_html(context, template_name):
     """ Renders the generated enemies to html and saves to disk, so that it can be converted to PDF later """
     rendered = render_to_string(template_name, context)
     prefix = _get_html_prefix(context).encode('utf-8')
-    htmlfile = NamedTemporaryFile(mode='w', prefix=prefix, suffix='.html', dir='/projects/rq_tools/temp/', delete=False)
+    htmlfile = NamedTemporaryFile(mode='w', prefix=prefix, suffix='.html', dir=settings.TEMP, delete=False)
     htmlfile.write(rendered.encode('utf-8'))
     htmlfile.close()
     return htmlfile.name
@@ -313,7 +312,7 @@ def _get_html_prefix(context):
 def generate_pdf(html_path):
     """ Generates a PDF based on the given html file """
     pdf_path = html_path.replace('.html', '.pdf')
-    os.system(HTML_TO_PDF_COMMAND % (html_path.encode('utf-8'), pdf_path.encode('utf-8')))
+    HTML(html_path).write_pdf(pdf_path)
     return pdf_path
 
 
@@ -327,11 +326,12 @@ def generate_pngs(html_path):
     for enemy in enemies:
         container.clear()
         container.append(enemy)
-        htmlfile = NamedTemporaryFile(mode='w', suffix='.html', dir='/projects/rq_tools/temp/', delete=False)
+        htmlfile = NamedTemporaryFile(mode='w', suffix='.html', dir=settings.TEMP, delete=False)
         htmlfile.write(soup.prettify('utf-8', formatter='html'))
         htmlfile.close()
         png_name = htmlfile.name.replace('.html', '.png')
-        os.system(HTML_TO_PNG_COMMAND % (htmlfile.name, png_name))
+        HTML(htmlfile.name).write_png(png_name, stylesheets=[CSS(string='@media print{body, td, th{font-size: 11px !important;}}')])
+        _trim(png_name)
         pngs.append(png_name)
     return pngs
 
@@ -364,3 +364,13 @@ def _as_json(e):
         'cults': [c.name for c in e.cults],
         'spirits': [_as_json(s) for s in e.spirits]
     }
+
+def _trim(image_path):
+    """ Removes the border from the given image """
+    im = Image.open(image_path)
+    im = im.crop(im.getbbox())  # Trims the transparent border if any
+    bg = Image.new(im.mode, im.size, im.getpixel((0,0)))  # 3rd argument is the color of the first pixel
+    diff = ImageChops.difference(im, bg)
+    bbox = diff.getbbox()
+    im = im.crop(bbox)
+    im.save(image_path)

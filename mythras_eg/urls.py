@@ -8,12 +8,12 @@ admin.autodiscover()
 dajaxice_autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^enemygen/', include('enemygen.urls')),
-    url(r'^mw_enemygen/', include('mw.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^dajaxice/', include('dajaxice.urls')),
     url(r'^accounts/register/$', MyRegistrationView.as_view(), name='registration_register'),
     url(r'^accounts/', include('registration.backends.simple.urls')),
+    url(r'^', include('enemygen.urls')),
+    #url(r'^mw_enemygen/', include('mw.urls')),
 )
 
 urlpatterns += staticfiles_urlpatterns() #For Dajaxice

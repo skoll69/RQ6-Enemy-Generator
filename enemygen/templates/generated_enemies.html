@@ -1,7 +1,5 @@
-{% load url from future %}
 {% load markdown %}
 {% load dajaxice_templatetags %}
-
 <html>
 <head>
 <title>RQ: {% if party %}{{ party.name }}{% else %}{{ enemies.0.name }}{% endif %}</title>
@@ -9,8 +7,9 @@
 {% dajaxice_js_import %}
 
 <style type="text/css">
-body, table{
+body, td, th{
     font-size: 12px;
+    font-family: "Times New Roman", Times, serif;
 }
 
 .nowrap{
@@ -30,7 +29,7 @@ body, table{
     text-align: left;
 }
 .top_note{
-    width: 580;
+    width: 580px;
 }
 
 div.row_container{
@@ -52,13 +51,7 @@ div.enemy_container{
 
 .enemy_table{
     background: white;
-    font-family: Serif;
     border-collapse: collapse;
-    font-size: 12px;
-}
-
-.enemy_table td, th{
-    font-size: 12px;
 }
 
 .inner_enemy_table{
@@ -102,10 +95,6 @@ table.weapon_table{
     border-spacing: 0px;
 }
 
-table.weapon_table tr td{
-    font-size: 12px;
-}
-
 a {
     text-decoration: none;
     color: black;
@@ -133,14 +122,28 @@ div#png_export{
     z-index: 3;
 }
 
+@page {
+  margin: 0;
+}
+
 @media print{
-    div#pdf_export, div#png_export{
+    div#pdf_export, div#png_export, .template_link{
         display: none;
     }
-    .template_link{
-        display: None;
+    body{
+        background-color: white;
+    }
+    div.row_container{
+        width: 770px;
+    }
+    div.enemy_container{
+        width: 380px;
+    }
+    body, td, th{
+        font-size: 10px;
     }
 }
+
 
 </style>
 </head>
@@ -515,26 +518,25 @@ div#png_export{
 </div>
 
 <span class="title">Combat Styles:</span>
-<span class="item_list"><!-- Combat styles -->
-    {% for cs in enemy.combat_styles %}
-        {{ cs.name }} {{ cs.value }}%{% if not forloop.last %}, {% endif %}
-        {% if cs.weapons %}
-        <table class="weapon_table">
-            <tr><th align="left">Weapon</th><th>Size/Force</th><th align="left">Reach</th><th align="left">Damage</th><th align="left">AP/HP</th><th align="left">Effects</th></tr>
-            {% for weapon in cs.weapons %}
-                <tr>
-                    <td>{{ weapon.name }}{% if weapon.type == '2h-melee' %} (2h){% endif %}</td>
-                    <td>{{weapon.size}}</td>
-                    <td>{% if weapon.type == 'ranged' %}{{weapon.range}}{% else %}{{weapon.reach}}{% endif %}</td>
-                    <td>{{weapon.damage}}{% if enemy.attributes.damage_modifier != '+0' and weapon.damage_modifier %}{{ enemy.attributes.damage_modifier }}{% endif %}</td>
-                    <td>{% if weapon.natural_weapon %}As per {{ weapon.ap_hp_as_per }}{% else %}{{weapon.ap}}/{{weapon.hp}}{% endif %}</td>
-                    <td>{{weapon.special_effects}}</td>
-                </tr>
-            {% endfor %}
-        </table>
-        {% endif %}
-    {% endfor %}
-</span>
+{% for cs in enemy.combat_styles %}
+    <span class="item_list">{{ cs.name }} {{ cs.value }}%{% if not forloop.last %}, {% endif %}</span>
+    {% if cs.weapons %}
+    <table class="weapon_table">
+        <tr><th align="left">Weapon</th><th>Size/Force</th><th align="left">Reach</th><th align="left">Damage</th><th align="left">AP/HP</th><th align="left">Effects</th></tr>
+        {% for weapon in cs.weapons %}
+            <tr>
+                <td>{{ weapon.name }}{% if weapon.type == '2h-melee' %} (2h){% endif %}</td>
+                <td>{{weapon.size}}</td>
+                <td>{% if weapon.type == 'ranged' %}{{weapon.range}}{% else %}{{weapon.reach}}{% endif %}</td>
+                <td>{{weapon.damage}}{% if enemy.attributes.damage_modifier != '+0' and weapon.damage_modifier %}{{ enemy.attributes.damage_modifier }}{% endif %}</td>
+                <td>{% if weapon.natural_weapon %}As per {{ weapon.ap_hp_as_per }}{% else %}{{weapon.ap}}/{{weapon.hp}}{% endif %}</td>
+                <td>{{weapon.special_effects}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+{% endfor %}
+
 
 {% if enemy.notes and not single_template %}
 <span class="title">Notes:</span>

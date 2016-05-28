@@ -24,6 +24,7 @@ class ChangeLogForm(forms.ModelForm):
     class Meta:
         model = ChangeLog
         widgets = {'description': forms.Textarea}
+        fields = '__all__'
     
 class ChangeLogAdmin(admin.ModelAdmin):
     list_display = ('publish_date', 'name')
@@ -36,6 +37,7 @@ class AdditionalFeatureItemForm(forms.ModelForm):
     class Meta:
         model = AdditionalFeatureItem
         widgets = {'name': forms.Textarea}
+        fields = '__all__'
     
 class AdditionalFeatureItemAdmin(admin.ModelAdmin):
     list_display = ('name', 'feature_list')

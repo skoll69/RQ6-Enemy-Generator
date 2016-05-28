@@ -1,12 +1,14 @@
+from django.db.models import Q
 from django.db import models
 from django.contrib.auth.models import User
+
 from enemygen_lib import ValidationError, replace_die_set, select_random_items
 from dice import Dice, clean
 from taggit.managers import TaggableManager
+
 import ordereddict
 import random
 import math
-from django.db.models import Q
 
 WEAPON_TYPE_CHOICES = (('1h-melee', '1-h Melee'), ('2h-melee', '2-h Melee'), ('ranged', 'Ranged'), ('shield', 'Shield'))
 WEAPON_SIZE_CHOICES = (('S', 'S'), ('M', 'M'), ('L', 'L'), ('H', 'H'), ('E', 'E'), ('C', 'C'))

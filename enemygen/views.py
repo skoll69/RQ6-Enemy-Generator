@@ -2,12 +2,14 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.conf import settings
 
 from enemygen.models import EnemyTemplate, Race, Party, ChangeLog, AdditionalFeatureList
 from enemygen.views_lib import get_ruleset, get_context, get_et_context, get_enemies, get_generated_party
 from enemygen.views_lib import get_enemy_templates, is_race_admin, get_statistics, get_random_party
-from enemygen.views_lib import generate_pdf, get_filter, get_party_templates, save_as_html, generate_pngs
+from enemygen.views_lib import get_filter, get_party_templates, save_as_html
 from enemygen.views_lib import get_party_context, get_enemies_lucky, get_party_filter, determine_enemies, as_json
+from enemygen import views_lib as lib
 
 import os
 import json
@@ -207,13 +209,13 @@ def set_party_filter(request):
 
 def pdf_export(request):
     if request.GET and request.GET.get('action') == 'pdf_export':
-        pdf_path = generate_pdf(request.GET.get('generated_html'))
+        pdf_path = lib.generate_pdf(request.GET.get('generated_html'))
         file_name, extension = os.path.splitext(os.path.basename(pdf_path))
         file_name = '_'.join(file_name.split('_')[:-1])  # Remove the last unique identifier from file name
         file_name = file_name.replace(',', '')
         file_name += extension
         data = open(pdf_path.encode('utf-8')).read()
-        response = HttpResponse(data, mimetype='application/pdf')
+        response = HttpResponse(data, content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="%s"' % file_name.encode('utf-8')
         response['Content-Length'] = len(data)
         return response
@@ -221,10 +223,10 @@ def pdf_export(request):
 
 def png_export(request):
     if request.GET and request.GET.get('action') == 'png_export':
-        png_paths = generate_pngs(request.GET.get('generated_html'))
+        png_paths = lib.generate_pngs(request.GET.get('generated_html'))
         new_paths = []
         for path in png_paths:
-            new_paths.append(path.replace('/projects/rq_tools/temp/', '/rq_temp/'))
+            new_paths.append(path.replace(settings.PROJECT_ROOT + 'temp/', '/rq_temp/'))
         return render(request, 'generated_enemies_as_pngs.html', {'png_paths': new_paths})
 
 

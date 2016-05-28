@@ -1,5 +1,3 @@
-{% load url from future %}
-
 <div id="menu">
 <span class="item"><a href="{% url 'home' %}">Home</a></span> | 
 <span class="item"><a href="{% url 'index' %}">Enemies</a></span> | 
@@ -15,7 +13,7 @@
     <span class="item"><a href="{% url 'auth_password_change' %}">Change password</a></span> |
     <span class="item"><a href="{% url 'auth_logout' %}">Log out</a></span>
 {% else %}
-    <span class="item"><a href="/rq_tools/accounts/register/">Register</a></span> |
+    <span class="item"><a href="{% url 'registration_register' %}">Register</a></span> |
     <span class="item"><a href="{% url 'auth_login' %}">Log in</a></span>
 {% endif %}
 </span>
