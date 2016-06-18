@@ -152,7 +152,8 @@ def race(request, race_id):
 def party(request, party_id):
     template = 'party.html'
     context = get_context(request)
-    context.update(get_party_context(Party.objects.get(id=party_id)))
+    pt = get_object_or_404(Party, id=party_id)
+    context.update(get_party_context(pt))
     if context['party'].owner != request.user:
         template = 'party_read_only.html'
     return render(request, template, context)
