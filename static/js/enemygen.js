@@ -136,7 +136,7 @@ function search_callback(result){
         var row = result.results[i];
         if (row.starred) var star = '<td><img et_id="'+row.id+'" class="star" height="22" width="22" src="/rq_static/images/star_filled.png" /></td>';
         else             var star = '<td><img et_id="'+row.id+'" class="star" height="22" width="22" src="/rq_static/images/star_empty.png" /></td>';
-        var name = '<td><a class="edit_item" href="/rq_tools/enemygen/enemy_template/'+row.id+'/">'+row.name+'</a></td>';
+        var name = '<td><a class="edit_item" href="/mythras_eg/enemy_template/'+row.id+'/">'+row.name+'</a></td>';
         var input = '<td><input id="enemy_template_id_'+row.id+'" name="enemy_template_id_'+row.id+'" size="4" min="0" max="40" type="number" class="enemy_amount"></td>';
         var race = '<td>'+row.race+'</td>';
         switch(row.rank){
