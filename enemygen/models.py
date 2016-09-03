@@ -1399,14 +1399,23 @@ class _Enemy(object):
         reaches = [value for value, lable in WEAPON_REACH_CHOICES]
         for item in weapons:
             if item.__class__.__name__ == 'EnemyWeapon':
-                try:
-                    item.weapon.size = sizes[sizes.index(item.weapon.size) + step]
-                except IndexError:
-                    item.weapon.size = 'C'
-                try:
-                    item.weapon.reach = reaches[reaches.index(item.weapon.reach) + step]
-                except IndexError:
-                    item.weapon.reach = 'U'
+                index = sizes.index(item.weapon.size) + step
+                if index < 0:
+                    item.weapon.size = 'S'
+                else:
+                    try:
+                        item.weapon.size = sizes[index]
+                    except IndexError:
+                        item.weapon.size = 'C'
+
+                index = reaches.index(item.weapon.reach) + step
+                if index < 1:
+                    item.weapon.reach = 'T'
+                else:
+                    try:
+                        item.weapon.reach = reaches[index]
+                    except IndexError:
+                        item.weapon.reach = 'U'
         return weapons
     
     def _add_hit_locations(self):
