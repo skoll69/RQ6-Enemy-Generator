@@ -1680,6 +1680,8 @@ class _Elemental(_Enemy):
         self._add_additional_features()
         self._add_hit_locations()
         self._calculate_attributes()
+        if self.et.cult_amount:
+            self._add_cults()
         self._add_combat_styles()
         return self
         
