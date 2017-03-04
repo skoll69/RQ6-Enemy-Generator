@@ -902,7 +902,12 @@ class EnemySkill(models.Model, Printer):
         return self.skill.name
 
     def roll(self, replace=None):
-        die_set = replace_die_set(self.die_set, replace)
+        # Ensure, that all valid stats are present in the dict. Some races miss some stats
+        # which will cause the generation to crash if the stat is nonetheless used in skills
+        replace_full = {'STR': 0, 'SIZ': 0, 'CON': 0, 'INT': 0, 'DEX': 0, 'POW': 0, 'CHA': 0}
+        if replace:
+            replace_full.update(replace)
+        die_set = replace_die_set(self.die_set, replace_full)
         dice = Dice(die_set)
         return dice.roll()
         
