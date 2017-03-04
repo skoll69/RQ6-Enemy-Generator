@@ -220,6 +220,7 @@ def pdf_export(request):
         response['Content-Disposition'] = 'attachment; filename="%s"' % file_name.encode('utf-8')
         response['Content-Length'] = len(data)
         return response
+    return redirect('home')
 
 
 def png_export(request):
@@ -229,6 +230,7 @@ def png_export(request):
         for path in png_paths:
             new_paths.append(path.replace(settings.PROJECT_ROOT + 'temp/', '/rq_temp/'))
         return render(request, 'generated_enemies_as_pngs.html', {'png_paths': new_paths})
+    return redirect('home')
 
 
 @login_required
