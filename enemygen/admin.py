@@ -47,6 +47,7 @@ class AdditionalFeatureItemAdmin(admin.ModelAdmin):
 class EnemyAdditionalFeatureListAdmin(admin.ModelAdmin):
     list_display = ('enemy_template', 'feature_list', 'probability')
     list_filter = ('feature_list',)
+    search_fields = ('enemy_template__name', 'feature_list__name')
     
 class CombatStyleAdmin(admin.ModelAdmin):
     list_display = ('name', 'enemy_template', 'one_h_amount', 'two_h_amount', 'ranged_amount', 'shield_amount')
