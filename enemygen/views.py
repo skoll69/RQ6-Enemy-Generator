@@ -80,6 +80,10 @@ def generate_enemies_json(request):
         return redirect('home')
     amount = request.GET.get('amount', 1)
     try:
+        template_id = int(template_id)
+    except ValueError:
+        raise Http404
+    try:
         amount = int(amount)
     except ValueError:
         amount = 1
