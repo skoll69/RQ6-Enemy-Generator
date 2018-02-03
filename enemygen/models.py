@@ -1548,7 +1548,7 @@ class _Enemy(object):
         return _divide_round_up(enc, 5)
     
     def _calculate_action_points(self):
-        self.attributes['action_points'] = int(math.ceil((self.stats['DEX'] + self.stats['INT'])//12.0))
+        self.attributes['action_points'] = int(math.ceil((self.stats['DEX'] + self.stats['INT'])/12.0))
 
     def _calculate_damage_modifier(self, strength, siz):
         if strength == 0 or siz == 0:
