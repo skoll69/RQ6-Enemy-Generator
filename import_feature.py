@@ -4,10 +4,11 @@ import django
 django.setup()
 from enemygen.models import AdditionalFeatureList, AdditionalFeatureItem
 
-FILENAME = 'MonsterIslandArtwork.txt'
-LIST_NAME = 'Monster Island Artwork'
-#LIST_TYPE = 'name'
-LIST_TYPE = 'party_feature'
+FILENAME = 'medieval german male'
+LIST_NAME = 'Medieval German Male'
+LIST_TYPE = 'name'
+#LIST_TYPE = 'party_feature'
+#LIST_TYPE = 'enemy_feature'
 
 def main():
     try:
@@ -16,21 +17,23 @@ def main():
         flist = AdditionalFeatureList(name=LIST_NAME, type=LIST_TYPE)
         flist.save()
         
-    features = []
-
+    i = 0
+    j = 0
     with open(FILENAME) as ff:
         for row in ff.readlines():
-            features.append(row.strip())
+            j += 1
+            row = row.strip()
             try:
-                AdditionalFeatureItem.objects.get(name=row.strip(), feature_list=flist)
+                AdditionalFeatureItem.objects.get(name=row, feature_list=flist)
             except AdditionalFeatureItem.DoesNotExist:
-                f = AdditionalFeatureItem(name=row.strip(), feature_list=flist)
-                f.save()
+                AdditionalFeatureItem(name=row, feature_list=flist).save()
+                i += 1
             except:
                 print row
                 raise
             
-    for f in features: print f
+    print "Processed %s items." % j
+    print "Imported %s items." % i
 
 if __name__ == '__main__':
     main()
