@@ -24,6 +24,7 @@ urlpatterns = patterns('',
     url(r'^set_party_filter/$', views.set_party_filter, name='set_party_filter'),
     url(r'^feature_items/(?P<feature_id>\d+)/$', views.feature_items, name='feature_items'),
     url(r'^generate_enemies_json/$', views.generate_enemies_json),
+    url(r'^generate_party_json/$', views.generate_party_json),
 
     url(r'^pdf_export/$', views.pdf_export, name='pdf_export'),
     url(r'^png_export/$', views.png_export, name='png_export'),
