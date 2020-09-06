@@ -8,7 +8,7 @@ from enemygen.models import EnemyTemplate, Race, Party, ChangeLog, AdditionalFea
 from enemygen.views_lib import get_ruleset, get_context, get_et_context, get_enemies, get_generated_party
 from enemygen.views_lib import get_enemy_templates, is_race_admin, get_statistics, get_random_party
 from enemygen.views_lib import get_filter, get_party_templates, save_as_html
-from enemygen.views_lib import get_party_context, get_enemies_lucky, get_party_filter, determine_enemies, as_json
+from enemygen.views_lib import get_party_context, get_enemies_lucky, get_party_filter, determine_enemies, as_json, enemy_as_json
 from enemygen import views_lib as lib
 
 import os
@@ -92,6 +92,18 @@ def generate_enemies_json(request):
     enemies = get_enemies(enemy_index, True)
     enemies_json = as_json(enemies)
     return HttpResponse(enemies_json, content_type="application/json")
+
+
+def generate_party_json(request):
+    party_object = Party.objects.get(id=request.GET['id'])
+    party = get_generated_party(party_object)
+    out = {'enemies': [], 'party_name': party['party'].name, 'additional_features': []}
+    for enemy in party['enemies']:
+        out['enemies'].append(enemy_as_json(enemy))
+    for af in party['party_additional_features']:
+        out['additional_features'].append({'name': af.name, 'feature': af.feature_list.name})
+    out = json.dumps(out)
+    return HttpResponse(out, content_type="application/json")
 
 
 def generate_party(request):

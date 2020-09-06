@@ -340,10 +340,10 @@ def as_json(enemies):
     """ Input: A list of generated enemies. Output: The enemies as a json string """
     out = []
     for e in enemies:
-        out.append(_as_json(e))
+        out.append(enemy_as_json(e))
     return json.dumps(out)
 
-def _as_json(e):
+def enemy_as_json(e):
     return {
         'name': e.name,
         'cult_rank': e.cult_rank,
@@ -362,7 +362,7 @@ def _as_json(e):
         'notes': e.notes,
         'features': ['%s: %s' % (f.feature_list.name, f.name) for f in e.additional_features],
         'cults': [c.name for c in e.cults],
-        'spirits': [_as_json(s) for s in e.spirits]
+        'spirits': [enemy_as_json(s) for s in e.spirits]
     }
 
 def _trim(image_path):
