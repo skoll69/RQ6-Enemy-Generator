@@ -58,6 +58,23 @@ def party_index(request):
     return render(request, 'party_index.html', context)
 
 
+def party_index_json(request):
+    out = []
+    for party in get_party_templates(get_party_filter(request)):
+        party_json = {
+            'name': party.name, 'owner': party.owner.username, 'tags': party.get_tags(), 'id': party.id, 'templates': []
+        }
+        for template in party.template_specs:
+            party_json['templates'].append({
+                'name': template.template.name,
+                'amount': template.amount,
+                'id': template.template.id,
+            })
+        out.append(party_json)
+
+    return HttpResponse(json.dumps(out), content_type="application/json")
+
+
 def generate_enemies(request):
     if not request.POST:
         return redirect('index')
