@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url(r'^index_json/$', views.index_json),
     url(r'^parties/$', views.party_index, name='party_index'),
     url(r'^party_index/$', views.party_index),  # Old one. Kept in case somebody has bookmarked it 
+    url(r'^party_index_json/$', views.party_index_json),
     url(r'^generate_enemies/$', views.generate_enemies, name='generate_enemies'),
     url(r'^generate_party/$', views.generate_party, name='generate_party'),
     url(r'^edit_index/$', views.edit_index, name='edit_index'),
