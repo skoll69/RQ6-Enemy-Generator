@@ -37,6 +37,8 @@ def get_context(request):
                'all_party_tags': sorted(list(Party.tags.all()), key=lambda x: x.name)}
     if (datetime.date.today() - ChangeLog.objects.all().reverse()[0].publish_date).days < 14:
         context['recent_changes'] = True
+    context['all_et_tags'] = [tagname for tagname in context['all_et_tags'] if EnemyTemplate.objects.filter(tags__name__in=[tagname], published=True)]
+    context['all_party_tags'] = [tagname for tagname in context['all_party_tags'] if Party.objects.filter(tags__name__in=[tagname], published=True)]
     return context
 
 
