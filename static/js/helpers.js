@@ -1,5 +1,4 @@
 function submit_callback(result, input_object){
-    console.log(result);
     if (result.success){
         $('#commit_result').html('Save successful');
         animate_background(input_object, true);
@@ -43,7 +42,7 @@ function animate_background(selector, success){
 	item.animate({backgroundColor: 'white'}, 3000);
 }
 
-function refresh_page(result){
+function refresh_page(){
     location.reload();
 }
 
