@@ -1,56 +1,62 @@
-function submit(id, type, input_object, value, parent_id){
-	//Called when a field is changed
-	console.log(value + ' ' + id + ' ' + type  + ' ' + input_object );
-    (function(value, id, type, input_object){
-        Dajaxice.enemygen.submit(function(result) {submit_callback(result, input_object)}, {'value': value, 'id': id, 'object': type, 'parent_id': parent_id});
-    })(value, id, type, input_object);
+async function submit(id, type, input_object, value, parent_id){
+    //Called when a field is changed
+    const res = await axios.post(`/mythras_eg/rest/submit/${id}/`, {value, 'object': type, parent_id});
+    submit_callback(res.data, input_object);
 }
 
-function add_custom_skill(event){
+async function add_custom_skill(event){
     var et_id = $(event.target).attr('et_id');
-    Dajaxice.enemygen.add_custom_skill(refresh_page, {'et_id': et_id})
+    await axios.post(`/mythras_eg/rest/add_custom_skill/${et_id}/`);
+    refresh_page();
 }
 
-function add_additional_feature(event){
+async function add_additional_feature(event){
     var parent_id = $(event.target).attr('parent_id');
     var type = $(event.target).attr('object_type');
     var feature_list_id = $('#additional_feature_options').val();
-    Dajaxice.enemygen.add_additional_feature(refresh_page, {'parent_id': parent_id, 'feature_list_id': feature_list_id, 'type': type})
+    await axios.post(`/mythras_eg/rest/add_additional_feature/${parent_id}/`, {feature_list_id, type});
+    refresh_page();
 }
 
-function add_custom_spell(event){
+async function add_custom_spell(event){
     var type = $(event.target).attr('type');
     var et_id = $(event.target).attr('et_id');
-    Dajaxice.enemygen.add_custom_spell(refresh_page, {'type': type, 'et_id': et_id})
+    await axios.post(`/mythras_eg/rest/add_custom_spell/${et_id}/${type}/`);
+    refresh_page();
 }
 
-function add_spirit(event){
+async function add_spirit(event){
     var spirit_ids = $('#spirit_options').val();
     var et_id = $(event.target).attr('et_id');
-    Dajaxice.enemygen.add_spirit(refresh_page, {'spirit_ids': spirit_ids, 'et_id': et_id})
+    await axios.post(`/mythras_eg/rest/add_spirit/${et_id}/`, {spirit_ids});
+    refresh_page();
 }
 
-function add_cult(event){
+async function add_cult(event){
     var cult_ids = $('#cult_options').val();
     var et_id = $(event.target).attr('et_id');
-    Dajaxice.enemygen.add_cult(refresh_page, {'cult_ids': cult_ids, 'et_id': et_id})
+    await axios.post(`/mythras_eg/rest/add_cult/${et_id}/`, {cult_ids});
+    refresh_page();
 }
 
-function add_template_to_party(event){
+async function add_template_to_party(event){
     var template_ids = $('#template_ids').val();
     var party_id = $(event.target).attr('party_id');
-    Dajaxice.enemygen.add_template_to_party(refresh_page, {'template_ids': template_ids, 'party_id': party_id})
+    await axios.post(`/mythras_eg/rest/add_template_to_party/${party_id}/`,  {template_ids});
+    refresh_page();
 }
 
-function add_custom_weapon(event){
+async function add_custom_weapon(event){
     var type = $(event.target).attr('type');
     var cs_id = $(event.target).attr('cs_id');
-    Dajaxice.enemygen.add_custom_weapon(refresh_page, {'type': type, 'cs_id': cs_id})
+    await axios.post(`/mythras_eg/rest/add_custom_weapon/${cs_id}/${type}/`);
+    refresh_page();
 }
 
-function add_hit_location(event){
+async function add_hit_location(event){
     var race_id = $(event.target).attr('race_id');
-    Dajaxice.enemygen.add_hit_location(refresh_page, {'race_id': race_id})
+    await axios.post(`/mythras_eg/rest/add_hit_location/${race_id}/`);
+    refresh_page();
 }
 
 function get_feature_list_items_callback(result){
@@ -61,37 +67,37 @@ function get_feature_list_items_callback(result){
     $('#nonrandom_feature_options').html(options);
 }
 
-function get_feature_list_items(event){
+async function get_feature_list_items(event){
     var list_id = $(event.target).val();
-    Dajaxice.enemygen.get_feature_list_items(get_feature_list_items_callback, {'list_id': list_id})
+    const res = await axios.get(`/mythras_eg/rest/get_feature_list_items/${list_id}/`);
+    get_feature_list_items_callback(res.data);
 }
 
-function add_nonrandom_feature(event){
+async function add_nonrandom_feature(event){
     var et_id = $(event.target).attr('et_id');
     var party_id = $(event.target).attr('party_id');
     var feature_id = $('#nonrandom_feature_options').val()
+    let data;
     if (et_id) {
-        Dajaxice.enemygen.add_nonrandom_feature(refresh_page, {'et_id': et_id, 'feature_id': feature_id})
+        data = {et_id};
     } else if (party_id) {
-        Dajaxice.enemygen.add_nonrandom_feature(refresh_page, {'party_id': party_id, 'feature_id': feature_id})
+        data = {party_id};
     }
+    await axios.post(`/mythras_eg/rest/add_nonrandom_feature/${feature_id}/`, data);
+    refresh_page();
 }
 
-function del_item(event){
+async function del_item(event){
     var item_id = $(event.target).attr('item_id');
     var item_type = $(event.target).attr('item_type');
-    Dajaxice.enemygen.del_item(refresh_page, {'item_id': item_id, 'item_type': item_type})
+    await axios.post(`/mythras_eg/rest/del_item/${item_id}/${item_type}/`);
+    refresh_page();
 }
 
-function deltag_submit(id, type, input_object, value){
-    (function(value, id, type, input_object){
-        Dajaxice.enemygen.submit(function(result) {deltag_callback(result, input_object)}, {'value': value, 'id': id, 'object': type, 'parent_id': null});
-    })(value, id, type, input_object);
-}
-
-function deltag_callback(result, object){
-    if (result.success){
-        $(object).parent().hide();
+async function deltag_submit(id, type, input_object, value){
+    const res = await axios.post(`/mythras_eg/rest/submit/${id}/`, {'value': value, 'object': type, 'parent_id': null});
+    if (res.data.success){
+        $(input_object).parent().hide();
     }
 }
 
@@ -107,24 +113,23 @@ function del_party_tag(event){
     deltag_submit(party_id, 'party_deltag', event.target, tag)
 }
 
-function apply_notes_to_templates(event){
+async function apply_notes_to_templates(event){
     var race_id = $(event.target).attr('item_id');
     var notes = $('#race_notes').html();
-    Dajaxice.enemygen.apply_notes_to_templates(apply_notes_to_templates_callback, {'race_id': race_id, 'notes': notes});
-}
+    const res = await axios.post(`/mythras_eg/rest/apply_notes_to_templates/${race_id}/`, {notes});
 
-function apply_notes_to_templates_callback(result){
-    if (result.success){
+    if (res.data.success){
         $('#apply_notes_to_templates_confirmation').show();
         setTimeout(function(){$('#apply_notes_to_templates_confirmation').fadeOut(1000);}, 3000);
     } else {
-        console.log(result);
+        console.log(res.data);
     }
 }
 
-function toggle_star(event){
+async function toggle_star(event){
     var et_id = $(event.target).attr('et_id');
-    Dajaxice.enemygen.toggle_star(function(result){toggle_star_callback(result, event.target)}, {'et_id': et_id});
+    const result = await axios.post(`/mythras_eg/rest/toggle_star/${et_id}/`);
+    toggle_star_callback(result.data, event.target)
 }
 
 function search_callback(result){
@@ -159,7 +164,7 @@ function search_callback(result){
     $('input#search').select();
 }
 
-function search(){
+async function search(){
     var string = $('input#search').val();
     var rank_filter = [];
     $('input.rank:checked').each(function(){
@@ -169,13 +174,14 @@ function search(){
     $('input.cult_rank:checked').each(function(){
         cult_rank_filter.push(parseInt($(this).attr('id')));
     })
-    var data = {'string': string, 'rank_filter': rank_filter, 'cult_rank_filter': cult_rank_filter}
-    Dajaxice.enemygen.search(function(result){search_callback(result)}, data);
     $('#enemy_template_list tr:gt(0)').remove();
     $('#getting_started').remove();
     $('#enemy_template_list').show();
     set_template_list_height();
     $('div#searching').show();
+    var data = {'string': string, 'rank_filter': rank_filter, 'cult_rank_filter': cult_rank_filter}
+    const res = await axios.get('/mythras_eg/rest/search/',  {params: data});
+    search_callback(res.data);
 }
 
 ////////////////////////////////////////
@@ -238,7 +244,25 @@ function set_template_list_height(){
     $('#enemy_template_list_container').css('height', template_list_height());
 }
 
+function get_cookie(name){
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].toString().replace(/^\s+/, "").replace(/\s+$/, "");
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+};
+
 $(document).ready(function(){
+    window.axios.defaults.headers.common['X-CSRFToken'] = get_cookie('csrftoken');
+
 	$('.data:input[type=number], .data:input[type=text], select.data, textarea.data').blur(function(event){
 		bind_change_listeners(event);
 	});
