@@ -1,3 +1,5 @@
+# pylint: disable=no-member
+
 from enemygen.models import Ruleset, EnemyTemplate, Race
 from enemygen.models import SpellAbstract, EnemySpell, CustomSpell, ChangeLog
 from enemygen.models import Weapon, CombatStyle, EnemyWeapon, CustomWeapon, Party, AdditionalFeatureList
@@ -13,8 +15,11 @@ import os
 import random
 import datetime
 import json
-from weasyprint import HTML, CSS
-from PIL import Image, ImageChops
+try:
+    from weasyprint import HTML, CSS
+    from PIL import Image, ImageChops
+except:
+    pass
 
 def get_filter(request):
     return request.session.get('filter', None)
@@ -294,7 +299,7 @@ def save_as_html(context, template_name):
     htmlfile = NamedTemporaryFile(mode='w', prefix=prefix, suffix='.html', dir=settings.TEMP, delete=False)
     htmlfile.write(rendered.encode('utf-8'))
     htmlfile.close()
-    return htmlfile.name
+    return os.path.basename(htmlfile.name)
 
 
 def _get_html_prefix(context):
@@ -313,6 +318,7 @@ def _get_html_prefix(context):
 
 def generate_pdf(html_path):
     """ Generates a PDF based on the given html file """
+    html_path = os.path.join(settings.TEMP, html_path)
     pdf_path = html_path.replace('.html', '.pdf')
     HTML(html_path).write_pdf(pdf_path)
     return pdf_path
@@ -320,8 +326,8 @@ def generate_pdf(html_path):
 
 def generate_pngs(html_path):
     """ Generates png-images out of the generated_html """
-    with open(html_path.encode('utf-8'), 'r') as ff:
-        soup = BeautifulSoup(ff)
+    with open(os.path.join(settings.TEMP, html_path).encode('utf-8'), 'r') as ff:
+        soup = BeautifulSoup(ff, 'lxml')
     enemies = soup.find_all('div', {'class': 'enemy_container'})
     container = soup.find('div', {'id': 'enemies'})
     pngs = []

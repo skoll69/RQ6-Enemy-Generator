@@ -1,10 +1,9 @@
 {% load markdown %}
-{% load dajaxice_templatetags %}
 <html>
 <head>
 <title>RQ: {% if party %}{{ party.name }}{% else %}{{ enemies.0.name }}{% endif %}</title>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-{% dajaxice_js_import %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <style type="text/css">
 body, td, th{
@@ -552,10 +551,30 @@ div#png_export{
 </div>
 
 <script>
-    $('.editable').blur(function(){
-        var data = {'value': $(this).html(), 'id': $(this).attr('id'), 'html_file': "{{ generated_html }}"}
-        Dajaxice.enemygen.change_template(function(result){}, data);
-    });
+function get_cookie(name){
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].toString().replace(/^\s+/, "").replace(/\s+$/, "");
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+};
+
+$(document).ready(function(){
+    window.axios.defaults.headers.common['X-CSRFToken'] = get_cookie('csrftoken');
+});
+
+$('.editable').blur(function(){
+    var data = {'value': $(this).html(), 'id': $(this).attr('id'), 'html_file': "{{ generated_html }}"}
+    axios.post('/mythras_eg/rest/change_template/', data);
+});
 
 </script>
 

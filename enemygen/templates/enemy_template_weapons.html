@@ -12,10 +12,9 @@
 <button class="weapon_selector {% if et.weapon_filter == 'Glorantha' %}active_button{% endif %}" filter="Glorantha">Glorantha</button>
 
 <script>
-function update_weapons(target){
-    var filter = target.attr('filter');
-    var data = {'cs_id': "{{ cs.id }}", 'filter': filter}
-    Dajaxice.enemygen.get_weapons(get_weapons_callback, data)
+async function update_weapons(target){
+    const result = await axios.get('/mythras_eg/rest/get_weapons/'+ {{cs.id}} +'/', {params: {'filter': target.attr('filter')}});
+    get_weapons_callback(result.data);
 };
 
 function get_weapons_callback(result){
