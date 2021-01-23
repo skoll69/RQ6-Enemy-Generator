@@ -1,3 +1,5 @@
+# pylint: disable=no-member
+
 from django.db.models import Q
 from django.db import models
 from django.contrib.auth.models import User
@@ -33,9 +35,9 @@ class Ruleset(models.Model, Printer):
     """  Ruleset element. Not really utilized currently, as the tools supports only RQ6 """
     name = models.CharField(max_length=30)
     owner = models.ForeignKey(User)
-    stats = models.ManyToManyField('StatAbstract', null=True, blank=True)
-    skills = models.ManyToManyField('SkillAbstract', null=True, blank=True)
-    races = models.ManyToManyField('Race', null=True, blank=True)
+    stats = models.ManyToManyField('StatAbstract', blank=True)
+    skills = models.ManyToManyField('SkillAbstract', blank=True)
+    races = models.ManyToManyField('Race', blank=True)
 
         
 class Weapon(models.Model, Printer):
@@ -189,7 +191,7 @@ class EnemyTemplate(models.Model, Printer):
     published = models.BooleanField(default=False)
     natural_armor = models.BooleanField(default=False)
     rank_choices = ((1, 'Rabble'), (2, 'Novice'), (3, 'Skilled'), (4, 'Veteran'), (5, 'Master'))
-    rank = models.SmallIntegerField(max_length=30, default=2, choices=rank_choices)
+    rank = models.SmallIntegerField(default=2, choices=rank_choices)
     movement = models.CharField(max_length=50, default=6)
     notes = models.TextField(null=True, blank=True)
     cult_choices = ((0, 'None'), (1, 'Common'), (2, 'Dedicated'), (3, 'Proven'), (4, 'Overseer'), (5, 'Leader'))
@@ -531,7 +533,7 @@ class EnemyTemplate(models.Model, Printer):
             return [star.template for star in stars]
         else:
             return []
-            
+
     @classmethod
     def search(cls, string, user, rank_filter=None, cult_rank_filter=None):
         if user.is_authenticated():
@@ -1361,7 +1363,7 @@ class _Enemy(object):
         if suffix:
             self.name += ' %s' % suffix
         if self.et.namelist:
-            self.name = '%s (%s)' % (self.et.namelist.get_random_item(), self.name)
+            self.name = '%s (%s)' % (self.et.namelist.get_random_item().name, self.name)
         
     def _add_stats(self):
         for stat in self.et.stats:
@@ -1400,8 +1402,8 @@ class _Enemy(object):
         step = (self.stats['SIZ']-11) / 10    # SIZ 21-30: step 1; 31-40: step 2, etc.
         if step == 0:
             return weapons
-        sizes = [value for value, lable in WEAPON_SIZE_CHOICES]
-        reaches = [value for value, lable in WEAPON_REACH_CHOICES]
+        sizes = [value for value, _ in WEAPON_SIZE_CHOICES]
+        reaches = [value for value, _ in WEAPON_REACH_CHOICES]
         for item in weapons:
             if item.__class__.__name__ == 'EnemyWeapon':
                 index = sizes.index(item.weapon.size) + step
