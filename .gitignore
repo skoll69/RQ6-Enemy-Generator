@@ -1,5 +1,5 @@
 .idea
 *.pyc
-mythras_eg/settings.py
+mythras_eg/settings*
 temp/
 .vscode

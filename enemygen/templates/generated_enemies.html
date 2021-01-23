@@ -396,7 +396,7 @@ div#png_export{
     </td></tr>
 </table>
 
-{% if enemy.cults|length > 1 or enemy.cults|length = 1 and enemy.cults.0.name|length > 27 %}
+{% if enemy.cults|length > 1 or enemy.cults|length == 1 and enemy.cults.0.name|length > 27 %}
 <span class="title">Cult(s):</span><span class="item_list">
     {% for cult in enemy.cults %}
         {{ cult.name }}{% if not forloop.last %}, {% endif %}
