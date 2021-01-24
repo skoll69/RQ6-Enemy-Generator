@@ -2,6 +2,7 @@
 
 from django.http import JsonResponse
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 from enemygen.models import EnemyStat, EnemySkill, EnemyTemplate
 from enemygen.models import SpellAbstract, EnemySpell, EnemyHitLocation
@@ -18,6 +19,7 @@ from bs4 import BeautifulSoup
 from enemygen.enemygen_lib import to_bool
 
 
+@login_required
 def apply_notes_to_templates(request, race_id):
     body = json.loads(request.body.decode('utf-8'))
     notes = body['notes']
@@ -32,6 +34,7 @@ def apply_notes_to_templates(request, race_id):
         return JsonResponse({'error': str(e)})
 
 
+@login_required
 def add_additional_feature(request, parent_id):
     body = json.loads(request.body.decode('utf-8'))
     feature_list_id = body['feature_list_id']
@@ -47,6 +50,7 @@ def add_additional_feature(request, parent_id):
         return JsonResponse({'error': str(e)})
 
 
+@login_required
 def add_custom_spell(request, et_id, type):
     try:
         CustomSpell.create(et_id, type)
@@ -55,6 +59,7 @@ def add_custom_spell(request, et_id, type):
         return JsonResponse({'error': str(e)})
 
 
+@login_required
 def add_custom_skill(request, et_id):
     try:
         CustomSkill.create(et_id)
@@ -63,6 +68,7 @@ def add_custom_skill(request, et_id):
         return JsonResponse({'error': str(e)})
 
 
+@login_required
 def add_spirit(request, et_id):
     spirit_ids = json.loads(request.body.decode('utf-8'))['spirit_ids']
     error = ''
@@ -77,6 +83,7 @@ def add_spirit(request, et_id):
         return JsonResponse({'success': True})
 
 
+@login_required
 def add_cult(request, et_id):
     cult_ids = json.loads(request.body.decode('utf-8'))['cult_ids']
     error = ''
@@ -91,6 +98,7 @@ def add_cult(request, et_id):
         return JsonResponse({'success': True})
 
 
+@login_required
 def add_template_to_party(request, party_id):
     template_ids = json.loads(request.body.decode('utf-8'))['template_ids']
     party = Party.objects.get(id=party_id)
@@ -100,6 +108,7 @@ def add_template_to_party(request, party_id):
     return JsonResponse({'success': True})
 
 
+@login_required
 def add_nonrandom_feature(request, feature_id):
     body = json.loads(request.body.decode('utf-8'))
     et_id = body.get('et_id', None)
@@ -115,6 +124,7 @@ def add_nonrandom_feature(request, feature_id):
     return JsonResponse({'success': False})
 
 
+@login_required
 def add_custom_weapon(request, cs_id, type):
     try:
         CustomWeapon.create(cs_id, type)
@@ -123,6 +133,7 @@ def add_custom_weapon(request, cs_id, type):
         return JsonResponse({'error': str(e)})
 
 
+@login_required
 def add_hit_location(request, race_id):
     try:
         HitLocation.create(race_id)
@@ -131,6 +142,7 @@ def add_hit_location(request, race_id):
         return JsonResponse({'error': str(e)})
 
 
+@login_required
 def del_item(request, item_id, item_type):
     try:
         item_id = int(item_id)
@@ -178,6 +190,7 @@ def del_item(request, item_id, item_type):
         return JsonResponse({'error': str(e)})
 
 
+@login_required
 def get_feature_list_items(request, list_id):
     flist = AdditionalFeatureList.objects.get(id=list_id)
     output = []
@@ -186,6 +199,7 @@ def get_feature_list_items(request, list_id):
     return JsonResponse({'data': output})
 
 
+@login_required
 def submit(request, id):
     body = json.loads(request.body.decode('utf-8'))
     value = body['value']
