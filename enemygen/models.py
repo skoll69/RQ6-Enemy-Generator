@@ -536,6 +536,7 @@ class EnemyTemplate(models.Model, Printer):
 
     @classmethod
     def search(cls, string, user, rank_filter=None, cult_rank_filter=None):
+        string = string.strip()
         if user.is_authenticated():
             queryset = EnemyTemplate.objects.filter(Q(published=True) | Q(published=False, owner=user))
         else:
