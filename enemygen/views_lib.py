@@ -131,7 +131,7 @@ def get_enemies(index, increment):
     for et, amount in index:
         if increment:
             et.increment_used()
-        for i in xrange(amount):
+        for i in range(amount):
             enemies.append(et.generate(i+1, increment))
     return enemies
 
@@ -145,7 +145,7 @@ def get_enemies_lucky(request):
         templates = EnemyTemplate.objects.filter(published=True)
     index = random.randint(0, len(templates)-1) 
     enemies = []
-    for i in xrange(6):
+    for i in range(6):
         enemies.append(templates[index].generate(i+1))
     return enemies
 
@@ -174,7 +174,7 @@ def _get_party_enemies(party):
         et = ttp.template
         amount = ttp.get_amount()
         et.increment_used()
-        for i in xrange(amount):
+        for i in range(amount):
             enemies.append(et.generate(i+1, True))
     return enemies
 
@@ -295,9 +295,9 @@ def get_statistics():
 def save_as_html(context, template_name):
     """ Renders the generated enemies to html and saves to disk, so that it can be converted to PDF later """
     rendered = render_to_string(template_name, context)
-    prefix = _get_html_prefix(context).encode('utf-8')
+    prefix = _get_html_prefix(context)
     htmlfile = NamedTemporaryFile(mode='w', prefix=prefix, suffix='.html', dir=settings.TEMP, delete=False)
-    htmlfile.write(rendered.encode('utf-8'))
+    htmlfile.write(rendered)
     htmlfile.close()
     return os.path.basename(htmlfile.name)
 
@@ -327,7 +327,7 @@ def generate_pdf(html_path):
 def generate_pngs(html_path):
     """ Generates png-images out of the generated_html """
     with open(os.path.join(settings.TEMP, html_path).encode('utf-8'), 'r') as ff:
-        soup = BeautifulSoup(ff, 'lxml')
+        soup = BeautifulSoup(ff, 'html.parser')
     enemies = soup.find_all('div', {'class': 'enemy_container'})
     container = soup.find('div', {'id': 'enemies'})
     pngs = []
@@ -335,7 +335,7 @@ def generate_pngs(html_path):
         container.clear()
         container.append(enemy)
         htmlfile = NamedTemporaryFile(mode='w', suffix='.html', dir=settings.TEMP, delete=False)
-        htmlfile.write(soup.prettify('utf-8', formatter='html'))
+        htmlfile.write(soup.prettify())
         htmlfile.close()
         png_name = htmlfile.name.replace('.html', '.png')
         HTML(htmlfile.name).write_png(png_name, stylesheets=[CSS(string='@media print{body, td, th{font-size: 11px !important;}}')])

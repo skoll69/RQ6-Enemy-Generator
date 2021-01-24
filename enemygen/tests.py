@@ -7,7 +7,7 @@ Replace this with more appropriate tests for your application.
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-import ordereddict
+from collections import OrderedDict
 
 from dice import Dice, _die_to_tuple, clean
 
@@ -123,7 +123,7 @@ class TestEnemyTemplate(TestCase):
         et = get_enemy_template()
         enemy = et.generate()
         self.assertTrue(isinstance(enemy, _Enemy))
-        self.assertTrue(isinstance(enemy.stats, ordereddict.OrderedDict))
+        self.assertTrue(isinstance(enemy.stats, OrderedDict))
         self.assertTrue(isinstance(enemy.skills, list))
         self.assertTrue(isinstance(enemy.skills[0], dict))
         self.assertTrue(isinstance(enemy.stats['STR'], int))
