@@ -12,16 +12,17 @@ from enemygen.models import EnemyAdditionalFeatureList, PartyAdditionalFeatureLi
 from enemygen.models import EnemyNonrandomFeature, PartyNonrandomFeature, EnemyCult
 from enemygen.views_lib import weapons
 from enemygen.dice import Dice
+from enemygen.enemygen_lib import to_bool
 
 import logging
 import json
+import html
 from bs4 import BeautifulSoup
-from enemygen.enemygen_lib import to_bool
 
 
 @login_required
 def apply_notes_to_templates(request, race_id):
-    body = json.loads(request.body.decode('utf-8'))
+    body = json.loads(request.body)
     notes = body['notes']
     try:
         race = Race.objects.get(id=int(race_id))
@@ -36,7 +37,7 @@ def apply_notes_to_templates(request, race_id):
 
 @login_required
 def add_additional_feature(request, parent_id):
-    body = json.loads(request.body.decode('utf-8'))
+    body = json.loads(request.body)
     feature_list_id = body['feature_list_id']
     try:
         if body['type'] == 'et':
@@ -70,7 +71,7 @@ def add_custom_skill(request, et_id):
 
 @login_required
 def add_spirit(request, et_id):
-    spirit_ids = json.loads(request.body.decode('utf-8'))['spirit_ids']
+    spirit_ids = json.loads(request.body)['spirit_ids']
     error = ''
     for spirit_id in spirit_ids:
         try:
@@ -85,7 +86,7 @@ def add_spirit(request, et_id):
 
 @login_required
 def add_cult(request, et_id):
-    cult_ids = json.loads(request.body.decode('utf-8'))['cult_ids']
+    cult_ids = json.loads(request.body)['cult_ids']
     error = ''
     for cult_id in cult_ids:
         try:
@@ -100,7 +101,7 @@ def add_cult(request, et_id):
 
 @login_required
 def add_template_to_party(request, party_id):
-    template_ids = json.loads(request.body.decode('utf-8'))['template_ids']
+    template_ids = json.loads(request.body)['template_ids']
     party = Party.objects.get(id=party_id)
     for template_id in template_ids:
         t = EnemyTemplate.objects.get(id=template_id)
@@ -110,7 +111,7 @@ def add_template_to_party(request, party_id):
 
 @login_required
 def add_nonrandom_feature(request, feature_id):
-    body = json.loads(request.body.decode('utf-8'))
+    body = json.loads(request.body)
     et_id = body.get('et_id', None)
     party_id = body.get('party_id', None)
     if et_id:
@@ -201,7 +202,7 @@ def get_feature_list_items(request, list_id):
 
 @login_required
 def submit(request, id):
-    body = json.loads(request.body.decode('utf-8'))
+    body = json.loads(request.body)
     value = body['value']
     object = body['object']
     parent_id = body.get('parent_id', None)
@@ -628,18 +629,18 @@ def change_template(request):
                id           - id of the html element to modify
                value        - new value
     """
-    body = json.loads(request.body.decode('utf-8'))
-    html_file = settings.TEMP + body['html_file'].encode('ascii','ignore')
-    id = body['id'].encode('ascii','ignore')
-    value = body['value'].encode('ascii','ignore')
-    with open(html_file.encode('utf-8'), 'r') as ff:
-        soup = BeautifulSoup(ff, 'lxml')
+    body = json.loads(request.body)
+    html_file = html.unescape(settings.TEMP + body['html_file'])
+    id = body['id']
+    value = body['value']
+    with open(html_file, 'r') as ff:
+        soup = BeautifulSoup(ff, 'html.parser')
     span_tag = soup.find('span', {'id': id})
     klasses = ' '.join(span_tag['class'])
-    new_tag = BeautifulSoup('<span id="%s" class="%s">%s</span>' % (id, klasses, value), 'lxml').span
+    new_tag = BeautifulSoup('<span id="%s" class="%s">%s</span>' % (id, klasses, value), 'html.parser').span
     soup.find('span', {'id': id}).replaceWith(new_tag)
-    with open(html_file.encode('utf-8'), 'w') as ff:
-        ff.write(soup.prettify('utf-8', formatter='html'))
+    with open(html_file, 'w') as ff:
+        ff.write(soup.prettify())
     return JsonResponse({'html_file': html_file})
 
 

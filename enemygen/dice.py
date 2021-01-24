@@ -4,7 +4,7 @@ Handles dice.
 
 import random
 import re
-import ordereddict
+from collections import OrderedDict
 
 
 class Dice:
@@ -57,7 +57,7 @@ def clean(dieset):
     components = re.findall(r"[\+\-]?[\w']+", dieset)
     if components[0][0] not in '+-':    # Prefix with plus if no prefix
         components[0] = '+' + components[0]
-    new_components = ordereddict.OrderedDict()
+    new_components = OrderedDict()
     # Add the components to a dict, counting (dict value) each different component type
     static_int = 0  # Holds the cumulative value of static int components
     for comp in components:

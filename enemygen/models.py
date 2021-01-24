@@ -4,11 +4,11 @@ from django.db.models import Q
 from django.db import models
 from django.contrib.auth.models import User
 
-from enemygen_lib import ValidationError, replace_die_set, select_random_items
-from dice import Dice, clean
+from .enemygen_lib import ValidationError, replace_die_set, select_random_items
+from .dice import Dice, clean
 from taggit.managers import TaggableManager
 
-import ordereddict
+from collections import OrderedDict
 import random
 import math
 
@@ -22,16 +22,7 @@ DICE_STEPS = ('-1d8', '-1d6', '-1d4', '-1d2', '+0', '+1d2', '+1d4', '+1d6', '+1d
               '+5d10', '+5d10+1d2', '+5d10+1d4', '+5d10+1d6', '+5d10+1d8')
 
 
-class Printer:
-    """ A simple class for returning the name of the element """
-    def __init__(self):
-        self.name = ''  # Not used. Added just to keep Pycharm from complaining.
-
-    def __unicode__(self):
-        return self.name
-
-        
-class Ruleset(models.Model, Printer):
+class Ruleset(models.Model):
     """  Ruleset element. Not really utilized currently, as the tools supports only RQ6 """
     name = models.CharField(max_length=30)
     owner = models.ForeignKey(User)
@@ -40,7 +31,7 @@ class Ruleset(models.Model, Printer):
     races = models.ManyToManyField('Race', blank=True)
 
         
-class Weapon(models.Model, Printer):
+class Weapon(models.Model):
     """ Weapons. Created by admins based on rulebooks. """
     name = models.CharField(max_length=80)
     damage = models.CharField(max_length=30, default=0)
@@ -58,7 +49,7 @@ class Weapon(models.Model, Printer):
         ordering = ['name', ]
 
         
-class Race(models.Model, Printer):
+class Race(models.Model):
     """ Template race. Templates inherit Movement, Hit Locations and notes. Discorporated attribute used by Spirits """
     name = models.CharField(max_length=30)
     owner = models.ForeignKey(User)
@@ -132,7 +123,7 @@ class Race(models.Model, Printer):
         return race
 
 
-class HitLocation(models.Model, Printer):
+class HitLocation(models.Model):
     name = models.CharField(max_length=30)
     armor = models.CharField(max_length=30, default='0')  # die_set
     range_start = models.SmallIntegerField()
@@ -175,7 +166,7 @@ class HitLocation(models.Model, Printer):
         self.save()
 
 
-class EnemyTemplate(models.Model, Printer):
+class EnemyTemplate(models.Model):
     name = models.CharField(max_length=50)
     owner = models.ForeignKey(User)
     ruleset = models.ForeignKey(Ruleset)
@@ -569,7 +560,7 @@ class EnemyTemplate(models.Model, Printer):
         return output
 
 
-class Party(models.Model, Printer):
+class Party(models.Model):
     name = models.CharField(max_length=50)
     owner = models.ForeignKey(User)
     published = models.BooleanField(default=False)
@@ -767,7 +758,7 @@ class CombatStyle(models.Model):
             cw.save()
 
 
-class EnemyWeapon(models.Model, Printer):
+class EnemyWeapon(models.Model):
     """ Enemy-specific instance of a Weapon. Links selected weapon to CombatStyle and records
         Probability.
     """
@@ -830,8 +821,11 @@ class EnemyWeapon(models.Model, Printer):
         ew.save()
         return ew
 
+    def __lt__(self, other):
+        return self.name < other.name
 
-class CustomWeapon(models.Model, Printer):
+
+class CustomWeapon(models.Model):
     combat_style = models.ForeignKey(CombatStyle)
     name = models.CharField(max_length=80)
     probability = models.SmallIntegerField(default=0)
@@ -879,7 +873,7 @@ class CustomWeapon(models.Model, Printer):
         return cw
 
 
-class SkillAbstract(models.Model, Printer):
+class SkillAbstract(models.Model):
     name = models.CharField(max_length=80)
     standard = models.BooleanField(default=True)
     magic = models.BooleanField(default=False)
@@ -890,7 +884,7 @@ class SkillAbstract(models.Model, Printer):
         ordering = ['name', ]
 
 
-class EnemySkill(models.Model, Printer):
+class EnemySkill(models.Model):
     skill = models.ForeignKey(SkillAbstract)
     enemy_template = models.ForeignKey(EnemyTemplate)
     die_set = models.CharField(max_length=100, blank=True)
@@ -924,7 +918,7 @@ class EnemySkill(models.Model, Printer):
         return value
 
 
-class CustomSkill(models.Model, Printer):
+class CustomSkill(models.Model):
     """ Customs skills on the Enemy Templates """
     enemy_template = models.ForeignKey(EnemyTemplate)
     name = models.CharField(max_length=80)
@@ -953,7 +947,7 @@ class CustomSkill(models.Model, Printer):
         return cs
 
 
-class EnemyHitLocation(models.Model, Printer):
+class EnemyHitLocation(models.Model):
     hit_location = models.ForeignKey(HitLocation)
     enemy_template = models.ForeignKey(EnemyTemplate)
     armor = models.CharField(max_length=30, blank=True)  # die_set
@@ -995,7 +989,7 @@ class EnemyHitLocation(models.Model, Printer):
         return ehl
 
 
-class StatAbstract(models.Model, Printer):
+class StatAbstract(models.Model):
     name = models.CharField(max_length=30)
     order = models.SmallIntegerField(null=True)
     
@@ -1003,7 +997,7 @@ class StatAbstract(models.Model, Printer):
         ordering = ['order', ]
 
 
-class RaceStat(models.Model, Printer):
+class RaceStat(models.Model):
     stat = models.ForeignKey(StatAbstract)
     race = models.ForeignKey(Race)
     default_value = models.CharField(max_length=30, null=True)
@@ -1022,7 +1016,7 @@ class RaceStat(models.Model, Printer):
         self.save()
 
 
-class EnemyStat(models.Model, Printer):
+class EnemyStat(models.Model):
     stat = models.ForeignKey(StatAbstract)
     enemy_template = models.ForeignKey(EnemyTemplate)
     die_set = models.CharField(max_length=30, null=True)
@@ -1044,7 +1038,7 @@ class EnemyStat(models.Model, Printer):
         self.save()
 
 
-class SpellAbstract(models.Model, Printer):
+class SpellAbstract(models.Model):
     """ A Spell. """
     name = models.CharField(max_length=30)
     
@@ -1062,7 +1056,7 @@ class SpellAbstract(models.Model, Printer):
         ordering = ['name', ]
 
 
-class EnemySpell(models.Model, Printer):
+class EnemySpell(models.Model):
     """ Enemy-specific instance of a SpellAbstract """
     spell = models.ForeignKey(SpellAbstract)
     enemy_template = models.ForeignKey(EnemyTemplate)
@@ -1088,7 +1082,7 @@ class EnemySpell(models.Model, Printer):
             self.delete()
 
 
-class CustomSpell(models.Model, Printer):
+class CustomSpell(models.Model):
     """ Custom spells created by users """
     enemy_template = models.ForeignKey(EnemyTemplate)
     name = models.CharField(max_length=80)
@@ -1114,7 +1108,7 @@ class CustomSpell(models.Model, Printer):
         ordering = ['name', ]
 
 
-class EnemySpirit(models.Model, Printer):
+class EnemySpirit(models.Model):
     """ Links spirits (EnemyTemplates) to animists """
     enemy_template = models.ForeignKey(EnemyTemplate, related_name='animist')   # The animist
     spirit = models.ForeignKey(EnemyTemplate, related_name='spirit')
@@ -1136,7 +1130,7 @@ class EnemySpirit(models.Model, Printer):
         return es
 
 
-class EnemyCult(models.Model, Printer):
+class EnemyCult(models.Model):
     """ Links Cults to EnemyTemplates """
     enemy_template = models.ForeignKey(EnemyTemplate, related_name='enemytemplate')
     cult = models.ForeignKey(EnemyTemplate, related_name='cult')
@@ -1179,7 +1173,7 @@ class AdditionalFeatureList(models.Model):
         return '%s - %s' % (self.get_type_display(), self.name)
 
 
-class AdditionalFeatureItem(models.Model, Printer):
+class AdditionalFeatureItem(models.Model):
     name = models.CharField(max_length=1000)
     feature_list = models.ForeignKey(AdditionalFeatureList)
  
@@ -1261,7 +1255,7 @@ class PartyNonrandomFeature(models.Model):
         return nonrandom_feature
 
 
-class PartyAdditionalFeatureList(models.Model, Printer):
+class PartyAdditionalFeatureList(models.Model):
     probability = models.CharField(max_length=30, default='50', null=True, blank=True)
     feature_list = models.ForeignKey(AdditionalFeatureList)
     party = models.ForeignKey(Party)
@@ -1301,7 +1295,7 @@ class PartyAdditionalFeatureList(models.Model, Printer):
         self.save()
 
 
-class ChangeLog(models.Model, Printer):
+class ChangeLog(models.Model):
     publish_date = models.DateField()
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=3000)
@@ -1318,7 +1312,7 @@ class _Enemy(object):
         self.name = ''
         self.et = enemy_template
         self.cult_rank = self.et.get_cult_rank
-        self.stats = ordereddict.OrderedDict()
+        self.stats = OrderedDict()
         self.stats_list = []
         self.skills = []
         self.skills_dict = {}   # Used during enemy generation
@@ -1400,7 +1394,7 @@ class _Enemy(object):
         
     def _adjust_size_and_reach(self, weapons):
         """ Adjusts weapon size and reach of big creatures """
-        step = (self.stats['SIZ']-11) / 10    # SIZ 21-30: step 1; 31-40: step 2, etc.
+        step = (self.stats['SIZ']-11) // 10    # SIZ 21-30: step 1; 31-40: step 2, etc.
         if step == 0:
             return weapons
         sizes = [value for value, _ in WEAPON_SIZE_CHOICES]
@@ -1559,9 +1553,9 @@ class _Enemy(object):
             return
         str_siz = strength + siz
         if str_siz <= 50:
-            index = (str_siz-1) / 5
+            index = (str_siz-1) // 5
         else:
-            index = ((str_siz - 1 - 50) / 10) + 10
+            index = ((str_siz - 1 - 50) // 10) + 10
         try:
             self.attributes['damage_modifier'] = DICE_STEPS[index]
         except IndexError:
