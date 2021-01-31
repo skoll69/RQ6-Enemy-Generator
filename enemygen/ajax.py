@@ -87,6 +87,8 @@ def add_spirit(request, et_id):
 @login_required
 def add_cult(request, et_id):
     cult_ids = json.loads(request.body)['cult_ids']
+    if not cult_ids:
+        return JsonResponse({'success': False})
     error = ''
     for cult_id in cult_ids:
         try:
