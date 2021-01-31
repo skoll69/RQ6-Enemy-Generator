@@ -13,7 +13,7 @@ def select_random_items(item_list, amount):
         item = select_random_item(item_list, selected_items)
         selected_items.append(item)
         output.append(item)
-    output.sort()
+    output.sort(key=lambda item: item.name)
     return output
 
 

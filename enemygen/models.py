@@ -1422,7 +1422,7 @@ class _Enemy(object):
     
     def _add_hit_locations(self):
         con_siz = self.stats['CON'] + self.stats['SIZ']
-        base_hp = ((con_siz-1) / 5) + 1  # used by Head and Legs
+        base_hp = ((con_siz-1) // 5) + 1  # used by Head and Legs
         for hl in self.et.hit_locations:
             hp = max(base_hp + Dice(hl.hp_modifier).roll(), 1)
             ap = hl.roll()
@@ -1494,7 +1494,7 @@ class _Enemy(object):
         self.additional_features.sort(key=lambda item: item.feature_list.name)
         
     def _calculate_attributes(self):
-        sr_natural = (self.stats['INT'] + self.stats['DEX']) / 2
+        sr_natural = (self.stats['INT'] + self.stats['DEX']) // 2
         sr = sr_natural - self._sr_penalty()
         self._calculate_action_points()
         self._calculate_damage_modifier(self.stats['STR'], self.stats['SIZ'])
@@ -1504,19 +1504,19 @@ class _Enemy(object):
         if 'Devotion' in self.skills_dict:
             self.is_theist = True
             self.attributes['devotional_pool'] = self._get_devotional_pool()
-            self.attributes['max_intensity'] = int(math.ceil(self.skills_dict['Devotion'] / 10.0))
+            self.attributes['max_intensity'] = int(math.ceil(self.skills_dict['Devotion'] / 10))
         if 'Shaping' in self.skills_dict:
             self.is_sorcerer = True
-            self.attributes['max_shaping'] = int(math.ceil(self.skills_dict['Shaping'] / 10.0))
+            self.attributes['max_shaping'] = int(math.ceil(self.skills_dict['Shaping'] / 10))
         if 'Invocation' in self.skills_dict:
-            self.attributes['intensity'] = int(math.ceil(self.skills_dict['Invocation'] / 10.0))
+            self.attributes['intensity'] = int(math.ceil(self.skills_dict['Invocation'] / 10))
         if 'Mysticism' in self.skills_dict and 'Meditation' in self.skills_dict:
             self.is_mystic = True
-            self.attributes['max_mysticism_intensity'] = int(math.ceil(self.skills_dict['Mysticism'] / 20.0))
-            self.attributes['max_total_intensity'] = int(math.ceil(self.skills_dict['Meditation'] / 10.0))
+            self.attributes['max_mysticism_intensity'] = int(math.ceil(self.skills_dict['Mysticism'] / 20))
+            self.attributes['max_total_intensity'] = int(math.ceil(self.skills_dict['Meditation'] / 10))
         if 'Binding' in self.skills_dict:
             self.is_animist = True
-            self.attributes['max_pow'] = int(math.ceil(self.skills_dict['Binding'] / 10.0)) * 3
+            self.attributes['max_pow'] = int(math.ceil(self.skills_dict['Binding'] / 10)) * 3
             self.attributes['max_spirits'] = self._get_max_spirits()
             
     def _get_max_spirits(self):
@@ -1545,7 +1545,7 @@ class _Enemy(object):
         return _divide_round_up(enc, 5)
     
     def _calculate_action_points(self):
-        self.attributes['action_points'] = int(math.ceil((self.stats['DEX'] + self.stats['INT'])/12.0))
+        self.attributes['action_points'] = int(math.ceil((self.stats['DEX'] + self.stats['INT']) / 12))
 
     def _calculate_damage_modifier(self, strength, siz):
         if strength == 0 or siz == 0:
@@ -1605,7 +1605,7 @@ class _Spirit(_Enemy):
         self.stats['DEX'] = self.stats['INT']
         
     def _calculate_attributes(self):
-        sr = (self.stats['INT'] + self.stats['CHA']) / 2
+        sr = (self.stats['INT'] + self.stats['CHA']) // 2
         self._calculate_action_points()
         self._calculate_spirit_damage()
         self.attributes['magic_points'] = self.stats['POW']
@@ -1614,19 +1614,19 @@ class _Spirit(_Enemy):
         if 'Devotion' in self.skills_dict:
             self.is_theist = True
             self.attributes['devotional_pool'] = self._get_devotional_pool()
-            self.attributes['max_intensity'] = int(math.ceil(self.skills_dict['Devotion'] / 10.0))
+            self.attributes['max_intensity'] = int(math.ceil(self.skills_dict['Devotion'] / 10))
         if 'Shaping' in self.skills_dict:
             self.is_sorcerer = True
-            self.attributes['max_shaping'] = int(math.ceil(self.skills_dict['Shaping'] / 10.0))
+            self.attributes['max_shaping'] = int(math.ceil(self.skills_dict['Shaping'] / 10))
         if 'Mysticism' in self.skills_dict and 'Meditation' in self.skills_dict:
             self.is_mystic = True
-            self.attributes['max_intensity'] = int(math.ceil(self.skills_dict['Mysticism'] / 20.0))
-            self.attributes['max_total_intensity'] = int(math.ceil(self.skills_dict['Meditation'] / 10.0))
+            self.attributes['max_intensity'] = int(math.ceil(self.skills_dict['Mysticism'] / 20))
+            self.attributes['max_total_intensity'] = int(math.ceil(self.skills_dict['Meditation'] / 10))
         if 'Binding' in self.skills_dict:
             self.is_animist = True
-            self.attributes['max_pow'] = int(math.ceil(self.skills_dict['Binding'] / 10.0)) * 3
+            self.attributes['max_pow'] = int(math.ceil(self.skills_dict['Binding'] / 10)) * 3
             self.attributes['max_spirits'] = self._get_max_spirits()
-        self.attributes['spirit_intensity'] = (self.stats['POW'] - 1) / 6
+        self.attributes['spirit_intensity'] = (self.stats['POW'] - 1) // 6
         
     def _calculate_action_points(self):
         pow_int = self.stats['POW'] + self.stats['INT']
@@ -1710,4 +1710,4 @@ class Star(models.Model):
     
     
 def _divide_round_up(n, d):
-    return (n + (d - 1))/d
+    return (n + (d - 1)) // d
