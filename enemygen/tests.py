@@ -189,7 +189,7 @@ class TestEnemyTemplate(TestCase):
                        
         self.assertEquals(enemy.attributes['magic_points'], enemy.stats['POW'])
         
-        sr = (enemy.stats['INT'] + enemy.stats['DEX']) / 2
+        sr = (enemy.stats['INT'] + enemy.stats['DEX']) // 2
         sr = '%s(%s-0)' % (sr, sr)
         self.assertEquals(enemy.attributes['strike_rank'], sr)
         
