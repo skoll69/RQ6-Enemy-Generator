@@ -141,6 +141,8 @@ def get_enemies_lucky(request):
     filtr = get_filter(request)
     if filtr and filtr != 'None':
         templates = EnemyTemplate.objects.filter(tags__name__in=[filtr, ], published=True)
+        if not templates:
+            templates = EnemyTemplate.objects.filter(published=True)
     else:
         templates = EnemyTemplate.objects.filter(published=True)
     index = random.randint(0, len(templates)-1) 
@@ -305,15 +307,14 @@ def save_as_html(context, template_name):
 def _get_html_prefix(context):
     party = context.get('party', None)
     if party:
-        prefix = 'rq_%s_' % party.name.replace(' ', '_')
+        prefix = 'rq_%s_' % party.name
     else:
         # noinspection PyBroadException
         try:
-            prefix = 'rq_%s_' % context['enemies'][0].name.replace(' ', '_').replace('_1', 's').replace('/', '_')
-            prefix = prefix.replace('"', '')
+            prefix = 'rq_%s_' % context['enemies'][0].name.replace('_1', 's').replace('/', '_')
         except:
             prefix = 'rq_'
-    return prefix
+    return prefix.replace(' ', '_').replace("'", '').replace('"', '')
 
 
 def generate_pdf(html_path):
