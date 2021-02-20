@@ -3,6 +3,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.conf import settings
+from django.utils.datastructures import MultiValueDictKeyError
 
 from enemygen.models import EnemyTemplate, Race, Party, ChangeLog, AdditionalFeatureList
 from enemygen.views_lib import get_ruleset, get_context, get_et_context, get_enemies, get_generated_party
@@ -79,6 +80,7 @@ def generate_enemies(request):
     if not request.POST:
         return redirect('index')
     context = get_context(request)
+    print(request)
     if request.POST.get('lucky', None):
         context['enemies'] = get_enemies_lucky(request)
         context['single_template'] = True
@@ -112,7 +114,10 @@ def generate_enemies_json(request):
 
 
 def generate_party_json(request):
-    party_object = Party.objects.get(id=request.GET['id'])
+    try:
+        party_object = Party.objects.get(id=request.GET['id'])
+    except (Party.DoesNotExist, MultiValueDictKeyError):
+        raise Http404
     party = get_generated_party(party_object)
     out = {'enemies': [], 'party_name': party['party'].name, 'additional_features': []}
     for enemy in party['enemies']:

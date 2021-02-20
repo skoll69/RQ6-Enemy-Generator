@@ -104,6 +104,8 @@ def add_cult(request, et_id):
 @login_required
 def add_template_to_party(request, party_id):
     template_ids = json.loads(request.body)['template_ids']
+    if not template_ids:
+        return JsonResponse({'success': False})
     party = Party.objects.get(id=party_id)
     for template_id in template_ids:
         t = EnemyTemplate.objects.get(id=template_id)
