@@ -49,13 +49,13 @@
         <p>Create your own templates on <a href="{% url 'edit_index' %}">My Content</a> -page.</p>
         <p>Star your favorite templates to see them in this starting page.</p>
         {% else %}
-        <p><a href="/mythras_eg/accounts/register/">Register</a> and <a href="{% url 'auth_login' %}">log in</a> to create your own templates!</p>
+        <p><a href="/accounts/register/">Register</a> and <a href="{% url 'auth_login' %}">log in</a> to create your own templates!</p>
         {% endif %}
         <p>Visit <a href="{% url 'instructions' %}">Help</a> for more info.</p>
     </div>
 {% endif %}
 <div id="searching">
-    <img src="/rq_static/images/loading.gif" height="80" width="80" />
+    <img src="/static/images/loading.gif" height="80" width="80" />
 </div>
 {% include 'enemy_template_list.html' %}
 

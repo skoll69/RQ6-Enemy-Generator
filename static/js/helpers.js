@@ -49,10 +49,10 @@ function refresh_page(){
 function toggle_star_callback(result, target){
     var target = $(target);
     if (result.success){
-        if (target.attr('src') === '/rq_static/images/star_filled.png'){
-            target.attr('src', '/rq_static/images/star_empty.png');
+        if (target.attr('src') === '/static/images/star_filled.png'){
+            target.attr('src', '/static/images/star_empty.png');
         } else {
-            target.attr('src', '/rq_static/images/star_filled.png');
+            target.attr('src', '/static/images/star_filled.png');
         }
     }
 }

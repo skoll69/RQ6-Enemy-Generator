@@ -266,7 +266,7 @@ def png_export(request):
         png_paths = lib.generate_pngs(request.GET.get('generated_html'))
         new_paths = []
         for path in png_paths:
-            new_paths.append(path.replace(settings.PROJECT_ROOT + 'temp/', '/rq_temp/'))
+            new_paths.append(path.replace(settings.PROJECT_ROOT + 'temp/', '/temp/'))
         return render(request, 'generated_enemies_as_pngs.html', {'png_paths': new_paths})
     return redirect('home')
 
