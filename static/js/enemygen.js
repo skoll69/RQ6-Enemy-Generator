@@ -1,12 +1,12 @@
 async function submit(id, type, input_object, value, parent_id){
     //Called when a field is changed
-    const res = await axios.post(`/mythras_eg/rest/submit/${id}/`, {value, 'object': type, parent_id});
+    const res = await axios.post(`/rest/submit/${id}/`, {value, 'object': type, parent_id});
     submit_callback(res.data, input_object);
 }
 
 async function add_custom_skill(event){
     var et_id = $(event.target).attr('et_id');
-    await axios.post(`/mythras_eg/rest/add_custom_skill/${et_id}/`);
+    await axios.post(`/rest/add_custom_skill/${et_id}/`);
     refresh_page();
 }
 
@@ -14,48 +14,48 @@ async function add_additional_feature(event){
     var parent_id = $(event.target).attr('parent_id');
     var type = $(event.target).attr('object_type');
     var feature_list_id = $('#additional_feature_options').val();
-    await axios.post(`/mythras_eg/rest/add_additional_feature/${parent_id}/`, {feature_list_id, type});
+    await axios.post(`/rest/add_additional_feature/${parent_id}/`, {feature_list_id, type});
     refresh_page();
 }
 
 async function add_custom_spell(event){
     var type = $(event.target).attr('type');
     var et_id = $(event.target).attr('et_id');
-    await axios.post(`/mythras_eg/rest/add_custom_spell/${et_id}/${type}/`);
+    await axios.post(`/rest/add_custom_spell/${et_id}/${type}/`);
     refresh_page();
 }
 
 async function add_spirit(event){
     var spirit_ids = $('#spirit_options').val();
     var et_id = $(event.target).attr('et_id');
-    await axios.post(`/mythras_eg/rest/add_spirit/${et_id}/`, {spirit_ids});
+    await axios.post(`/rest/add_spirit/${et_id}/`, {spirit_ids});
     refresh_page();
 }
 
 async function add_cult(event){
     var cult_ids = $('#cult_options').val();
     var et_id = $(event.target).attr('et_id');
-    await axios.post(`/mythras_eg/rest/add_cult/${et_id}/`, {cult_ids});
+    await axios.post(`/rest/add_cult/${et_id}/`, {cult_ids});
     refresh_page();
 }
 
 async function add_template_to_party(event){
     var template_ids = $('#template_ids').val();
     var party_id = $(event.target).attr('party_id');
-    await axios.post(`/mythras_eg/rest/add_template_to_party/${party_id}/`,  {template_ids});
+    await axios.post(`/rest/add_template_to_party/${party_id}/`,  {template_ids});
     refresh_page();
 }
 
 async function add_custom_weapon(event){
     var type = $(event.target).attr('type');
     var cs_id = $(event.target).attr('cs_id');
-    await axios.post(`/mythras_eg/rest/add_custom_weapon/${cs_id}/${type}/`);
+    await axios.post(`/rest/add_custom_weapon/${cs_id}/${type}/`);
     refresh_page();
 }
 
 async function add_hit_location(event){
     var race_id = $(event.target).attr('race_id');
-    await axios.post(`/mythras_eg/rest/add_hit_location/${race_id}/`);
+    await axios.post(`/rest/add_hit_location/${race_id}/`);
     refresh_page();
 }
 
@@ -69,7 +69,7 @@ function get_feature_list_items_callback(result){
 
 async function get_feature_list_items(event){
     var list_id = $(event.target).val();
-    const res = await axios.get(`/mythras_eg/rest/get_feature_list_items/${list_id}/`);
+    const res = await axios.get(`/rest/get_feature_list_items/${list_id}/`);
     get_feature_list_items_callback(res.data);
 }
 
@@ -83,19 +83,19 @@ async function add_nonrandom_feature(event){
     } else if (party_id) {
         data = {party_id};
     }
-    await axios.post(`/mythras_eg/rest/add_nonrandom_feature/${feature_id}/`, data);
+    await axios.post(`/rest/add_nonrandom_feature/${feature_id}/`, data);
     refresh_page();
 }
 
 async function del_item(event){
     var item_id = $(event.target).attr('item_id');
     var item_type = $(event.target).attr('item_type');
-    await axios.post(`/mythras_eg/rest/del_item/${item_id}/${item_type}/`);
+    await axios.post(`/rest/del_item/${item_id}/${item_type}/`);
     refresh_page();
 }
 
 async function deltag_submit(id, type, input_object, value){
-    const res = await axios.post(`/mythras_eg/rest/submit/${id}/`, {'value': value, 'object': type, 'parent_id': null});
+    const res = await axios.post(`/rest/submit/${id}/`, {'value': value, 'object': type, 'parent_id': null});
     if (res.data.success){
         $(input_object).parent().hide();
     }
@@ -116,7 +116,7 @@ function del_party_tag(event){
 async function apply_notes_to_templates(event){
     var race_id = $(event.target).attr('item_id');
     var notes = $('#race_notes').html();
-    const res = await axios.post(`/mythras_eg/rest/apply_notes_to_templates/${race_id}/`, {notes});
+    const res = await axios.post(`/rest/apply_notes_to_templates/${race_id}/`, {notes});
 
     if (res.data.success){
         $('#apply_notes_to_templates_confirmation').show();
@@ -128,7 +128,7 @@ async function apply_notes_to_templates(event){
 
 async function toggle_star(event){
     var et_id = $(event.target).attr('et_id');
-    const result = await axios.post(`/mythras_eg/rest/toggle_star/${et_id}/`);
+    const result = await axios.post(`/rest/toggle_star/${et_id}/`);
     toggle_star_callback(result.data, event.target)
 }
 
@@ -139,9 +139,9 @@ function search_callback(result){
     $('div#searching').hide()
     for (i in result.results){
         var row = result.results[i];
-        if (row.starred) var star = '<td><img et_id="'+row.id+'" class="star" height="22" width="22" src="/rq_static/images/star_filled.png" /></td>';
-        else             var star = '<td><img et_id="'+row.id+'" class="star" height="22" width="22" src="/rq_static/images/star_empty.png" /></td>';
-        var name = '<td><a class="edit_item" href="/mythras_eg/enemy_template/'+row.id+'/">'+row.name+'</a></td>';
+        if (row.starred) var star = '<td><img et_id="'+row.id+'" class="star" height="22" width="22" src="/static/images/star_filled.png" /></td>';
+        else             var star = '<td><img et_id="'+row.id+'" class="star" height="22" width="22" src="/static/images/star_empty.png" /></td>';
+        var name = '<td><a class="edit_item" href="/enemy_template/'+row.id+'/">'+row.name+'</a></td>';
         var input = '<td><input id="enemy_template_id_'+row.id+'" name="enemy_template_id_'+row.id+'" size="4" min="0" max="40" type="number" class="enemy_amount"></td>';
         var race = '<td>'+row.race+'</td>';
         switch(row.rank){
@@ -180,7 +180,7 @@ async function search(){
     set_template_list_height();
     $('div#searching').show();
     var data = {'string': string, 'rank_filter': rank_filter, 'cult_rank_filter': cult_rank_filter}
-    const res = await axios.get('/mythras_eg/rest/search/',  {params: data});
+    const res = await axios.get('/rest/search/',  {params: data});
     search_callback(res.data);
 }
 

@@ -247,8 +247,8 @@ jQuery.fn.sort = function (columnstyle, clickablestyle, sortasc, sortdesc, oncli
     jQuery('thead tr th:not(".numcx")', tid)
         .append('<img src="" class="sort-img" />');
     jQuery('thead tr th:not(".numcx") img', tid).css('visibility', 'hidden');
-    var upimage = '/rq_static/js/tquery/images/up.png';
-    var downimage = '/rq_static/js/tquery/images/down.png';
+    var upimage = '/static/js/tquery/images/up.png';
+    var downimage = '/static/js/tquery/images/down.png';
     jQuery('thead tr th:not(".numcx")', this).mousedown(function () {
         jQuery(this).addClass(onclickstyle)
 
