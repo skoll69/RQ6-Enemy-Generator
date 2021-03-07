@@ -3,7 +3,7 @@ astroid==1.6.6
 backports.functools-lru-cache==1.6.1
 beautifulsoup4==4.4.1
 cairocffi==0.7.2
-CairoSVG==1.0.20
+CairoSVG==2.5.1
 colorama==0.4.3
 configparser==4.0.2
 cryptography==2.3.1
