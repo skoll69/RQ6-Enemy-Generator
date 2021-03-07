@@ -253,9 +253,9 @@ def pdf_export(request):
         file_name = '_'.join(file_name.split('_')[:-1])  # Remove the last unique identifier from file name
         file_name = file_name.replace(',', '')
         file_name += extension
-        data = open(pdf_path.encode('utf-8')).read()
+        data = open(pdf_path, 'rb').read()
         response = HttpResponse(data, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="%s"' % file_name.encode('utf-8')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % file_name
         response['Content-Length'] = len(data)
         return response
     return redirect('home')
