@@ -461,10 +461,10 @@ div#png_export{
         Intensity {{ spirit.attributes.spirit_intensity }}, Action Points {{ spirit.attributes.action_points }}, Spirit Damage {{ spirit.attributes.spirit_damage }};
         {% for stat in spirit.get_stats %}{{ stat.name }} {{ stat.value }}{% if not forloop.last %}, {% endif %}{% endfor %};
         {% for skill in spirit.skills %}{{ skill.name }} {{ skill.value }}%{% if not forloop.last %}, {% endif %}{% endfor %};
-        {% if spirit.folk_spells %}<u>Folk Spells</u>: {% for spell in spirit.folk_spells %}{{ spell }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if spirit.theism_spells %};{% endif %}
-        {% if spirit.theism_spells %}<u>Theism Spells</u>: {% for spell in spirit.theism_spells %}{{ spell }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if spirit.sorcery_spells %};{% endif %}
-        {% if spirit.sorcery_spells %}<u>Sorcery Spells</u>: {% for spell in spirit.sorcery_spells %}{{ spell }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %};{% endif %}
-        {% if spirit.mysticism_spells %}<u>Mystic talents</u>: {% for spell in spirit.mysticism_spells %}{{ spell }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %};{% endif %}
+        {% if spirit.folk_spells %}<u>Folk Spells</u>: {% for spell in spirit.folk_spells %}{{ spell.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if spirit.theism_spells %};{% endif %}
+        {% if spirit.theism_spells %}<u>Theism Spells</u>: {% for spell in spirit.theism_spells %}{{ spell.name }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if spirit.sorcery_spells %};{% endif %}
+        {% if spirit.sorcery_spells %}<u>Sorcery Spells</u>: {% for spell in spirit.sorcery_spells %}{{ spell.name }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %};{% endif %}
+        {% if spirit.mysticism_spells %}<u>Mystic talents</u>: {% for spell in spirit.mysticism_spells %}{{ spell.name }}{% if spell.detail %} {{ spell.detail }}{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %};{% endif %}
         {% if spirit.spirits %}
             <br><u>Spirits of {{ spirit.name }}</u>:<br>
             {% for inner_spirit in spirit.spirits %}
