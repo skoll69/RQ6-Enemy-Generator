@@ -62,6 +62,9 @@ class Race(models.Model):
     class Meta:
         ordering = ['name', ]
         
+    def __str__(self):
+        return self.name
+
     @property
     def hit_locations(self):
         return HitLocation.objects.filter(race=self)
@@ -134,6 +137,9 @@ class HitLocation(models.Model):
     class Meta:
         ordering = ['range_start', ]
 
+    def __str__(self):
+        return self.name
+
     @property
     def range(self):
         if self.range_start == self.range_end:
@@ -193,7 +199,10 @@ class EnemyTemplate(models.Model):
     
     class Meta:
         ordering = ['name', ]
-        
+
+    def __str__(self):
+        return self.name
+
     @classmethod
     def create(cls, owner, ruleset, race, name="Enemy Template"):
         enemy_template = cls(name=name, owner=owner, ruleset=ruleset, race=race)
@@ -653,6 +662,9 @@ class TemplateToParty(models.Model):
     def get_amount(self):
         return Dice(self.amount).roll()        
 
+    def __str__(self):
+        return self.party.name + ' - ' + self.template.name
+    
 
 class CombatStyle(models.Model):
     name = models.CharField(max_length=80)
@@ -883,6 +895,9 @@ class SkillAbstract(models.Model):
     class Meta:
         ordering = ['name', ]
 
+    def __str__(self):
+        return self.name
+
 
 class EnemySkill(models.Model):
     skill = models.ForeignKey(SkillAbstract)
@@ -924,6 +939,9 @@ class CustomSkill(models.Model):
     name = models.CharField(max_length=80)
     die_set = models.CharField(max_length=30, blank=True)
     include = models.BooleanField()
+
+    def __str__(self):
+        return self.name
 
     def roll(self, replace=None):
         die_set = replace_die_set(self.die_set, replace)
@@ -996,6 +1014,9 @@ class StatAbstract(models.Model):
     class Meta:
         ordering = ['order', ]
 
+    def __str__(self):
+        return self.name
+
 
 class RaceStat(models.Model):
     stat = models.ForeignKey(StatAbstract)
@@ -1055,6 +1076,9 @@ class SpellAbstract(models.Model):
     class Meta:
         ordering = ['name', ]
 
+    def __str__(self):
+        return self.name
+
 
 class EnemySpell(models.Model):
     """ Enemy-specific instance of a SpellAbstract """
@@ -1067,6 +1091,9 @@ class EnemySpell(models.Model):
         ordering = ['spell', ]
         unique_together = ('spell', 'enemy_template')
     
+    def __str__(self):
+        return self.name
+
     @property
     def name(self):
         return self.spell.name
@@ -1093,6 +1120,9 @@ class CustomSpell(models.Model):
                                                     ('mysticism', 'Mysticism'),
                                                     ))
 
+    def __str__(self):
+        return self.name
+
     @classmethod
     def create(cls, et_id, spelltype):
         et = EnemyTemplate.objects.get(id=et_id)
@@ -1116,7 +1146,10 @@ class EnemySpirit(models.Model):
     
     class Meta:
         ordering = ['spirit', ]
-        
+
+    def __str__(self):
+        return self.name
+
     @property
     def name(self):
         return self.spirit.name
@@ -1135,7 +1168,10 @@ class EnemyCult(models.Model):
     enemy_template = models.ForeignKey(EnemyTemplate, related_name='enemytemplate')
     cult = models.ForeignKey(EnemyTemplate, related_name='cult')
     probability = models.SmallIntegerField(default=0)
-    
+
+    def __str__(self):
+        return self.name
+
     class Meta:
         ordering = ['cult', ]
         
@@ -1159,7 +1195,10 @@ class AdditionalFeatureList(models.Model):
     
     class Meta:
         ordering = ['type', 'name']
-    
+
+    def __str__(self):
+        return self.name
+
     @property
     def items(self):
         return AdditionalFeatureItem.objects.filter(feature_list=self)
@@ -1231,6 +1270,9 @@ class EnemyNonrandomFeature(models.Model):
     enemy_template = models.ForeignKey(EnemyTemplate)
     feature = models.ForeignKey(AdditionalFeatureItem)
 
+    def __str__(self):
+        return self.enemy_template.name + ' - ' + self.feature.name
+
     @classmethod
     def create(cls, enemy_template, feature_id):
         feature = AdditionalFeatureItem.objects.get(id=feature_id)
@@ -1262,6 +1304,9 @@ class PartyAdditionalFeatureList(models.Model):
     
     class Meta:
         ordering = ['feature_list', ]
+
+    def __str__(self):
+        return self.party.name + ' - ' + self.feature_list.name
 
     @classmethod
     def create(cls, party, feature_list_id):
