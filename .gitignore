@@ -3,3 +3,4 @@
 mythras_eg/settings.py
 temp/
 .vscode
+dump.sql
