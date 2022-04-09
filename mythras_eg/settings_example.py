@@ -1,4 +1,6 @@
-PROJECT_ROOT = '/projects/meg/'
+import os
+
+PROJECT_ROOT = os.path.join('projects', 'meg')
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000
 DATABASES = {
     'default': {
@@ -43,7 +45,7 @@ ROOT_URLCONF = 'mythras_eg.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [PROJECT_ROOT + 'templates'],
+        'DIRS': [os.path.join(PROJECT_ROOT, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -67,9 +69,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # For development
-import os.path
 STATIC_ROOT = ''
-STATICFILES_DIRS = ( os.path.join('static'), )
+STATICFILES_DIRS = ( 'static' )
 
 # Django registration stuff
 ACCOUNT_ACTIVATION_DAYS = 7
@@ -114,4 +115,4 @@ LOGGING = {
     }
 }
 
-TEMP = PROJECT_ROOT + 'temp/'
+TEMP = os.path.join(PROJECT_ROOT, 'temp')
