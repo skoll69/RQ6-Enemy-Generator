@@ -15,6 +15,7 @@ Mythras Encounter Generator has been tested with Python 3.8.10. Other versions m
 * It is recommended to create a virtualenv
 * Install requirements from `requirements.txt`
 * Unzip `dump.zip` and import it to your local database
+* Create a folder named `temp` in the project directory (it's not possible to add empty folders to git)
 
 ### WeasyPrint
 
