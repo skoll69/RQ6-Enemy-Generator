@@ -66,6 +66,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# For development
+import os.path
+STATIC_ROOT = ''
+STATICFILES_DIRS = ( os.path.join('static'), )
+
 # Django registration stuff
 ACCOUNT_ACTIVATION_DAYS = 7
 LOGIN_REDIRECT_URL = '/'
