@@ -371,7 +371,8 @@ def enemy_as_json(e):
         'notes': e.notes,
         'features': ['%s: %s' % (f.feature_list.name, f.name) for f in e.additional_features],
         'cults': [c.name for c in e.cults],
-        'spirits': [enemy_as_json(s) for s in e.spirits]
+        'spirits': [enemy_as_json(s) for s in e.spirits],
+        'natural_armor': e.natural_armor
     }
 
 def _trim(image_path):
