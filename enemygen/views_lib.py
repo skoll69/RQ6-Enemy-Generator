@@ -353,7 +353,7 @@ def as_json(enemies):
     return json.dumps(out)
 
 def enemy_as_json(e):
-    return {
+    out = {
         'name': e.name,
         'cult_rank': e.cult_rank,
         'stats': [{s['name']: s['value']} for s in e.stats_list],
@@ -372,8 +372,10 @@ def enemy_as_json(e):
         'features': ['%s: %s' % (f.feature_list.name, f.name) for f in e.additional_features],
         'cults': [c.name for c in e.cults],
         'spirits': [enemy_as_json(s) for s in e.spirits],
-        'natural_armor': e.natural_armor
     }
+    if hasattr(e, 'natural_armor'):
+        out['natural_armor'] = e.natural_armor
+    return out
 
 def _trim(image_path):
     """ Removes the border from the given image """
