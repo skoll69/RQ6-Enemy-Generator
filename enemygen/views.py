@@ -42,7 +42,7 @@ def index_json(request):
     for et in get_enemy_templates(get_filter(request), request.user):
         out.append({
             'name': et.name, 'race': et.race.name, 'rank': et.rank, 'owner': et.owner.username,
-            'tags': et.get_tags(), 'id': et.id
+            'tags': et.get_tags(), 'id': et.id, 'notes': et.notes
         })
     return HttpResponse(json.dumps(out), content_type="application/json")
 
