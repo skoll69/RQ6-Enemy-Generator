@@ -1392,6 +1392,7 @@ class _Enemy(object):
         if self.et.cult_amount:
             self._add_cults()
         self._add_combat_styles()
+        self.natural_armor = self.et.natural_armor
         return self
         
     @property
