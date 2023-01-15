@@ -116,7 +116,7 @@ def generate_enemies_json(request):
 def generate_party_json(request):
     try:
         party_object = Party.objects.get(id=request.GET['id'])
-    except (Party.DoesNotExist, MultiValueDictKeyError):
+    except (Party.DoesNotExist, MultiValueDictKeyError, ValueError):
         raise Http404
     party = get_generated_party(party_object)
     out = {'enemies': [], 'party_name': party['party'].name, 'additional_features': []}
