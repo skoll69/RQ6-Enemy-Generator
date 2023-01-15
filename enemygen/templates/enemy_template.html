@@ -58,7 +58,7 @@ $(document).ready(function(){
         var namelist_id = parseInt($(event.target).val())
         if (namelist_id > 0){
             console.log(namelist_id);
-            $('#namelist_cell').append('<a id="namelist_link" href="http://skoll.xyz/enemygen/feature_items/'+ namelist_id +'/" target=_blank>View names</a>')
+            $('#namelist_cell').append('<a id="namelist_link" href="/feature_items/'+ namelist_id +'/" target=_blank>View names</a>')
         }
     })
   $('#txtHint').focus(function(){  // For some reason IE takes focus to the hint input instead of the text input
