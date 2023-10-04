@@ -26,7 +26,7 @@ lxml==4.9.1
 markdown2==2.4.0
 mccabe==0.6.1
 mysqlclient==2.0.3
-Pillow==9.3.0
+Pillow==10.0.1
 pycparser==2.14
 Pyphen==0.10.0
 pytz==2020.5
