@@ -7,7 +7,7 @@ CairoSVG==2.7.0
 cffi==1.14.5
 colorama==0.4.3
 configparser==4.0.2
-cryptography==41.0.6
+cryptography==42.0.0
 cssselect==0.9.1
 cssselect2==0.4.1
 defusedxml==0.7.0
