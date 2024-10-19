@@ -1,5 +1,5 @@
 &nbsp;
-<div id="toggle_folk_spells" {% if not et.is_folk_magician %} style="display: none; " {% else %} style="cursor: pointer;"{% endif %}>
+<div id="folk_spells_header" {% if not et.is_folk_magician %} style="display: none; " {% else %} style="cursor: pointer;"{% endif %}>
     <h3 style="display: inline">Folk Spells </h3><span style="font-size:9px">Click to show/hide</span>
 </div>
 &nbsp;
@@ -31,7 +31,7 @@
         <button class="add_custom_spell" et_id="{{ et.id }}" type="folk">Add custom spell</button>
 </div>
 &nbsp;
-<div id="toggle_theism_spells" {% if not et.is_theist %} style="display: none; " {% else %} style="cursor: pointer;"{% endif %}>
+<div id="theism_spells_header" {% if not et.is_theist %} style="display: none; " {% else %} style="cursor: pointer;"{% endif %}>
     <h3 style="display: inline">Theism Spells </h3><span style="font-size:9px">Click to show/hide</span>
 </div>
 &nbsp;
@@ -64,7 +64,7 @@
         <button class="add_custom_spell" et_id="{{ et.id }}" type="theism">Add custom spell</button>
 </div>
 &nbsp;
-<div id="toggle_sorcery_spells" {% if not et.is_sorcerer %} style="display: none; " {% else %} style="cursor: pointer;"{% endif %}>
+<div id="sorcery_spells_header" {% if not et.is_sorcerer %} style="display: none; " {% else %} style="cursor: pointer;"{% endif %}>
     <h3 style="display: inline">Sorcery Spells </h3><span style="font-size:9px">Click to show/hide</span>
 </div>
 &nbsp;
@@ -97,7 +97,7 @@
         <button class="add_custom_spell" et_id="{{ et.id }}" type="sorcery">Add custom spell</button>
 </div>
 &nbsp;
-<div id="toggle_mysticism_spells" {% if not et.is_mystic %} style="display: none; " {% else %} style="cursor: pointer;"{% endif %}>
+<div id="mysticism_spells_header" {% if not et.is_mystic %} style="display: none; " {% else %} style="cursor: pointer;"{% endif %}>
     <h3 style="display: inline">Mystic Talents </h3><span style="font-size:9px">Click to show/hide</span>
 </div>
 &nbsp;
@@ -130,7 +130,7 @@
         <button class="add_custom_spell" et_id="{{ et.id }}" type="mysticism">Add custom talent</button>
 </div>
 &nbsp;
-<div id="toggle_spirits" {% if not et.is_animist %} style="display: none; " {% else %} style="cursor: pointer;"{% endif %}>
+<div id="spirits_header" {% if not et.is_animist %} style="display: none; " {% else %} style="cursor: pointer;"{% endif %}>
     <h3 style="display: inline">Spirits </h3><span style="font-size:9px">Click to show/hide</span>
 </div>
 &nbsp;
