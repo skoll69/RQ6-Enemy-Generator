@@ -1,6 +1,6 @@
 import os
 
-PROJECT_ROOT = os.path.join('projects', 'meg')
+PROJECT_ROOT = os.sep + os.path.join('projects', 'meg')
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000
 DATABASES = {
     'default': {
@@ -70,7 +70,7 @@ STATIC_URL = '/static/'
 
 # For development
 STATIC_ROOT = ''
-STATICFILES_DIRS = ( 'static' )
+STATICFILES_DIRS = ( 'static', 'temp' )
 
 # Django registration stuff
 ACCOUNT_ACTIVATION_DAYS = 7
