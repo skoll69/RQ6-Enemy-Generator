@@ -649,7 +649,7 @@ def change_template(request):
 
 
 def toggle_star(request, et_id):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         EnemyTemplate.objects.get(id=et_id).toggle_star(request.user)
         return JsonResponse({'success': True})
     else:

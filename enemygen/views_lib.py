@@ -86,7 +86,7 @@ def get_enemy_templates(filtr, user):
         templates = EnemyTemplate.get_starred(user)
     else:
         templates = list(published_templates)
-    if user.is_authenticated():
+    if user.is_authenticated:
         # Add the unpublished templates of the logged-in user
         unpubl = EnemyTemplate.objects.filter(published=False, owner=user).order_by('rank').exclude(race__name='Cult')
         if filtr:

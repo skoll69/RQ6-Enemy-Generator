@@ -1,5 +1,4 @@
 from django.conf.urls import include, url
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from enemygen.reg_views import MyRegistrationView
@@ -7,7 +6,7 @@ from enemygen.reg_views import MyRegistrationView
 admin.autodiscover()
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
     url(r'^accounts/register/$', MyRegistrationView.as_view(), name='registration_register'),
 
       url(r'^accounts/password/reset/$',
@@ -24,6 +23,7 @@ urlpatterns = [
                     name='password_reset_confirm'),
 
 
-    url(r'^accounts/', include('registration.backends.simple.urls')),
+    url(r'^accounts/', include('django_registration.backends.activation.urls')),
+    url(r'^accounts/', include('django.contrib.auth.urls')),
     url(r'^', include('enemygen.urls')),
 ]

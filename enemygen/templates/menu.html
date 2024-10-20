@@ -1,21 +1,21 @@
 <div id="menu">
-<span class="item"><a href="{% url 'home' %}">Home</a></span> | 
-<span class="item"><a href="{% url 'index' %}">Enemies</a></span> | 
-<span class="item"><a href="{% url 'party_index' %}">Parties</a></span> | 
-<span class="item"><a href="{% url 'edit_index' %}">My content</a></span> |
-<span class="item"><a href="{% url 'instructions' %}">Help</a></span> |
-<span class="item"><a href="{% url 'statistics' %}">Statistics</a></span> |
-<span class="item"><a href="{% url 'whats_new' %}">What's new{% if recent_changes %}<font color="red"> !</font>{% endif %}</a></span> |
-<span class="item"><a href="{% url 'about' %}">About</a></span>
+    <span class="item"><a href="{% url 'home' %}">Home</a></span> |
+    <span class="item"><a href="{% url 'index' %}">Enemies</a></span> |
+    <span class="item"><a href="{% url 'party_index' %}">Parties</a></span> |
+    <span class="item"><a href="{% url 'edit_index' %}">My content</a></span> |
+    <span class="item"><a href="{% url 'instructions' %}">Help</a></span> |
+    <span class="item"><a href="{% url 'statistics' %}">Statistics</a></span> |
+    <span class="item"><a href="{% url 'whats_new' %}">What's new{% if recent_changes %}<font color="red"> !</font>{% endif %}</a></span> |
+    <span class="item"><a href="{% url 'about' %}">About</a></span>
 
-<span style="position: absolute; right: 15px;">
-{% if user.username %}
-    <span class="item"><a href="{% url 'auth_password_change' %}">Change password</a></span> |
-    <span class="item"><a href="{% url 'auth_logout' %}">Log out</a></span>
-{% else %}
-    <span class="item"><a href="{% url 'registration_register' %}">Register</a></span> |
-    <span class="item"><a href="{% url 'auth_login' %}">Log in</a></span>
-{% endif %}
-</span>
+    <span style="position: absolute; right: 15px;">
+        {% if user.username %}
+        <span class="item"><a href="{% url 'password_change' %}">Change password</a></span> |
+        <span class="item"><a href="{% url 'logout' %}">Log out</a></span>
+        {% else %}
+        <span class="item"><a href="{% url 'registration_register' %}">Register</a></span> |
+        <span class="item"><a href="{% url 'login' %}">Log in</a></span>
+        {% endif %}
+    </span>
 
 </div>

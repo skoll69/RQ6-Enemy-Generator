@@ -24,7 +24,7 @@ def index(request):
 
 def simple_index(request):
     context = get_context(request)
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         templates = EnemyTemplate.objects.filter(owner=request.user)
         paginator = Paginator(templates, 200)
         page = request.GET.get('page')

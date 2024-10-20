@@ -4,20 +4,20 @@
 <div id="search_container">
     <input id="search" size="60" type="text" /> <button id="search_button">Search</button>
     <div class="rank_filter">
-    Filter by rank:
-    <input type="checkbox" id="1" class="rank" /> Rabble |
-    <input type="checkbox" id="2" class="rank" /> Novice | 
-    <input type="checkbox" id="3" class="rank" /> Skilled | 
-    <input type="checkbox" id="4" class="rank" /> Veteran | 
-    <input type="checkbox" id="5" class="rank" /> Master
+        Filter by rank:
+        <input type="checkbox" id="1" class="rank" /> Rabble |
+        <input type="checkbox" id="2" class="rank" /> Novice |
+        <input type="checkbox" id="3" class="rank" /> Skilled |
+        <input type="checkbox" id="4" class="rank" /> Veteran |
+        <input type="checkbox" id="5" class="rank" /> Master
     </div>
     <div class="rank_filter">
-    Filter by cult rank:
-    <input type="checkbox" id="1" class="cult_rank" /> Common |
-    <input type="checkbox" id="2" class="cult_rank" /> Dedicated | 
-    <input type="checkbox" id="3" class="cult_rank" /> Proven | 
-    <input type="checkbox" id="4" class="cult_rank" /> Overseer | 
-    <input type="checkbox" id="5" class="cult_rank" /> Leader
+        Filter by cult rank:
+        <input type="checkbox" id="1" class="cult_rank" /> Common |
+        <input type="checkbox" id="2" class="cult_rank" /> Dedicated |
+        <input type="checkbox" id="3" class="cult_rank" /> Proven |
+        <input type="checkbox" id="4" class="cult_rank" /> Overseer |
+        <input type="checkbox" id="5" class="cult_rank" /> Leader
     </div>
 </div>
 <div id="results_number">&nbsp;</div>
@@ -31,9 +31,9 @@
     {% csrf_token %}
     <div id="selected_enemy_template_list_container" style="display:none;">
         <table id="selected_enemy_template_list">
-        {% include 'enemy_list_table_head.html' %}
+            {% include 'enemy_list_table_head.html' %}
         </table>
-    <hr>
+        <hr>
     </div>
     <div id="generate_button_container">
         <input id="generate_button" disabled class="disabled" type="submit" name="generate" value="Generate"><br>
@@ -41,18 +41,18 @@
 </form>
 
 {% if not templates %}
-    <div id="getting_started">
-        <h2>Getting started</h2>
-        <p>Use the Search functionality to find templates or browse the <a href="{% url 'index' %}">full template list</a> (very slow!).</p>
-        <p>To generate enemies, enter amount and hit Generate.</p>
-        {% if user.is_authenticated %}
-        <p>Create your own templates on <a href="{% url 'edit_index' %}">My Content</a> -page.</p>
-        <p>Star your favorite templates to see them in this starting page.</p>
-        {% else %}
-        <p><a href="/accounts/register/">Register</a> and <a href="{% url 'auth_login' %}">log in</a> to create your own templates!</p>
-        {% endif %}
-        <p>Visit <a href="{% url 'instructions' %}">Help</a> for more info.</p>
-    </div>
+<div id="getting_started">
+    <h2>Getting started</h2>
+    <p>Use the Search functionality to find templates or browse the <a href="{% url 'index' %}">full template list</a> (very slow!).</p>
+    <p>To generate enemies, enter amount and hit Generate.</p>
+    {% if user.is_authenticated %}
+    <p>Create your own templates on <a href="{% url 'edit_index' %}">My Content</a> -page.</p>
+    <p>Star your favorite templates to see them in this starting page.</p>
+    {% else %}
+    <p><a href="/accounts/register/">Register</a> and <a href="{% url 'login' %}">log in</a> to create your own templates!</p>
+    {% endif %}
+    <p>Visit <a href="{% url 'instructions' %}">Help</a> for more info.</p>
+</div>
 {% endif %}
 <div id="searching">
     <img src="/static/images/loading.gif" height="80" width="80" />

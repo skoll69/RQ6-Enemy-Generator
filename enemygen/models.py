@@ -25,7 +25,7 @@ DICE_STEPS = ('-1d8', '-1d6', '-1d4', '-1d2', '+0', '+1d2', '+1d4', '+1d6', '+1d
 class Ruleset(models.Model):
     """  Ruleset element. Not really utilized currently, as the tools supports only RQ6 """
     name = models.CharField(max_length=30)
-    owner = models.ForeignKey(User)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     stats = models.ManyToManyField('StatAbstract', blank=True)
     skills = models.ManyToManyField('SkillAbstract', blank=True)
     races = models.ManyToManyField('Race', blank=True)
@@ -52,7 +52,7 @@ class Weapon(models.Model):
 class Race(models.Model):
     """ Template race. Templates inherit Movement, Hit Locations and notes. Discorporated attribute used by Spirits """
     name = models.CharField(max_length=30)
-    owner = models.ForeignKey(User)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     movement = models.CharField(max_length=50, default=6)
     special = models.TextField(blank=True)
     published = models.BooleanField(default=False)
@@ -61,7 +61,7 @@ class Race(models.Model):
     
     class Meta:
         ordering = ['name', ]
-        
+
     def __str__(self):
         return self.name
 
@@ -131,7 +131,7 @@ class HitLocation(models.Model):
     armor = models.CharField(max_length=30, default='0')  # die_set
     range_start = models.SmallIntegerField()
     range_end = models.SmallIntegerField()
-    race = models.ForeignKey(Race)
+    race = models.ForeignKey(Race, on_delete=models.CASCADE)
     hp_modifier = models.CharField(max_length=30, default='0')
 
     class Meta:
@@ -174,9 +174,9 @@ class HitLocation(models.Model):
 
 class EnemyTemplate(models.Model):
     name = models.CharField(max_length=50)
-    owner = models.ForeignKey(User)
-    ruleset = models.ForeignKey(Ruleset)
-    race = models.ForeignKey(Race)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    ruleset = models.ForeignKey(Ruleset, on_delete=models.CASCADE)
+    race = models.ForeignKey(Race, on_delete=models.CASCADE)
     folk_spell_amount = models.CharField(max_length=30, null=True, blank=True, default='0')
     theism_spell_amount = models.CharField(max_length=30, null=True, blank=True, default='0')
     sorcery_spell_amount = models.CharField(max_length=30, null=True, blank=True, default='0')
@@ -194,7 +194,7 @@ class EnemyTemplate(models.Model):
     cult_choices = ((0, 'None'), (1, 'Common'), (2, 'Dedicated'), (3, 'Proven'), (4, 'Overseer'), (5, 'Leader'))
     cult_rank = models.SmallIntegerField(default=0, choices=cult_choices)
     tags = TaggableManager(blank=True)
-    namelist = models.ForeignKey('AdditionalFeatureList', null=True, blank=True)
+    namelist = models.ForeignKey('AdditionalFeatureList', on_delete=models.CASCADE, null=True, blank=True)
     weapon_filter = models.CharField(max_length=50, blank=True, null=True)
     
     class Meta:
@@ -515,7 +515,7 @@ class EnemyTemplate(models.Model):
             combat_style.set_value(combat_style.die_set + bonus)
 
     def is_starred(self, user):
-        if user.is_authenticated():
+        if user.is_authenticated:
             try:
                 Star.objects.get(user=user, template=self)
                 return True
@@ -528,7 +528,7 @@ class EnemyTemplate(models.Model):
         
     @classmethod
     def get_starred(cls, user):
-        if user.is_authenticated():
+        if user.is_authenticated:
             stars = Star.objects.filter(user=user).order_by('template__rank', 'template__name')
             return [star.template for star in stars]
         else:
@@ -537,7 +537,7 @@ class EnemyTemplate(models.Model):
     @classmethod
     def search(cls, string, user, rank_filter=None, cult_rank_filter=None):
         string = string.strip()
-        if user.is_authenticated():
+        if user.is_authenticated:
             queryset = EnemyTemplate.objects.filter(Q(published=True) | Q(published=False, owner=user))
         else:
             queryset = EnemyTemplate.objects.filter(published=True)
@@ -571,14 +571,14 @@ class EnemyTemplate(models.Model):
 
 class Party(models.Model):
     name = models.CharField(max_length=50)
-    owner = models.ForeignKey(User)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     published = models.BooleanField(default=False)
     notes = models.TextField(null=True, blank=True, default='')
     tags = TaggableManager(blank=True)
     
     class Meta:
         ordering = ['name', ]
-        
+
     @classmethod
     def create(cls, owner):
         p = cls(name='New Party', owner=owner)
@@ -655,12 +655,12 @@ class Party(models.Model):
 
 
 class TemplateToParty(models.Model):
-    template = models.ForeignKey(EnemyTemplate)
-    party = models.ForeignKey(Party)
+    template = models.ForeignKey(EnemyTemplate, on_delete=models.CASCADE)
+    party = models.ForeignKey(Party, on_delete=models.CASCADE)
     amount = models.CharField(max_length=50)
     
     def get_amount(self):
-        return Dice(self.amount).roll()        
+        return Dice(self.amount).roll()
 
     def __str__(self):
         return self.party.name + ' - ' + self.template.name
@@ -669,7 +669,7 @@ class TemplateToParty(models.Model):
 class CombatStyle(models.Model):
     name = models.CharField(max_length=80)
     die_set = models.CharField(max_length=30, default="STR+DEX")
-    enemy_template = models.ForeignKey(EnemyTemplate)
+    enemy_template = models.ForeignKey(EnemyTemplate, on_delete=models.CASCADE)
     one_h_amount = models.CharField(max_length=30, default='0')
     two_h_amount = models.CharField(max_length=30, default='0')
     ranged_amount = models.CharField(max_length=30, default='0')
@@ -774,8 +774,8 @@ class EnemyWeapon(models.Model):
     """ Enemy-specific instance of a Weapon. Links selected weapon to CombatStyle and records
         Probability.
     """
-    combat_style = models.ForeignKey(CombatStyle)
-    weapon = models.ForeignKey(Weapon)
+    combat_style = models.ForeignKey(CombatStyle, on_delete=models.CASCADE)
+    weapon = models.ForeignKey(Weapon, on_delete=models.CASCADE)
     probability = models.SmallIntegerField(default=1)
     
     class Meta:
@@ -838,7 +838,7 @@ class EnemyWeapon(models.Model):
 
 
 class CustomWeapon(models.Model):
-    combat_style = models.ForeignKey(CombatStyle)
+    combat_style = models.ForeignKey(CombatStyle, on_delete=models.CASCADE)
     name = models.CharField(max_length=80)
     probability = models.SmallIntegerField(default=0)
     damage = models.CharField(max_length=30, default=0)
@@ -900,8 +900,8 @@ class SkillAbstract(models.Model):
 
 
 class EnemySkill(models.Model):
-    skill = models.ForeignKey(SkillAbstract)
-    enemy_template = models.ForeignKey(EnemyTemplate)
+    skill = models.ForeignKey(SkillAbstract, on_delete=models.CASCADE)
+    enemy_template = models.ForeignKey(EnemyTemplate, on_delete=models.CASCADE)
     die_set = models.CharField(max_length=100, blank=True)
     include = models.BooleanField()
     
@@ -935,7 +935,7 @@ class EnemySkill(models.Model):
 
 class CustomSkill(models.Model):
     """ Customs skills on the Enemy Templates """
-    enemy_template = models.ForeignKey(EnemyTemplate)
+    enemy_template = models.ForeignKey(EnemyTemplate, on_delete=models.CASCADE)
     name = models.CharField(max_length=80)
     die_set = models.CharField(max_length=30, blank=True)
     include = models.BooleanField()
@@ -966,8 +966,8 @@ class CustomSkill(models.Model):
 
 
 class EnemyHitLocation(models.Model):
-    hit_location = models.ForeignKey(HitLocation)
-    enemy_template = models.ForeignKey(EnemyTemplate)
+    hit_location = models.ForeignKey(HitLocation, on_delete=models.CASCADE)
+    enemy_template = models.ForeignKey(EnemyTemplate, on_delete=models.CASCADE)
     armor = models.CharField(max_length=30, blank=True)  # die_set
     
     class Meta:
@@ -1019,8 +1019,8 @@ class StatAbstract(models.Model):
 
 
 class RaceStat(models.Model):
-    stat = models.ForeignKey(StatAbstract)
-    race = models.ForeignKey(Race)
+    stat = models.ForeignKey(StatAbstract, on_delete=models.CASCADE)
+    race = models.ForeignKey(Race, on_delete=models.CASCADE)
     default_value = models.CharField(max_length=30, null=True)
     
     class Meta:
@@ -1038,8 +1038,8 @@ class RaceStat(models.Model):
 
 
 class EnemyStat(models.Model):
-    stat = models.ForeignKey(StatAbstract)
-    enemy_template = models.ForeignKey(EnemyTemplate)
+    stat = models.ForeignKey(StatAbstract, on_delete=models.CASCADE)
+    enemy_template = models.ForeignKey(EnemyTemplate, on_delete=models.CASCADE)
     die_set = models.CharField(max_length=30, null=True)
     
     class Meta:
@@ -1082,8 +1082,8 @@ class SpellAbstract(models.Model):
 
 class EnemySpell(models.Model):
     """ Enemy-specific instance of a SpellAbstract """
-    spell = models.ForeignKey(SpellAbstract)
-    enemy_template = models.ForeignKey(EnemyTemplate)
+    spell = models.ForeignKey(SpellAbstract, on_delete=models.CASCADE)
+    enemy_template = models.ForeignKey(EnemyTemplate, on_delete=models.CASCADE)
     probability = models.SmallIntegerField(default=0)
     detail = models.CharField(max_length=50, null=True, blank=True)
         
@@ -1111,7 +1111,7 @@ class EnemySpell(models.Model):
 
 class CustomSpell(models.Model):
     """ Custom spells created by users """
-    enemy_template = models.ForeignKey(EnemyTemplate)
+    enemy_template = models.ForeignKey(EnemyTemplate, on_delete=models.CASCADE)
     name = models.CharField(max_length=80)
     probability = models.SmallIntegerField(default=0)
     type = models.CharField(max_length=30, choices=(('folk', 'Folk magic'),
@@ -1140,8 +1140,8 @@ class CustomSpell(models.Model):
 
 class EnemySpirit(models.Model):
     """ Links spirits (EnemyTemplates) to animists """
-    enemy_template = models.ForeignKey(EnemyTemplate, related_name='animist')   # The animist
-    spirit = models.ForeignKey(EnemyTemplate, related_name='spirit')
+    enemy_template = models.ForeignKey(EnemyTemplate, on_delete=models.CASCADE, related_name='animist')   # The animist
+    spirit = models.ForeignKey(EnemyTemplate, on_delete=models.CASCADE, related_name='spirit')
     probability = models.SmallIntegerField(default=0)
     
     class Meta:
@@ -1165,8 +1165,8 @@ class EnemySpirit(models.Model):
 
 class EnemyCult(models.Model):
     """ Links Cults to EnemyTemplates """
-    enemy_template = models.ForeignKey(EnemyTemplate, related_name='enemytemplate')
-    cult = models.ForeignKey(EnemyTemplate, related_name='cult')
+    enemy_template = models.ForeignKey(EnemyTemplate, on_delete=models.CASCADE, related_name='enemytemplate')
+    cult = models.ForeignKey(EnemyTemplate, on_delete=models.CASCADE, related_name='cult')
     probability = models.SmallIntegerField(default=0)
 
     def __str__(self):
@@ -1214,7 +1214,7 @@ class AdditionalFeatureList(models.Model):
 
 class AdditionalFeatureItem(models.Model):
     name = models.CharField(max_length=1000)
-    feature_list = models.ForeignKey(AdditionalFeatureList)
+    feature_list = models.ForeignKey(AdditionalFeatureList, on_delete=models.CASCADE)
  
     class Meta:
         ordering = ['name', ]
@@ -1222,8 +1222,8 @@ class AdditionalFeatureItem(models.Model):
 
 class EnemyAdditionalFeatureList(models.Model):
     probability = models.CharField(max_length=30, default='POW+POW', null=True, blank=True)
-    feature_list = models.ForeignKey(AdditionalFeatureList)
-    enemy_template = models.ForeignKey(EnemyTemplate)
+    feature_list = models.ForeignKey(AdditionalFeatureList, on_delete=models.CASCADE)
+    enemy_template = models.ForeignKey(EnemyTemplate, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['feature_list', ]
@@ -1267,8 +1267,8 @@ class EnemyAdditionalFeatureList(models.Model):
 
 
 class EnemyNonrandomFeature(models.Model):
-    enemy_template = models.ForeignKey(EnemyTemplate)
-    feature = models.ForeignKey(AdditionalFeatureItem)
+    enemy_template = models.ForeignKey(EnemyTemplate, on_delete=models.CASCADE)
+    feature = models.ForeignKey(AdditionalFeatureItem, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.enemy_template.name + ' - ' + self.feature.name
@@ -1286,8 +1286,8 @@ class EnemyNonrandomFeature(models.Model):
 
 
 class PartyNonrandomFeature(models.Model):
-    party = models.ForeignKey(Party)
-    feature = models.ForeignKey(AdditionalFeatureItem)
+    party = models.ForeignKey(Party, on_delete=models.CASCADE)
+    feature = models.ForeignKey(AdditionalFeatureItem, on_delete=models.CASCADE)
 
     @classmethod
     def create(cls, party, feature_id):
@@ -1299,8 +1299,8 @@ class PartyNonrandomFeature(models.Model):
 
 class PartyAdditionalFeatureList(models.Model):
     probability = models.CharField(max_length=30, default='50', null=True, blank=True)
-    feature_list = models.ForeignKey(AdditionalFeatureList)
-    party = models.ForeignKey(Party)
+    feature_list = models.ForeignKey(AdditionalFeatureList, on_delete=models.CASCADE)
+    party = models.ForeignKey(Party, on_delete=models.CASCADE)
     
     class Meta:
         ordering = ['feature_list', ]
@@ -1738,8 +1738,8 @@ class _Elemental(_Enemy):
 
 class Star(models.Model):
     """ Functionality for starring templates (marking as favourite) """
-    user = models.ForeignKey(User)
-    template = models.ForeignKey(EnemyTemplate)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    template = models.ForeignKey(EnemyTemplate, on_delete=models.CASCADE)
     
     class Meta:
         unique_together = ('user', 'template')
