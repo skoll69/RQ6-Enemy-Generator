@@ -337,18 +337,23 @@ $(document).ready(function(){
     
     $('#pro_skill_include_24').change(function(event){  // Shaping
         $('#sorcery_spells_container').toggle();
+        $('#sorcery_spells_header').toggle();
     })
     $('#pro_skill_include_22').change(function(event){  // Devotion
         $('#theism_spells_container').toggle();
+        $('#theism_spells_header').toggle();
     })
     $('#pro_skill_include_20').change(function(event){  // Folk magician
         $('#folk_spells_container').toggle();
+        $('#folk_spells_header').toggle();
     })
     $('#pro_skill_include_27').change(function(event){  // Animist
         $('#spirits_container').toggle();
+        $('#spirits_header').toggle();
     })
     $('#pro_skill_include_30').change(function(event){  // Mystic
         $('#mysticism_spells_container').toggle();
+        $('#mysticism_spells_header').toggle();
     })
     $('img.star').click(function(event){
         toggle_star(event);
