@@ -17,6 +17,7 @@ from enemygen.enemygen_lib import to_bool
 import logging
 import json
 import html
+import os
 from bs4 import BeautifulSoup
 
 
@@ -634,7 +635,7 @@ def change_template(request):
                value        - new value
     """
     body = json.loads(request.body)
-    html_file = html.unescape(settings.TEMP + body['html_file'])
+    html_file = html.unescape(settings.TEMP + os.path.sep + body['html_file'])
     id = body['id']
     value = body['value']
     with open(html_file, 'r') as ff:
