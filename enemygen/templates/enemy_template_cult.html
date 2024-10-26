@@ -4,6 +4,30 @@
 
 {% block content %}
 
+<script>
+$(document).ready(function(){
+  $('#folk_spells_header').click(function(event){
+    $('#folk_spells_container_inner').toggle();
+  });
+
+  $('#theism_spells_header').click(function(event){
+    $('#theism_spells_container_inner').toggle();
+  });
+
+  $('#sorcery_spells_header').click(function(event){
+    $('#sorcery_spells_container_inner').toggle();
+  });
+
+  $('#mysticism_spells_header').click(function(event){
+    $('#mysticism_spells_container_inner').toggle();
+  });
+
+  $('#spirits_header').click(function(event){
+    $('#spirits_container_inner').toggle();
+  });
+});
+</script>
+
 <div> <!-- Buttons -->
     <form action="{% url 'delete_template' et.id %}" method="post">
     {% csrf_token %}
