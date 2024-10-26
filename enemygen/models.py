@@ -538,9 +538,9 @@ class EnemyTemplate(models.Model):
     def search(cls, string, user, rank_filter=None, cult_rank_filter=None):
         string = string.strip()
         if user.is_authenticated():
-            queryset = EnemyTemplate.objects.filter(Q(published=True) | Q(published=False, owner=user))
+            queryset = EnemyTemplate.objects.filter(Q(published=True) | Q(published=False, owner=user)).select_related('owner', 'race')
         else:
-            queryset = EnemyTemplate.objects.filter(published=True)
+            queryset = EnemyTemplate.objects.filter(published=True).select_related('owner', 'race')
         queryset = queryset.exclude(race__name='Cult')
         if rank_filter:
             queryset = queryset.filter(rank__in=rank_filter)

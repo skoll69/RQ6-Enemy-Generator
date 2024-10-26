@@ -6,7 +6,7 @@ from enemygen.models import Weapon, CombatStyle, EnemyWeapon, CustomWeapon, Part
 
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.conf import settings
 
 from bs4 import BeautifulSoup
@@ -38,12 +38,11 @@ def get_context(request):
                'party_filter': get_party_filter(request),
                'generated': _get_generated_amount(),
                'request': request,
-               'all_et_tags': sorted(list(EnemyTemplate.tags.all()), key=lambda x: x.name),
-               'all_party_tags': sorted(list(Party.tags.all()), key=lambda x: x.name)}
+               'all_et_tags': sorted(list(EnemyTemplate.tags.filter(enemytemplate__published=True)), key=lambda x: x.name),
+               'all_party_tags': sorted(list(Party.tags.filter(party__published=True)), key=lambda x: x.name)
+               }
     if (datetime.date.today() - ChangeLog.objects.all().reverse()[0].publish_date).days < 14:
         context['recent_changes'] = True
-    context['all_et_tags'] = [tagname for tagname in context['all_et_tags'] if EnemyTemplate.objects.filter(tags__name__in=[tagname], published=True)]
-    context['all_party_tags'] = [tagname for tagname in context['all_party_tags'] if Party.objects.filter(tags__name__in=[tagname], published=True)]
     return context
 
 
@@ -182,10 +181,7 @@ def _get_party_enemies(party):
 
 
 def _get_generated_amount():
-    n = 0
-    for et in EnemyTemplate.objects.all():
-        n += et.generated
-    return n
+    return EnemyTemplate.objects.aggregate(Sum('generated'))['generated__sum']
 
 
 def spell_list(spell_type, et):
