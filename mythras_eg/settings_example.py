@@ -1,6 +1,7 @@
 import os
+from pathlib import Path
 
-PROJECT_ROOT = os.sep + os.path.join('projects', 'meg')
+PROJECT_ROOT = Path(__file__).resolve(strict=True).parent.parent
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000
 DATABASES = {
     'default': {
@@ -40,6 +41,8 @@ MIDDLEWARE = (
 )
 
 ROOT_URLCONF = 'mythras_eg.urls'
+
+DEFAULT_AUTO_FIELD='django.db.models.AutoField' 
 
 TEMPLATES = [
     {

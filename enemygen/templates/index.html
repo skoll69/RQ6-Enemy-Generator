@@ -9,9 +9,6 @@
     <select name="filter" onchange="this.form.submit()">
             <option value="None" {% if filter == 'None' %}selected="selected"{% endif %}>None</option>
             <option value="Starred" {% if filter == 'Starred' %}selected="selected"{% endif %}>Starred</option>
-        {% for tag in all_et_tags %}
-            <option value="{{ tag.name }}" {% if tag.name == filter %}selected="selected"{% endif %}>{{ tag }}</option>
-        {% endfor %}
     </select>
     </form>
 </div>

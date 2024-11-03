@@ -322,7 +322,7 @@ class EnemyTemplate(models.Model):
     
     @property
     def stats(self):
-        return EnemyStat.objects.filter(enemy_template=self)
+        return EnemyStat.objects.filter(enemy_template=self).select_related('stat')
 
     @property
     def stat_dict(self):
@@ -334,14 +334,14 @@ class EnemyTemplate(models.Model):
     @property
     def skills(self):
         output = []
-        output.extend(list(EnemySkill.objects.filter(enemy_template=self)))
+        output.extend(list(EnemySkill.objects.filter(enemy_template=self).select_related('skill')))
         output.extend(list(CustomSkill.objects.filter(enemy_template=self)))
         output = sorted(output, key=lambda k: k.name)
         return output
         
     @property
     def included_standard_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self, skill__standard=True, include=True)
+        return EnemySkill.objects.filter(enemy_template=self, skill__standard=True, include=True).select_related('skill')
         
     @property
     def is_spirit(self):
@@ -357,27 +357,27 @@ class EnemyTemplate(models.Model):
         
     @property
     def raw_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self)
+        return EnemySkill.objects.filter(enemy_template=self).select_related('skill')
         
     @property
     def standard_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self, skill__standard=True)
+        return EnemySkill.objects.filter(enemy_template=self, skill__standard=True).select_related('skill')
         
     @property
     def included_magic_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, skill__magic=True, include=True)
+        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, skill__magic=True, include=True).select_related('skill')
         
     @property
     def magic_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, skill__magic=True)
+        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, skill__magic=True).select_related('skill')
         
     @property
     def included_professional_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, skill__magic=False, include=True)
+        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, skill__magic=False, include=True).select_related('skill')
         
     @property
     def professional_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, skill__magic=False)
+        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, skill__magic=False).select_related('skill')
         
     @property
     def included_custom_skills(self):
@@ -425,7 +425,7 @@ class EnemyTemplate(models.Model):
 
     @property
     def hit_locations(self):
-        return EnemyHitLocation.objects.filter(enemy_template=self)
+        return EnemyHitLocation.objects.filter(enemy_template=self).select_related('hit_location')
 
     @property
     def combat_styles(self):
@@ -433,7 +433,7 @@ class EnemyTemplate(models.Model):
         
     @property
     def additional_features(self):
-        return EnemyAdditionalFeatureList.objects.filter(enemy_template=self)
+        return EnemyAdditionalFeatureList.objects.filter(enemy_template=self).select_related('feature_list')
         
     @property
     def nonrandom_features(self):

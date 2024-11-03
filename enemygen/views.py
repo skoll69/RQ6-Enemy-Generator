@@ -18,6 +18,7 @@ import json
 
 def index(request):
     context = get_context(request)
+
     context['templates'] = get_enemy_templates(get_filter(request), request.user)
     return render(request, 'index.html', context)
 
@@ -80,7 +81,6 @@ def generate_enemies(request):
     if not request.POST:
         return redirect('index')
     context = get_context(request)
-    print(request)
     if request.POST.get('lucky', None):
         context['enemies'] = get_enemies_lucky(request)
         context['single_template'] = True
@@ -145,7 +145,7 @@ def generate_party(request):
 @login_required
 def edit_index(request):
     context = get_context(request)
-    templates = EnemyTemplate.objects.filter(owner=request.user).exclude(race__name='Cult')
+    templates = EnemyTemplate.objects.filter(owner=request.user).exclude(race__name='Cult').select_related('race')
     for et in templates:
         et.starred = et.is_starred(request.user)
     context['enemy_templates'] = templates
@@ -168,7 +168,7 @@ def race_index(request):
 def enemy_template(request, enemy_template_id):
     context = get_context(request)
     template = 'enemy_template.html'
-    et = get_object_or_404(EnemyTemplate, id=enemy_template_id)
+    et = get_object_or_404(EnemyTemplate.objects.select_related('race'), id=enemy_template_id)
     et.starred = et.is_starred(request.user)
     if et.is_cult:
         template = 'enemy_template_cult.html'

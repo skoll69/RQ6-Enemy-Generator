@@ -38,8 +38,8 @@ def get_context(request):
                'party_filter': get_party_filter(request),
                'generated': _get_generated_amount(),
                'request': request,
-               'all_et_tags': sorted(list(EnemyTemplate.tags.filter(enemytemplate__published=True)), key=lambda x: x.name),
-               'all_party_tags': sorted(list(Party.tags.filter(party__published=True)), key=lambda x: x.name)
+               'all_et_tags': sorted(list(EnemyTemplate.tags.all()), key=lambda x: x.name),
+               'all_party_tags': sorted(list(Party.tags.all()), key=lambda x: x.name)
                }
     if (datetime.date.today() - ChangeLog.objects.all().reverse()[0].publish_date).days < 14:
         context['recent_changes'] = True
@@ -56,7 +56,8 @@ def get_et_context(et):
                'spirit_options': spirit_options(),
                'cult_options': cult_options(),
                'additional_feature_lists': AdditionalFeatureList.objects.filter(type='enemy_feature'),
-               'namelists': AdditionalFeatureList.objects.filter(type='name')}
+               'namelists': AdditionalFeatureList.objects.filter(type='name'),
+            }
     return context
 
 
@@ -78,7 +79,7 @@ def get_party_context(party):
 
 
 def get_enemy_templates(filtr, user):
-    published_templates = EnemyTemplate.objects.filter(published=True).order_by('rank').exclude(race__name='Cult')
+    published_templates = EnemyTemplate.objects.filter(published=True).order_by('rank').exclude(race__name='Cult').select_related('race')
     if filtr and filtr not in ('None', 'Starred'):
         templates = list(published_templates.filter(tags__name__in=[filtr, ]))
     elif filtr == 'Starred':
@@ -87,7 +88,7 @@ def get_enemy_templates(filtr, user):
         templates = list(published_templates)
     if user.is_authenticated:
         # Add the unpublished templates of the logged-in user
-        unpubl = EnemyTemplate.objects.filter(published=False, owner=user).order_by('rank').exclude(race__name='Cult')
+        unpubl = EnemyTemplate.objects.filter(published=False, owner=user).order_by('rank').exclude(race__name='Cult').select_related('race')
         if filtr:
             templates.extend(list(unpubl.filter(tags__name__in=[filtr, ])))
         else:
@@ -187,17 +188,13 @@ def _get_generated_amount():
 def spell_list(spell_type, et):
     """ Returns the list of the given type of spells for the given EnemyTemplate """
     output = []
-    for spell in SpellAbstract.objects.filter(type=spell_type):
-        try:
-            es = EnemySpell.objects.get(spell=spell, enemy_template=et)
-            prob = es.probability
-            detail_text = es.detail
-        except EnemySpell.DoesNotExist:
-            prob = 0
-            detail_text = spell.default_detail
-        sp = {'id': spell.id, 'name': spell.name, 'probability': prob, 'detail_text': detail_text,
-              'detail': spell.detail}
-        output.append(sp)
+    found = []
+    for spell in EnemySpell.objects.filter(enemy_template=et, spell__type=spell_type).select_related('spell'):
+        output.append({'id': spell.spell.id, 'name': spell.spell.name, 'probability': spell.probability, 'detail_text': spell.detail, 'detail': spell.spell.detail })
+        found.append(spell.spell.id)
+    for spell in SpellAbstract.objects.filter(type=spell_type).exclude(id__in=found):
+        output.append({'id': spell.id, 'name': spell.name, 'probability': 0, 'detail_text': spell.default_detail, 'detail': spell.detail})
+    output.sort(key=lambda x: x['name'])
     for spell in CustomSpell.objects.filter(enemy_template=et, type=spell_type):
         sp = {'id': spell.id, 'name': spell.name, 'probability': spell.probability, 'custom': True}
         output.append(sp)
