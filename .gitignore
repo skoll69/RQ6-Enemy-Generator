@@ -1,6 +1,9 @@
 .idea
 *.pyc
 mythras_eg/settings.py
+mythras_eg/settings_prod.py
 temp/
 .vscode
 dump.sql
+.venv
+*/__pycache__
