@@ -70,9 +70,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# For development
-STATIC_ROOT = ''
-STATICFILES_DIRS = ( 'static', 'temp' )
+# STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static') # For collectstatic
+STATICFILES_DIRS = ( 'static', 'temp' ) # For development
 
 # Django registration stuff
 ACCOUNT_ACTIVATION_DAYS = 7
