@@ -1,13 +1,16 @@
+import os
+
 from django.conf.urls import include
 from django.urls import re_path as url
-from django.urls import path
-
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from enemygen.reg_views import MyRegistrationView
 
 admin.autodiscover()
 
+temp_path = static('/temp/', document_root=os.path.join(settings.PROJECT_ROOT, 'temp')) if settings.DEBUG else []
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^accounts/register/$', MyRegistrationView.as_view(), name='registration_register'),
@@ -23,4 +26,4 @@ urlpatterns = [
     url(r'^accounts/', include('django_registration.backends.activation.urls')),
     url(r'^accounts/', include('django.contrib.auth.urls')),
     url(r'^', include('enemygen.urls')),
-]
+] + temp_path
