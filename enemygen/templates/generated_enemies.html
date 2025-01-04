@@ -379,7 +379,7 @@ div#png_export{
                 {% if enemy.cults|length == 1 and enemy.cults.0.name|length <= 27 %}
                     <td>Cult</td>         <td>{{ enemy.cults.0.name }}</td></tr>
                 {% else %}
-                    <td>&nbsp;</td>         <td>&nbsp;</td></tr>
+                    <td style="visibility:hidden">.</td>         <td>&nbsp;</td></tr>
                 {% endif %}
         </table>
     {% if enemy.hit_locations %}
