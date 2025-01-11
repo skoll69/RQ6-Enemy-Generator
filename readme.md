@@ -21,9 +21,11 @@ https://doc.courtbouillon.org/weasyprint/stable/
 
 ## Start Dev env
 
-### Windows
+`python manage.py runserver`
 
-`python.exe .\manage.py runserver`
+## Unit tests
+
+`python manage.py test`
 
 ## AWS Setup reminder list
 
