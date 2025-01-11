@@ -8,16 +8,15 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 
 from collections import OrderedDict
-
-from dice import Dice, _die_to_tuple, clean
-
-from models import EnemyTemplate, _Enemy, Ruleset, StatAbstract, Race, SpellAbstract
-from models import EnemyStat, EnemySkill, SkillAbstract, EnemySpell
-from models import CombatStyle, Weapon
-
-from enemygen_lib import select_random_item, replace_die_set
-from views_lib import as_json
 import json
+
+from .dice import Dice, _die_to_tuple, clean
+
+from .models import EnemyTemplate, _Enemy, Ruleset, StatAbstract, Race, SpellAbstract
+from .models import EnemyStat, EnemySkill, SkillAbstract, EnemySpell
+from .models import CombatStyle, Weapon
+from .enemygen_lib import select_random_item, replace_die_set
+from .views_lib import as_json
 
 class TestDice(TestCase):
     def test_1_die_to_tuple(self):
@@ -374,7 +373,7 @@ class TestJson(TestCase):
         edict = json.loads(ejson)
         self.assertEqual(edict[0]['folk_spells'][0], 'Bladesharp')
         self.assertEqual(edict[0]['combat_styles'][0]['name'], 'Primary Combat Style')
-        self.assertEqual(edict[0]['skills'][2].keys()[0], 'Endurance')
+        self.assertEqual(list(edict[0]['skills'][2].keys())[0], 'Endurance')
         self.assertEqual(edict[0]['skills'][2]['Endurance'], enemy.skills_dict['Endurance'])
 
 
