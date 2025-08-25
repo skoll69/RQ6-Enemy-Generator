@@ -1,6 +1,7 @@
 import os
 import shutil
 import pytest
+import sys
 
 from .conftest import run, env_vars
 
@@ -49,11 +50,48 @@ def test_dump_uploaded_verifies_weapons_table(has_container_cli, ensure_apple_ru
     if not db_name or not root_password:
         pytest.skip("DB_NAME/MYSQL_ROOT_PASSWORD not set in .env; cannot verify dump upload as root")
 
+    # Show database diagnostics first (very visible in output)
+    print("\n=== DB DIAGNOSTICS BEGIN ===", file=sys.stderr)
+    # Selected DB name from mysql perspective
+    dcode, dout, derr = run([
+        'container', 'exec', '-i', 'mythras-mysql', 'sh', '-c',
+        f"MYSQL_PWD='{root_password}' mysql -N -B -uroot {db_name} -e 'SELECT DATABASE();'"
+    ])
+    if dcode == 0:
+        print(f"[diagnostic] SELECT DATABASE(): {(dout or '').strip()}", file=sys.stderr)
+    else:
+        print(f"[diagnostic] SELECT DATABASE() failed: {(derr or '').strip()}", file=sys.stderr)
+
+    # List all databases
+    dbsc, dbso, dbse = run([
+        'container', 'exec', '-i', 'mythras-mysql', 'sh', '-c',
+        f"MYSQL_PWD='{root_password}' mysql -N -B -uroot -e 'SHOW DATABASES;'"
+    ])
+    dblist = (dbso or '').strip()
+    print("[diagnostic] SHOW DATABASES:\n" + (dblist if dblist else '(no databases or query failed)'), file=sys.stderr)
+    if dbsc != 0 and dbse:
+        print("[diagnostic] SHOW DATABASES stderr:\n" + dbse, file=sys.stderr)
+
+    # List all tables in target DB
+    tcode, tout, terr = run([
+        'container', 'exec', '-i', 'mythras-mysql', 'sh', '-c',
+        f"MYSQL_PWD='{root_password}' mysql -N -B -uroot {db_name} -e 'SHOW TABLES;'"
+    ])
+    tables_list = (tout or '').strip()
+    if tables_list:
+        lines = tables_list.splitlines()
+        print(f"[diagnostic] SHOW TABLES in {db_name} (count={len(lines)}):\n" + tables_list, file=sys.stderr)
+    else:
+        print(f"[diagnostic] SHOW TABLES in {db_name}: (no tables or query failed)", file=sys.stderr)
+    if tcode != 0 and terr:
+        print("[diagnostic] SHOW TABLES stderr:\n" + terr, file=sys.stderr)
+    print("=== DB DIAGNOSTICS END ===\n", file=sys.stderr)
+
     # helper to run count as root
     def query_weapons_count_as_root():
         code, out, err = run([
             'container', 'exec', '-i', 'mythras-mysql', 'sh', '-c',
-            f"MYSQL_PWD='{root_password}' mysql -N -B -uroot {db_name} -e 'SELECT COUNT(*) FROM weapons'"
+            f"MYSQL_PWD='{root_password}' mysql -N -B -uroot {db_name} -e 'SELECT COUNT(*) FROM mw_enemyweapon'"
         ])
         return code, (out or '').strip(), (err or '')
 

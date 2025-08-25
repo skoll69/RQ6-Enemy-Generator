@@ -231,6 +231,20 @@ if [[ -z "$TARGET_DB" && "$AS_ROOT" -eq 1 && "${AUTO_START_DB:-0}" == "1" ]]; th
   fi
 fi
 
+# Additional robust fallback: when importing as root and TARGET_DB still empty,
+# resolve from MYSQL_DATABASE or DB_NAME regardless of AUTO_START_DB or data dir state.
+if [[ -z "$TARGET_DB" && "$AS_ROOT" -eq 1 ]]; then
+  if [[ -n "${MYSQL_DATABASE:-}" ]]; then
+    TARGET_DB="$MYSQL_DATABASE"
+  elif [[ -f "$ENV_FILE" ]]; then
+    _ENV_DB_NAME=$(grep -E '^DB_NAME=' "$ENV_FILE" | tail -n1 | cut -d'=' -f2- || true)
+    if [[ -n "$_ENV_DB_NAME" ]]; then TARGET_DB="$_ENV_DB_NAME"; fi
+  fi
+  if [[ -n "$TARGET_DB" ]]; then
+    echo "[auto] Resolved target database: $TARGET_DB" >&2
+  fi
+fi
+
 debug_print "DUMP_CMD=${DUMP_CMD[*]}"
 
 if [[ $AS_ROOT -eq 1 ]]; then
@@ -288,13 +302,13 @@ build_mysql8_filter() {
   # - remove DEFINER clauses and /*!50013 DEFINER=... */ (single-line)
   # - change SQL SECURITY DEFINER -> SQL SECURITY INVOKER (safer)
   # - drop GTID_PURGED and SQL_LOG_BIN statements
-  # Use BSD/macOS sed-friendly delimiters and spacing classes.
+  # Use BSD/macOS sed-friendly patterns (no GNU-specific I modifier on address commands).
   sed -E \
     -e 's|/\*![0-9][0-9]*[[:space:]]+DEFINER=`[^`]+`@`[^`]+`[[:space:]]+\*/||g' \
     -e 's|DEFINER=`[^`]+`@`[^`]+`||g' \
-    -e 's/SQL[[:space:]]+SECURITY[[:space:]]+DEFINER/SQL SECURITY INVOKER/gI' \
-    -e '/^SET[[:space:]]+@@GLOBAL\.GTID_PURGED/dI' \
-    -e '/^SET[[:space:]]+SQL_LOG_BIN[[:space:]]*=.*/dI'
+    -e 's/[Ss][Qq][Ll][[:space:]]+[Ss][Ee][Cc][Uu][Rr][Ii][Tt][Yy][[:space:]]+[Dd][Ee][Ff][Ii][Nn][Ee][Rr]/SQL SECURITY INVOKER/g' \
+    -e '/^[[:space:]]*[Ss][Ee][Tt][[:space:]]+@@[Gg][Ll][Oo][Bb][Aa][Ll]\.[Gg][Tt][Ii][Dd]_[Pp][Uu][Rr][Gg][Ee][Dd]/d' \
+    -e '/^[[:space:]]*[Ss][Ee][Tt][[:space:]]+[Ss][Qq][Ll]_[Ll][Oo][Gg]_[Bb][Ii][Nn][[:space:]]*=.*/d'
 }
 
 # Helper to show error context around a failing line

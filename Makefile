@@ -232,29 +232,29 @@ apple-env-check:
 	: "$$MYSQL_ROOT_PASSWORD" >/dev/null 2>&1 || { echo "Error: MYSQL_ROOT_PASSWORD must be set in .env or environment" >&2; exit 1; }
 
 # Free host port 3306 by killing any process listening on it (best-effort)
-apple-free-port-3306:
+apple-free-port-3307:
 	@# Try lsof first, then netstat; ignore errors if tools are missing
 	@if command -v lsof >/dev/null 2>&1; then \
-	  PIDS=$$(lsof -t -iTCP:3306 -sTCP:LISTEN 2>/dev/null | sort -u); \
+	  PIDS=$$(lsof -t -iTCP:3307 -sTCP:LISTEN 2>/dev/null | sort -u); \
 	  if [ -n "$$PIDS" ]; then \
-	    echo "[apple-free-port-3306] Detected listeners on 3306: $$PIDS"; \
+	    echo "[apple-free-port-3307] Detected listeners on 3307: $$PIDS"; \
 	    kill $$PIDS >/dev/null 2>&1 || true; \
 	    sleep 0.3; \
 	    # Force kill any remaining
-	    STILL=$$(lsof -t -iTCP:3306 -sTCP:LISTEN 2>/dev/null | sort -u); \
-	    if [ -n "$$STILL" ]; then echo "[apple-free-port-3306] Forcing kill for: $$STILL"; kill -9 $$STILL >/dev/null 2>&1 || true; fi; \
+	    STILL=$$(lsof -t -iTCP:3307 -sTCP:LISTEN 2>/dev/null | sort -u); \
+	    if [ -n "$$STILL" ]; then echo "[apple-free-port-3307] Forcing kill for: $$STILL"; kill -9 $$STILL >/dev/null 2>&1 || true; fi; \
 	  else \
-	    echo "[apple-free-port-3306] No listeners on 3306 (lsof)"; \
+	    echo "[apple-free-port-3307] No listeners on 3307 (lsof)"; \
 	  fi; \
 	elif command -v netstat >/dev/null 2>&1; then \
-	  if netstat -anv 2>/dev/null | grep -E '\\.3306 .*LISTEN' >/dev/null; then \
-	    echo "[apple-free-port-3306] Port 3306 appears in LISTEN state but cannot identify PIDs via netstat on this platform."; \
-	    echo "[apple-free-port-3306] Hint: Consider 'sudo lsof -iTCP:3306 -sTCP:LISTEN -Pn' to find the process."; \
+	  if netstat -anv 2>/dev/null | grep -E '\\.3307 .*LISTEN' >/dev/null; then \
+	    echo "[apple-free-port-3307] Port 3307 appears in LISTEN state but cannot identify PIDs via netstat on this platform."; \
+	    echo "[apple-free-port-3307] Hint: Consider 'sudo lsof -iTCP:3307 -sTCP:LISTEN -Pn' to find the process."; \
 	  else \
-	    echo "[apple-free-port-3306] No listeners on 3306 (netstat)"; \
+	    echo "[apple-free-port-3307] No listeners on 3307 (netstat)"; \
 	  fi; \
 	else \
-	  echo "[apple-free-port-3306] Neither lsof nor netstat available; cannot proactively free port 3306."; \
+	  echo "[apple-free-port-3307] Neither lsof nor netstat available; cannot proactively free port 3307."; \
 	fi
 
 apple-pre-remove:
