@@ -331,3 +331,48 @@ def _autouse_upload_dump(ensure_dump_uploaded):
     """Autouse bootstrap to ensure dump upload happens before any tests."""
     print("[autouse] ensured dump upload setup has been invoked.", file=sys.stderr)
     return None
+
+
+# --- Generate statistics after dump upload, before tests ---
+@pytest.fixture(scope='session')
+def ensure_stats_generated(env_vars, ensure_dump_uploaded, has_container_cli):
+    """Generate a statistics file (tables + row counts) just before tests start.
+    - Depends on ensure_dump_uploaded so it runs after a successful (or attempted) import.
+    - Uses Makefile target 'generate-stats' which defaults to DB_NAME from .env.
+    - Logs extensively; non-fatal on failure (prints warning and returns).
+    """
+    import time
+
+    if not has_container_cli:
+        print("[ensure_stats_generated] container CLI not present; skipping stats generation.", file=sys.stderr)
+        return
+
+    db_name = env_vars.get('DB_NAME')
+    root_pw = env_vars.get('MYSQL_ROOT_PASSWORD')
+    if not (db_name and root_pw):
+        print("[ensure_stats_generated] DB_NAME/MYSQL_ROOT_PASSWORD not set in .env; skipping stats generation.", file=sys.stderr)
+        return
+
+    # Normalize quotes for safety (if user left them in .env)
+    if root_pw and ((root_pw.startswith("'") and root_pw.endswith("'")) or (root_pw.startswith('"') and root_pw.endswith('"'))):
+        root_pw = root_pw[1:-1]
+
+    print(f"[ensure_stats_generated] {time.strftime('%Y-%m-%d %H:%M:%S')} generating stats...", file=sys.stderr)
+    code, out, err = run(['make', 'generate-stats'], timeout=300)
+    print(f"[ensure_stats_generated] make generate-stats exit={code}", file=sys.stderr)
+    if out:
+        print(f"[ensure_stats_generated] stdout:\n{out}", file=sys.stderr)
+    if err:
+        print(f"[ensure_stats_generated] stderr:\n{err}", file=sys.stderr)
+    if code != 0:
+        print("[ensure_stats_generated] Warning: generate-stats failed; continuing without blocking tests.", file=sys.stderr)
+        return
+
+    print("[ensure_stats_generated] statistics generated.", file=sys.stderr)
+
+
+@pytest.fixture(scope='session', autouse=True)
+def _autouse_generate_stats(ensure_stats_generated):
+    """Autouse to ensure stats are generated as the last step before tests."""
+    print("[autouse] ensured stats generation has been invoked.", file=sys.stderr)
+    return None
