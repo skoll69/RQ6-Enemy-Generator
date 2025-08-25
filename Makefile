@@ -85,12 +85,14 @@ upload-dump-compat-debug:
 	CONTAINER=$(EFFECTIVE_CONTAINER) DUMP_DEBUG=1 bash ./upload_dump.sh --debug --mysql8-compat $(ARGS)
 
 # Generate DB statistics file (tables and row counts)
-# Usage: make generate-stats [DB=mythras_eg]
+# Usage: make generate-stats (defaults to DB_NAME from .env/environment)
 generate-stats:
-	@DB_NAME_EFF=$${DB:-$${DB_NAME:-$${MYSQL_DATABASE:-}}}; \
-	if [ -z "$$DB_NAME_EFF" ]; then echo "Error: set DB, or DB_NAME/MYSQL_DATABASE in .env" >&2; exit 1; fi; \
+	@ENV_FILE=.env; \
+	if [ -f "$$ENV_FILE" ]; then export $$(grep -E '^(DB_NAME)=' "$$ENV_FILE" 2>/dev/null || true); fi; \
+	DB_NAME_EFF=$${DB_NAME:-}; \
+	if [ -z "$$DB_NAME_EFF" ]; then echo "Error: Set DB_NAME in .env or environment" >&2; exit 1; fi; \
 	chmod +x ./generate_stats.sh >/dev/null 2>&1 || true; \
-	./generate_stats.sh --db "$$DB_NAME_EFF"
+	./generate_stats.sh
 
 
 scripts-chmod:
