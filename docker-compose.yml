@@ -1,0 +1,33 @@
+# This docker-compose.yml is compatible with Docker Desktop and Apple container
+# See: https://github.com/apple/container
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    # On Apple Silicon, the official image provides arm64/v8; Docker will pick correct platform automatically.
+    # Uncomment the next line if Docker fails to auto-select the correct platform.
+    # platform: linux/arm64/v8
+    container_name: mythras-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-mythras_eg}
+      MYSQL_USER: ${MYSQL_USER:-mythras_eg}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql  # For Docker Desktop named volume; Apple container no-compose uses host bind: "$HOME/container-data/mysql:/var/lib/mysql"
+      # Optional: place .sql or .sql.gz files in ./db_init to auto-import on FIRST RUN only.
+      # The official MySQL image runs scripts from /docker-entrypoint-initdb.d ONLY when the data dir is empty.
+      # Uncomment the next line to enable automatic import from ./db_init:
+      # - ./db_init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  db_data:
