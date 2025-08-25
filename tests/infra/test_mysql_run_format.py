@@ -14,6 +14,7 @@ def test_apple_container_mysql_run_exact_format():
     Skips when Apple 'container' CLI is not available. Cleans up any existing
     container named mythras-mysql before starting, and removes it at the end.
     """
+    pytest.skip("Disabled by requirement: skip running test_mysql_run_format")
     if not shutil.which('container'):
         pytest.skip("Apple 'container' CLI not present on this system")
 

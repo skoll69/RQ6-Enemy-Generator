@@ -84,9 +84,17 @@ upload-dump-compat:
 upload-dump-compat-debug:
 	CONTAINER=$(EFFECTIVE_CONTAINER) DUMP_DEBUG=1 bash ./upload_dump.sh --debug --mysql8-compat $(ARGS)
 
+# Generate DB statistics file (tables and row counts)
+# Usage: make generate-stats [DB=mythras_eg]
+generate-stats:
+	@DB_NAME_EFF=$${DB:-$${DB_NAME:-$${MYSQL_DATABASE:-}}}; \
+	if [ -z "$$DB_NAME_EFF" ]; then echo "Error: set DB, or DB_NAME/MYSQL_DATABASE in .env" >&2; exit 1; fi; \
+	chmod +x ./generate_stats.sh >/dev/null 2>&1 || true; \
+	./generate_stats.sh --db "$$DB_NAME_EFF"
+
 
 scripts-chmod:
-	chmod +x start_db.sh stop_db.sh upload_dump.sh run_db_nocompose.sh stop_db_nocompose.sh start_db_simple.sh analyze_dump.sh
+	chmod +x start_db.sh stop_db.sh upload_dump.sh run_db_nocompose.sh stop_db_nocompose.sh start_db_simple.sh analyze_dump.sh generate_stats.sh
 
 
 # Minimal new start: direct minimal commands to create/start DB, create user, and upload dump

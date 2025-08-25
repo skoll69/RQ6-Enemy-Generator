@@ -324,26 +324,34 @@ show_error_context() {
   fi
 }
 
-# Stream import without copying file into container
+# Stream import without copying file into container (use temp filtered file in compat mode for safer processing)
 TMP_ERR=$(mktemp 2>/dev/null || echo "/tmp/upload_dump_err.$$")
+TMP_FILTER=""
+CONTEXT_FILE="$DUMP_PATH"
 echo "Importing $DUMP_PATH into container $CONTAINER_NAME using $CONTAINER_CLI..."
 set +e
 if [[ "${DUMP_CMD[0]}" == "zcat" ]]; then
   if [[ "$MYSQL8_COMPAT" == "1" ]]; then
-    debug_print "Command: (echo SET NAMES utf8mb4; zcat) | sed(filters) | exec mysql"
+    TMP_FILTER=$(mktemp 2>/dev/null || echo "/tmp/filtered_dump.$$")
+    debug_print "Compat path: creating filtered temp (gz). Pipeline: (SET NAMES; zcat) | crlf->lf | sed(filters) > $TMP_FILTER"
     { echo "SET NAMES utf8mb4;"; zcat "$DUMP_PATH"; } \
-      | build_mysql8_filter \
-      | "$CONTAINER_CLI" exec -i "$CONTAINER_NAME" "${IMPORT_CMD[@]}" "${MYSQL_FLAGS[@]}" 2>"$TMP_ERR"
+      | sed -e 's/\r$//' \
+      | build_mysql8_filter > "$TMP_FILTER"
+    CONTEXT_FILE="$TMP_FILTER"
+    cat "$TMP_FILTER" | "$CONTAINER_CLI" exec -i "$CONTAINER_NAME" "${IMPORT_CMD[@]}" "${MYSQL_FLAGS[@]}" 2>"$TMP_ERR"
   else
     debug_print "Command: zcat '$DUMP_PATH' | $CONTAINER_CLI exec -i $CONTAINER_NAME ${IMPORT_CMD[*]} ${MYSQL_FLAGS[*]}"
     zcat "$DUMP_PATH" | "$CONTAINER_CLI" exec -i "$CONTAINER_NAME" "${IMPORT_CMD[@]}" "${MYSQL_FLAGS[@]}" 2>"$TMP_ERR"
   fi
 else
   if [[ "$MYSQL8_COMPAT" == "1" ]]; then
-    debug_print "Command: (echo SET NAMES utf8mb4; cat) | sed(filters) | exec mysql"
+    TMP_FILTER=$(mktemp 2>/dev/null || echo "/tmp/filtered_dump.$$")
+    debug_print "Compat path: creating filtered temp (plain). Pipeline: (SET NAMES; cat) | crlf->lf | sed(filters) > $TMP_FILTER"
     { echo "SET NAMES utf8mb4;"; cat "$DUMP_PATH"; } \
-      | build_mysql8_filter \
-      | "$CONTAINER_CLI" exec -i "$CONTAINER_NAME" "${IMPORT_CMD[@]}" "${MYSQL_FLAGS[@]}" 2>"$TMP_ERR"
+      | sed -e 's/\r$//' \
+      | build_mysql8_filter > "$TMP_FILTER"
+    CONTEXT_FILE="$TMP_FILTER"
+    cat "$TMP_FILTER" | "$CONTAINER_CLI" exec -i "$CONTAINER_NAME" "${IMPORT_CMD[@]}" "${MYSQL_FLAGS[@]}" 2>"$TMP_ERR"
   else
     debug_print "Command: cat '$DUMP_PATH' | $CONTAINER_CLI exec -i $CONTAINER_NAME ${IMPORT_CMD[*]} ${MYSQL_FLAGS[*]}"
     cat "$DUMP_PATH" | "$CONTAINER_CLI" exec -i "$CONTAINER_NAME" "${IMPORT_CMD[@]}" "${MYSQL_FLAGS[@]}" 2>"$TMP_ERR"
@@ -354,10 +362,13 @@ set -e
 if [[ $status -ne 0 ]]; then
   echo "Import failed (exit code $status). mysql stderr:" >&2
   cat "$TMP_ERR" >&2 || true
-  show_error_context "$TMP_ERR" "$DUMP_PATH"
+  show_error_context "$TMP_ERR" "$CONTEXT_FILE"
   rm -f "$TMP_ERR" >/dev/null 2>&1 || true
+  [ -n "$TMP_FILTER" ] && rm -f "$TMP_FILTER" >/dev/null 2>&1 || true
   exit $status
 fi
 rm -f "$TMP_ERR" >/dev/null 2>&1 || true
+[ -n "$TMP_FILTER" ] && rm -f "$TMP_FILTER" >/dev/null 2>&1 || true
 
+# Post-import statistics generation moved to separate script generate_stats.sh by requirement.
 echo "Import completed."
