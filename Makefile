@@ -98,7 +98,7 @@ scripts-chmod:
 
 
 # Minimal new start: direct minimal commands to create/start DB, create user, and upload dump
-	env-new-start:
+env-new-start:
 		@set -eu; \
 		ENV_FILE=.env; \
 		# Load required variables safely from .env
@@ -279,14 +279,14 @@ apple-pre-remove:
 	  echo "[apple-pre-remove] No existing mythras-mysql container found."; \
 	fi
 
-	apple-show-cmd:
-		@echo "[apple-run] Executing required command:"; \
-		echo "container run"; \
-		echo "  --name mythras-mysql"; \
-		echo "  --publish 127.0.0.1:3307:3306"; \
-		echo "  --volume \"$${HOME}/container-data/mysql:/var/lib/mysql\""; \
-		echo "  --env MYSQL_ROOT_PASSWORD=***"; \
-		echo "  docker.io/library/mysql:8"
+apple-show-cmd:
+	@echo "[apple-run] Executing required command:"; \
+	echo "container run"; \
+	echo "  --name mythras-mysql"; \
+	echo "  --publish 127.0.0.1:3307:3306"; \
+	echo "  --volume \"$${HOME}/container-data/mysql:/var/lib/mysql\""; \
+	echo "  --env MYSQL_ROOT_PASSWORD=***"; \
+	echo "  docker.io/library/mysql:8"
 
 apple-run:
 	@/bin/bash -eu -o pipefail <<'BASH'
