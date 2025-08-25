@@ -451,7 +451,7 @@ mysql-shell-db:
 # Usage: make mysql-shell-app [USER=mythras_eg] [DB=mythras_eg]
 mysql-shell-app:
 	@set -eu; \
-	CLI=container; \
+	CLI=${CLI:-container}; \
 	# Load only needed DB vars from .env in a safe way (no sourcing arbitrary lines)
 	ENV_FILE=.env; TMP_ENV=$$(mktemp 2>/dev/null || echo /tmp/meg_env_$$); \
 	if [ -f "$$ENV_FILE" ]; then \
@@ -473,9 +473,9 @@ mysql-shell-app:
 	fi; \
 	DB_ARGS=""; if [ -n "$$DB" ]; then DB_ARGS="$$DB"; fi; \
 	if [ -n "$$PW" ]; then \
-	  MYSQL_PWD="$$PW" $$CLI exec -it mythras-mysql mysql $$HOST_OPT $$PORT_OPT -u "$$U" $$DB_ARGS; \
+	  MYSQL_PWD="$$PW" $$CLI exec -it mythras-mysql sh -c "mysql $$HOST_OPT $$PORT_OPT -u \"$$U\" $$DB_ARGS"; \
 	else \
-	  $$CLI exec -it mythras-mysql mysql $$HOST_OPT $$PORT_OPT -u "$$U" -p $$DB_ARGS; \
+	  $$CLI exec -it mythras-mysql sh -c "mysql $$HOST_OPT $$PORT_OPT -u \"$$U\" -p $$DB_ARGS"; \
 	fi
 
 

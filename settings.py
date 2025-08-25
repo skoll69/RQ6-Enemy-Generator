@@ -4,6 +4,14 @@
 from pathlib import Path
 import os
 
+# Ensure PyMySQL is used as MySQLdb driver to satisfy Django's mysql backend
+try:
+    import pymysql  # type: ignore
+    pymysql.install_as_MySQLdb()
+except Exception:
+    # If PyMySQL is not available, Django will error when connecting; requirements include pymysql
+    pass
+
 BASE_DIR = Path(__file__).resolve().parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
@@ -50,30 +58,39 @@ TEMPLATES = [
 
 WSGI_APPLICATION = os.environ.get("WSGI_APPLICATION", "wsgi.application")
 
-# Use SQLite by default for tests/dev; override via env if needed
+# Load .env early so Django always picks up container MySQL settings
+try:
+    from dotenv import load_dotenv  # type: ignore
+    load_dotenv(dotenv_path=str(BASE_DIR / '.env'))
+except Exception:
+    # python-dotenv may not be installed in all environments; it's optional.
+    # If unavailable, environment variables must be exported by the shell.
+    pass
+
+# Mandatory MySQL configuration (SQLite disabled by requirement)
 DB_NAME = os.environ.get("DB_NAME")
-if DB_NAME:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.mysql",
-            "NAME": DB_NAME,
-            "USER": os.environ.get("DB_USER", "mythras_eg"),
-            "PASSWORD": os.environ.get("DB_PASSWORD", ""),
-            "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
-            "PORT": os.environ.get("DB_PORT", "3307"),
-            "OPTIONS": {
-                "charset": "utf8mb4",
-                "init_command": "SET sql_mode='STRICT_ALL_TABLES'",
-            },
-        }
+if not DB_NAME:
+    raise RuntimeError(
+        "DB_NAME is not set. SQLite is disabled for this project. "
+        "Set DB_NAME and other DB_* variables in .env or environment."
+    )
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": DB_NAME,
+        "USER": os.environ.get("DB_USER", "mythras_eg"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+        "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
+        "PORT": os.environ.get("DB_PORT", "3307"),
+        "OPTIONS": {
+            "charset": "utf8mb4",
+            "init_command": "SET sql_mode='STRICT_ALL_TABLES'",
+            "connect_timeout": 5,
+            "ssl": {"disabled": True},  # temporarily, to rule out TLS weirdness
+        },
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": os.environ.get("SQLITE_NAME", str(BASE_DIR / "db.sqlite3")),
-        }
-    }
+}
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = os.environ.get("TIME_ZONE", "UTC")
