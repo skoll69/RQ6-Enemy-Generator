@@ -21,20 +21,20 @@ if [ -f "$ENV_FILE" ]; then echo "Loaded .env from $ENV_FILE" >&2; else echo ".e
 if [ -n "${MYSQL_ROOT_PASSWORD:-}" ]; then echo "MYSQL_ROOT_PASSWORD: <set>" >&2; else echo "MYSQL_ROOT_PASSWORD: <not set> (will fail)" >&2; fi
 
 echo "Executing required command:" >&2
-echo "container run \\n  --name mythras-mysql \\n  --publish 127.0.0.1:3307:3306 \\n  --volume \"$HOME/container-data/mysql:/var/lib/mysql\" \\
+echo "container run \\n  --name mythras-mysql \\n  --publish 127.0.0.1:3308:3306 \\n  --volume \"$HOME/container-data/mysql:/var/lib/mysql\" \\
   --env MYSQL_ROOT_PASSWORD=*** \\
   docker.io/library/mysql:8" >&2
 
 # Previously without a persistent volume:
 # exec container run \
 #   --name mythras-mysql \
-#   --publish 127.0.0.1:3307:3306 \
+#   --publish 127.0.0.1:3308:3306 \
 #   --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
 #   docker.io/library/mysql:8
 
 exec container run \
   --name mythras-mysql \
-  --publish 127.0.0.1:3307:3306 \
+  --publish 127.0.0.1:3308:3306 \
   --volume "$HOME/container-data/mysql:/var/lib/mysql" \
   --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
   docker.io/library/mysql:8

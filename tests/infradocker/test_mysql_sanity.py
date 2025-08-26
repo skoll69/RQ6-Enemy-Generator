@@ -23,7 +23,7 @@ def test_mysql_cli_sanity_tcp_tls(has_docker_cli, ensure_docker_run_started, env
         pytest.skip("docker CLI not present on this system")
 
     host = env_vars.get('DB_HOST', '127.0.0.1')
-    port = env_vars.get('DB_PORT', '3307')
+    port = env_vars.get('DB_PORT', '3308')
     user = env_vars.get('DB_USER') or env_vars.get('MYSQL_USER')
     password = env_vars.get('DB_PASSWORD') or env_vars.get('MYSQL_PASSWORD')
     dbname = env_vars.get('DB_NAME') or env_vars.get('MYSQL_DATABASE')

@@ -180,7 +180,7 @@ if ! "$CONTAINER_CLI" inspect "$CONTAINER_NAME" >/dev/null 2>&1; then
   echo " - Start it with the required syntax (Apple container):" >&2
   echo "   container run \\" >&2
   echo "     --name mythras-mysql \\" >&2
-  echo "     --publish 127.0.0.1:3307:3306 \\" >&2
+  echo "     --publish 127.0.0.1:3308:3306 \\" >&2
   echo "     --env MYSQL_ROOT_PASSWORD=\"$$MYSQL_ROOT_PASSWORD\" \\" >&2
   echo "     docker.io/library/mysql:8" >&2
   echo " - Or via Makefile: make start-db (runs the exact command above)" >&2

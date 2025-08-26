@@ -38,7 +38,7 @@ Use ONLY the following exact command to start MySQL (reads password from your sh
 ```
 container run \
   --name mythras-mysql \
-  --publish 127.0.0.1:3307:3306 \
+  --publish 127.0.0.1:3308:3306 \
   --volume "$HOME/container-data/mysql:/var/lib/mysql" \
   --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
   docker.io/library/mysql:8
@@ -46,7 +46,7 @@ container run \
 <!-- Previous (no volume) kept for reference:
 container run \
   --name mythras-mysql \
-  --publish 127.0.0.1:3307:3306 \
+  --publish 127.0.0.1:3308:3306 \
   --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
   docker.io/library/mysql:8
 -->
@@ -65,7 +65,7 @@ Use ONLY this exact command to start MySQL with Apple container (reads password 
 ```
 container run \
   --name mythras-mysql \
-  --publish 127.0.0.1:3307:3306 \
+  --publish 127.0.0.1:3308:3306 \
   --volume "$HOME/container-data/mysql:/var/lib/mysql" \
   --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
   docker.io/library/mysql:8
@@ -73,7 +73,7 @@ container run \
 <!-- Previous (no volume) kept for reference:
 container run \
   --name mythras-mysql \
-  --publish 127.0.0.1:3307:3306 \
+  --publish 127.0.0.1:3308:3306 \
   --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
   docker.io/library/mysql:8
 -->
@@ -105,7 +105,7 @@ Prerequisites:
 ```
 container run \
   --name mythras-mysql \
-  --publish 127.0.0.1:3307:3306 \
+  --publish 127.0.0.1:3308:3306 \
   --volume "$HOME/container-data/mysql:/var/lib/mysql" \
   --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
   docker.io/library/mysql:8
@@ -113,7 +113,7 @@ container run \
 <!-- Previous (no volume) kept for reference:
 container run \
   --name mythras-mysql \
-  --publish 127.0.0.1:3307:3306 \
+  --publish 127.0.0.1:3308:3306 \
   --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
   docker.io/library/mysql:8
 -->
@@ -160,7 +160,7 @@ If you want the MySQL container to automatically import your dump into the datab
 ```
 container run \
   --name mythras-mysql \
-  --publish 127.0.0.1:3307:3306 \
+  --publish 127.0.0.1:3308:3306 \
   --volume "$HOME/container-data/mysql:/var/lib/mysql" \
   --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
   docker.io/library/mysql:8
@@ -168,7 +168,7 @@ container run \
 <!-- Previous (no volume) kept for reference:
 container run \
   --name mythras-mysql \
-  --publish 127.0.0.1:3307:3306 \
+  --publish 127.0.0.1:3308:3306 \
   --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
   docker.io/library/mysql:8
 -->
@@ -200,7 +200,7 @@ If you installed Apple container, you can quickly spin up MySQL using the requir
 ```
 container run \
   --name mythras-mysql \
-  --publish 127.0.0.1:3307:3306 \
+  --publish 127.0.0.1:3308:3306 \
   --volume "$HOME/container-data/mysql:/var/lib/mysql" \
   --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
   docker.io/library/mysql:8
@@ -208,14 +208,14 @@ container run \
 <!-- Previous (no volume) kept for reference:
 container run \
   --name mythras-mysql \
-  --publish 127.0.0.1:3307:3306 \
+  --publish 127.0.0.1:3308:3306 \
   --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
   docker.io/library/mysql:8
 -->
 - Or via Makefile: make start-db (it runs the exact command above, frees host port 3306 by killing listeners, and auto-removes any existing mythras-mysql container before starting)
 - Optional: make scripts-chmod  # if you want to run helper scripts; they now invoke the same exact command
 - cp .env.example .env       # if you haven’t already
-  # If a non-default port was used (e.g., 3307), set DB_PORT in your .env accordingly before running Django.
+  # If a non-default port was used (e.g., 3308), set DB_PORT in your .env accordingly before running Django.
 - make checkdb               # runs python manage.py checkdb; should print Database connection OK
 - make migrate               # initialize tables if using an empty DB
 - Place your SQL dump at project root as 'dump.sql'.
@@ -252,7 +252,7 @@ container run \
     - ./run_db_nocompose.sh --fresh
   - If you need first-run DB initialization scripts, add --db-init.
 - Port 3306 already in use:
-  - The script auto-selects a free port (e.g., 3307) and prints a reminder.
+  - The script auto-selects a free port (e.g., 3308) and prints a reminder.
   - Update DB_PORT in your .env accordingly before running Django.
 - Ensure MYSQL_ROOT_PASSWORD is set in .env. The script reads .env automatically.
 
@@ -368,7 +368,7 @@ This will:
 - on failure, try ./run_db_nocompose.sh (no-compose with a bind-mounted data dir),
 - and if that fails (common on Apple container due to mount permissions), retry with ./run_db_nocompose.sh --ephemeral (no host data mount, no persistence).
 
-After it starts, update DB_PORT in your .env if a non-default port was selected (e.g., 3307), then run:
+After it starts, update DB_PORT in your .env if a non-default port was selected (e.g., 3308), then run:
 - python manage.py checkdb
 - python manage.py migrate
 

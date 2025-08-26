@@ -8,7 +8,7 @@ SHELL := /bin/bash
 DOCKER ?= docker
 CONTAINER_NAME ?= mythras-mysql
 MYSQL_IMAGE ?= docker.io/library/mysql:8
-HOST_PORT ?= 3307
+HOST_PORT ?= 3308
 HOST_IP ?= 127.0.0.1
 
 # Non-Apple container related targets replicated
@@ -131,7 +131,7 @@ show-db-env:
 	if [ -f "$$ENV_FILE" ]; then set -a; . "$$ENV_FILE"; set +a; fi; \
 	PORT_MAP=$$($(DOCKER) ps --filter "name=$(CONTAINER_NAME)" --format "{{.Ports}}" | head -n1); \
 	echo "DB_HOST=$${DB_HOST:-127.0.0.1}"; \
-	echo "DB_PORT=$${DB_PORT:-3307}"; \
+	echo "DB_PORT=$${DB_PORT:-3308}"; \
 	echo "DB_NAME=$${DB_NAME:-$${MYSQL_DATABASE:-}}"; \
 	echo "CONTAINER_NAME=$(CONTAINER_NAME)"; \
 	echo "Container port mapping: $${PORT_MAP:-<none>}"
