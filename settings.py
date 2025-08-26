@@ -83,7 +83,7 @@ DATABASES = {
         "USER": os.environ.get("DB_USER", "mythras_eg"),
         "PASSWORD": os.environ["DB_PASSWORD"],
         "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
-        "PORT": os.environ.get("DB_PORT", "3307"),
+        "PORT": os.environ.get("DB_PORT", "3308"),
         "OPTIONS": {
             "charset": "utf8mb4",
             "init_command": "SET sql_mode='STRICT_ALL_TABLES'",
@@ -125,7 +125,7 @@ STATIC_ROOT = str(BASE_DIR / "static_root")
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # Speed up tests by creating tables directly from models (no migrations for enemygen)
-MIGRATION_MODULES = {"enemygen": None}
+#MIGRATION_MODULES = {"enemygen": None}
 
 # Optional: value used by enemygen.urls if present
 WEB_ROOT = ""

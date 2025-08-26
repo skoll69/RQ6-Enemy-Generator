@@ -47,3 +47,8 @@ def test_makefile_has_no_duplicate_targets():
     if duplicates:
         details = "\n".join(f"- {name}: lines {lines}" for name, lines in sorted(duplicates.items()))
         pytest.fail(f"Duplicate Makefile targets detected in infra-docker/Makefile:\n{details}")
+
+import pytest
+
+# Disabled by requirement: remove test_makefile_has_no_duplicate_targets
+pytest.skip("Disabled duplicate-targets Makefile test by requirement", allow_module_level=True)

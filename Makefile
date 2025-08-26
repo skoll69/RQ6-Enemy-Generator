@@ -114,5 +114,32 @@ show-running-container show-container:
 ps-docker-running:
 	@$(DOCKER) ps --filter "status=running"
 
+# Utility
+show-running-container show-container:
+	@echo "Showing status for container: $(CONTAINER_NAME)"
+	@$(DOCKER) ps --filter "name=$(CONTAINER_NAME)" --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"
+
+ps-docker-running:
+	@$(DOCKER) ps --filter "status=running"
+
+cleanup clean-db reset-env:
+	@echo "Removing container: $(CONTAINER_NAME) (if exists)"
+	-$(DOCKER) rm -f $(CONTAINER_NAME) >/dev/null 2>&1 || true
+
+show-db-env:
+	@ENV_FILE=.env; \
+	if [ -f "$$ENV_FILE" ]; then set -a; . "$$ENV_FILE"; set +a; fi; \
+	PORT_MAP=$$($(DOCKER) ps --filter "name=$(CONTAINER_NAME)" --format "{{.Ports}}" | head -n1); \
+	echo "DB_HOST=$${DB_HOST:-127.0.0.1}"; \
+	echo "DB_PORT=$${DB_PORT:-3307}"; \
+	echo "DB_NAME=$${DB_NAME:-$${MYSQL_DATABASE:-}}"; \
+	echo "CONTAINER_NAME=$(CONTAINER_NAME)"; \
+	echo "Container port mapping: $${PORT_MAP:-<none>}"
+
+start-db-3308:
+	@$(MAKE) start-db HOST_PORT=3308
+
+
+
 git-repair:
 	bash ./tools/git_repair.sh

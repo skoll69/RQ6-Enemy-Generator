@@ -129,7 +129,7 @@ def ensure_docker_run_started(env_vars, has_docker_cli):
     env['MYSQL_ROOT_PASSWORD'] = root_pw
     _code, _out, _err = run_logged([
         cli, 'run', '--name', name,
-        '-p', '127.0.0.1:3307:3306',
+        '-p', '127.0.0.1:3308:3306',
         '-e', f"MYSQL_ROOT_PASSWORD={root_pw}",
         '-d', 'docker.io/library/mysql:8'
     ], label='docker.run', env=env, timeout=30)
