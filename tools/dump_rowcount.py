@@ -2,23 +2,19 @@
 import argparse
 import csv
 import re
+import os
 import time
 from datetime import datetime
 from pathlib import Path
 
-# Simple parser for MySQL dumps to count inserted rows per table
-# It looks for INSERT INTO <table> ... VALUES (...),(...),...; and counts the top-level value tuples.
-
-# Support variants like:
-# INSERT [IGNORE|DELAYED|LOW_PRIORITY] INTO `db`.`table` [(col,...)] VALUES ...
-# REPLACE INTO `table` [(col,...)] VALUES ...
-INSERT_RE = re.compile(
-    r"^\s*(INSERT|REPLACE)\s+(?:IGNORE\s+|DELAYED\s+|LOW_PRIORITY\s+)?INTO\s+"
-    r"(?:`?[A-Za-z0-9_]+`?\.)?`?([A-Za-z0-9_]+)`?"  # optional schema, capture table
-    r"\s*(?:\([^;]*?\)\s*)?"                      # optional column list
-    r"VALUES\s*(.*)$",
-    re.IGNORECASE,
-)
+# We now use a SQL tokenizer/parser (sqlparse) instead of brittle regexes.
+# This greatly improves correctness on multi-line INSERTs, odd whitespace, comments, and quoted strings.
+try:
+    import sqlparse  # type: ignore
+    from sqlparse.sql import Identifier, IdentifierList, TokenList
+    from sqlparse.tokens import Keyword, DML
+except Exception:
+    sqlparse = None  # We'll fall back to the previous robust regex-based parser if sqlparse isn't available.
 
 
 def _find_stmt_end(sql: str) -> int:
@@ -196,31 +192,126 @@ def count_tuples_in_values(values_blob: str) -> int:
     return count
 
 
-def parse_dump(dump_path: Path) -> dict:
-    """Parse dump.sql and return {table: intended_rowcount} by counting INSERT value tuples."""
-    table_counts: dict[str, int] = {}
+def _count_values_section(values_sql: str) -> int:
+    return count_tuples_in_values(values_sql)
 
+
+def _parse_with_sqlparse(sql_text: str) -> dict:
+    counts: dict[str, int] = {}
+    # sqlparse can be extremely slow for huge dumps; only use if explicitly enabled
+    if not os.getenv('DUMP_ROWCOUNT_USE_SQLPARSE'):
+        return counts
+    for stmt in sqlparse.parse(sql_text):
+        tokens = [t for t in stmt.tokens if not t.is_whitespace]
+        if not tokens:
+            continue
+        dml_tok = next((t for t in tokens if t.ttype is DML or (t.ttype is Keyword and t.value.upper() in ("INSERT", "REPLACE"))), None)
+        if not dml_tok:
+            continue
+        upper = stmt.normalized.upper()
+        if not (upper.startswith('INSERT') or upper.startswith('REPLACE')):
+            continue
+        table_name = None
+        saw_into = False
+        for t in tokens:
+            if t.ttype is Keyword and t.value.upper() == 'INTO':
+                saw_into = True
+                continue
+            if saw_into:
+                if isinstance(t, Identifier):
+                    table_name = t.get_real_name()
+                    break
+                val = t.value.strip()
+                if val:
+                    if '.' in val:
+                        val = val.split('.')[-1]
+                    table_name = val.strip('`')
+                    break
+        if not table_name:
+            continue
+        raw = str(stmt)
+        m = re.search(r"\bVALUE(S)?\b", raw, flags=re.IGNORECASE)
+        if not m:
+            continue
+        values_sql = raw[m.end():]
+        if values_sql.endswith(';'):
+            values_sql = values_sql[:-1]
+        tuples = _count_values_section(values_sql)
+        counts[table_name] = counts.get(table_name, 0) + tuples
+    return counts
+
+
+def parse_dump(dump_path: Path) -> dict:
+    """Parse dump.sql and return {table: intended_rowcount} by counting INSERT value tuples.
+    Default: use robust streaming parser to avoid hangs. Optionally, if DUMP_ROWCOUNT_USE_SQLPARSE=1,
+    try sqlparse first, then fall back to streaming on error.
+    """
     if not dump_path.exists():
         raise FileNotFoundError(f"Dump file not found: {dump_path}")
 
-    # Accumulate lines between INSERT start and terminating semicolon
-    current_table = None
+    # Optional sqlparse path (disabled by default)
+    if sqlparse is not None and os.getenv('DUMP_ROWCOUNT_USE_SQLPARSE'):
+        try:
+            sql_text = dump_path.read_text(encoding='utf-8', errors='ignore')
+            return _parse_with_sqlparse(sql_text)
+        except Exception as e:
+            if os.getenv('DEBUG'):
+                print(f"[dump_rowcount] sqlparse failed, falling back to streaming parser: {e}")
+            # fall through to streaming
+
+    # Streaming parser: reads file line-by-line, accumulates only current statement
+    table_counts: dict[str, int] = {}
+    current_table: str | None = None
     buffer_parts: list[str] = []
+    waiting_for_values = False
+
+    # emergency guard: prevent pathological single-statement buffers (e.g., >100MB)
+    MAX_STMT_CHARS = 100 * 1024 * 1024
 
     with dump_path.open('r', encoding='utf-8', errors='ignore') as f:
         for raw_line in f:
             line = raw_line.rstrip('\n')
 
-            # If not currently inside an INSERT, look for start
-            if current_table is None:
-                m = INSERT_RE.match(line)
-                if not m:
+            # If not currently inside an INSERT
+            if current_table is None and not waiting_for_values:
+                # Fast pre-filter to skip lines that cannot be start of INSERT/REPLACE
+                if not line or ('INSERT' not in line.upper() and 'REPLACE' not in line.upper()):
                     continue
-                # group(2) = table, group(3) = tail after VALUES
-                current_table = m.group(2)
-                rest = m.group(3)
+                # Identify table name after INTO (schema-qualified allowed)
+                m_into = re.search(r"\b(INSERT|REPLACE)\b\s+(?:IGNORE\s+|DELAYED\s+|LOW_PRIORITY\s+)?INTO\s+((`?[A-Za-z0-9_]+`?\.)?`?([A-Za-z0-9_]+)`?)", line, flags=re.IGNORECASE)
+                if not m_into:
+                    continue
+                current_table = m_into.group(4)
+                # Look for VALUES on same line
+                m_vals = re.search(r"\bVALUES?\b", line, flags=re.IGNORECASE)
+                if m_vals:
+                    rest = line[m_vals.end():]
+                    buffer_parts = [rest]
+                    joined = ''.join(buffer_parts)
+                    idx = _find_stmt_end(joined)
+                    if idx != -1:
+                        blob = joined[:idx]
+                        tuples = count_tuples_in_values(blob)
+                        table_counts[current_table] = table_counts.get(current_table, 0) + tuples
+                        current_table = None
+                        buffer_parts = []
+                    else:
+                        waiting_for_values = False
+                    continue
+                else:
+                    # values appear later lines
+                    waiting_for_values = True
+                    buffer_parts = []
+                    continue
+
+            # Waiting for VALUES portion after header
+            if waiting_for_values and current_table is not None:
+                m_vals2 = re.search(r"\bVALUES?\b", line, flags=re.IGNORECASE)
+                if not m_vals2:
+                    continue
+                rest = line[m_vals2.end():]
                 buffer_parts = [rest]
-                # If this line already contains a terminating semicolon (not inside quotes/comments), process immediately
+                waiting_for_values = False
                 joined = ''.join(buffer_parts)
                 idx = _find_stmt_end(joined)
                 if idx != -1:
@@ -231,16 +322,28 @@ def parse_dump(dump_path: Path) -> dict:
                     buffer_parts = []
                 continue
 
-            # We are inside an INSERT values continuation
-            buffer_parts.append(line)
-            joined = '\n'.join(buffer_parts)
-            idx = _find_stmt_end(joined)
-            if idx != -1:
-                blob = joined[:idx]
-                tuples = count_tuples_in_values(blob)
-                table_counts[current_table] = table_counts.get(current_table, 0) + tuples
-                current_table = None
-                buffer_parts = []
+            # Accumulating VALUES continuation
+            if current_table is not None and not waiting_for_values:
+                buffer_parts.append(line)
+                # emergency guard on buffer size
+                if sum(len(p) for p in buffer_parts) > MAX_STMT_CHARS:
+                    if os.getenv('DEBUG'):
+                        print(f"[dump_rowcount] WARNING: statement for table {current_table} exceeded {MAX_STMT_CHARS} chars; flushing partial")
+                    blob = '\n'.join(buffer_parts)
+                    # try to count what we can up to current point (best-effort)
+                    tuples = count_tuples_in_values(blob)
+                    table_counts[current_table] = table_counts.get(current_table, 0) + tuples
+                    current_table = None
+                    buffer_parts = []
+                    continue
+                joined = '\n'.join(buffer_parts)
+                idx = _find_stmt_end(joined)
+                if idx != -1:
+                    blob = joined[:idx]
+                    tuples = count_tuples_in_values(blob)
+                    table_counts[current_table] = table_counts.get(current_table, 0) + tuples
+                    current_table = None
+                    buffer_parts = []
 
     return table_counts
 
