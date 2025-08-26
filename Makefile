@@ -143,3 +143,26 @@ start-db-3308:
 
 git-repair:
 	bash ./tools/git_repair.sh
+
+
+
+# Generate CSV of intended rowcounts per table from dump.sql
+# Usage: make dump-rowcount [DUMP=dump.sql] [OUT=dump_rowcount.csv]
+dump-rowcount:
+	@python3 tools/dump_rowcount.py --dump "$${DUMP:-dump.sql}" --out "$${OUT:-dump_rowcount.csv}"
+
+# Recreate the target database and import dump.sql to ensure exact row counts match dump
+# Usage: make import-dump-clean [DB=<db_name>] [DUMP=dump.sql]
+import-dump-clean:
+	@ENV_FILE=.env; \
+	if [ -f "$$ENV_FILE" ]; then set -a; . "$$ENV_FILE"; set +a; fi; \
+	DB_NAME="$${DB:-$${DB_NAME:-}}"; \
+	ROOTPW="$${MYSQL_ROOT_PASSWORD:-}"; \
+	DUMP_FILE="$${DUMP:-dump.sql}"; \
+	: $${DB_NAME:?DB or DB_NAME required in env}; : $${ROOTPW:?MYSQL_ROOT_PASSWORD required in env}; \
+	[ -f "$$DUMP_FILE" ] || { echo "dump file not found: $$DUMP_FILE" >&2; exit 1; }; \
+	echo "[import-dump-clean] Dropping and recreating database '$$DB_NAME'..."; \
+	MYSQL_PWD="$$ROOTPW" $(DOCKER) exec -i $(CONTAINER_NAME) sh -c "mysql -uroot -e 'DROP DATABASE IF EXISTS \`$$DB_NAME\`; CREATE DATABASE \`$$DB_NAME\`;'"; \
+	echo "[import-dump-clean] Importing dump into '$$DB_NAME'..."; \
+	CONTAINER=docker bash ./upload_dump.sh --mysql8-compat --db "$$DB_NAME" --dump "$$DUMP_FILE"; \
+	echo "[import-dump-clean] Done."
