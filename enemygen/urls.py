@@ -1,9 +1,12 @@
 from django.urls import re_path as url
 from django.conf import settings
+from django.contrib import admin
+from django.urls import path, include
+
 
 from enemygen import views
 from enemygen import ajax
-
+from enemygen.reg_views import MyRegistrationView
 try:
     ROOT = settings.WEB_ROOT
 except:
@@ -11,6 +14,18 @@ except:
 
 urlpatterns = [
     url('^' + ROOT + r'$', views.home, name='home'),
+    # -> added after manage.py runserver complains about not finding the registration
+
+
+    url(r'^accounts/register/$', MyRegistrationView.as_view(), name='registration_register'),
+    # this above is mandatory?
+    #url(r'^admin/', admin.site.urls),
+    path("accounts/", include("django.contrib.auth.urls")),
+
+    path("admin/", admin.site.urls),
+
+    # <- added after manage.py runserver complains about not finding the registration
+
     url('^' + ROOT + r'enemies/$', views.index, name='index'),
     url('^' + ROOT + r'simple_index/$', views.simple_index),
     url('^' + ROOT + r'index_json/$', views.index_json),
