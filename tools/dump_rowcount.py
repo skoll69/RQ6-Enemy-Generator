@@ -2,6 +2,8 @@
 import argparse
 import csv
 import re
+import time
+from datetime import datetime
 from pathlib import Path
 
 # Simple parser for MySQL dumps to count inserted rows per table
@@ -251,6 +253,12 @@ def main():
 
     dump_path = Path(args.dump)
     out_path = Path(args.out)
+
+    # Start printout
+    start_ts = datetime.now().isoformat(timespec='seconds')
+    t0 = time.time()
+    print(f"[dump_rowcount] START {start_ts} dump={dump_path}")
+
     counts = parse_dump(dump_path)
 
     # Write CSV
@@ -261,7 +269,11 @@ def main():
         for table, cnt in sorted(counts.items()):
             w.writerow([table, cnt])
 
+    # End printout
+    end_ts = datetime.now().isoformat(timespec='seconds')
+    duration = time.time() - t0
     print(f"Wrote rowcount CSV: {out_path} ({len(counts)} tables)")
+    print(f"[dump_rowcount] END   {end_ts} dump={dump_path} out={out_path} tables={len(counts)} duration={duration:.2f}s")
 
 
 if __name__ == '__main__':

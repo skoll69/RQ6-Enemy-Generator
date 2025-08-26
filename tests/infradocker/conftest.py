@@ -149,7 +149,7 @@ def ensure_docker_run_started(env_vars, has_docker_cli):
 
     # Step 2: wait for mysql readiness
     start2 = time.time()
-    while time.time() - start2 < 60:
+    while time.time() - start2 < 90:
         # Try mysqladmin ping, then fallback to SELECT 1
         code, _o, _e = run([cli, 'exec', name, 'sh', '-c', f"MYSQL_PWD='{root_pw}' mysqladmin ping -uroot --silent"], timeout=5)
         if code == 0:
@@ -157,10 +157,10 @@ def ensure_docker_run_started(env_vars, has_docker_cli):
         code2, _o2, _e2 = run([cli, 'exec', name, 'sh', '-c', f"MYSQL_PWD='{root_pw}' mysql -N -B -uroot -e 'SELECT 1'"], timeout=5)
         if code2 == 0:
             return
-        time.sleep(1)
+        time.sleep(2)
 
     # If not ready, still proceed but tests may skip; provide diagnostics hint
-    print("[ensure_docker_run_started] MySQL did not report ready within 60s; continuing.", file=sys.stderr)
+    print("[ensure_docker_run_started] MySQL did not report ready within 90s; continuing.", file=sys.stderr)
     return
 
 
@@ -206,12 +206,23 @@ FLUSH PRIVILEGES;
     heredoc = f"MYSQL_PWD='{root_pw}' mysql -N -B -uroot <<'SQL'\n{sql}\nSQL\n"
 
     print(f"[ensure_db_user_exists] exec: {cli} exec -i mythras-mysql sh -c '<heredoc-sql>'", file=sys.stderr)
-    code, out, err = run([cli, 'exec', '-i', 'mythras-mysql', 'sh', '-c', heredoc])
-    print(f"[ensure_db_user_exists] exit={code}", file=sys.stderr)
-    if out:
-        print(f"[ensure_db_user_exists] stdout:\n{out}", file=sys.stderr)
-    if err:
-        print(f"[ensure_db_user_exists] stderr:\n{err}", file=sys.stderr)
+
+    # Retry loop: MySQL may still be initializing. Try for up to 90 seconds.
+    import time
+    start_try = time.time()
+    last = (None, None, None)
+    while time.time() - start_try < 90:
+        code, out, err = run([cli, 'exec', '-i', 'mythras-mysql', 'sh', '-c', heredoc])
+        print(f"[ensure_db_user_exists] attempt exit={code}", file=sys.stderr)
+        if out:
+            print(f"[ensure_db_user_exists] stdout:\n{out}", file=sys.stderr)
+        if err:
+            print(f"[ensure_db_user_exists] stderr:\n{err}", file=sys.stderr)
+        if code == 0:
+            break
+        last = (code, out, err)
+        # brief backoff before retry
+        time.sleep(3)
 
     if code != 0:
         try:
@@ -221,12 +232,12 @@ FLUSH PRIVILEGES;
             clist_tail = '(no docker ps available)'
         try:
             _c2, logs, _e2 = run([cli, 'logs', 'mythras-mysql'])
-            logs_tail = '\n'.join((logs or '').splitlines()[-50:])
+            logs_tail = '\n'.join((logs or '').splitlines()[-100:])
         except Exception:
             logs_tail = '(no logs available)'
         pytest.skip(
             "Failed to ensure DB user before docker tests.\n" +
-            f"Exit: {code}\nSTDOUT:\n{out}\nSTDERR:\n{err}\n" +
+            f"Exit: {last[0]}\nSTDOUT:\n{last[1]}\nSTDERR:\n{last[2]}\n" +
             f"docker ps -a (tail):\n{clist_tail}\nLogs (tail):\n{logs_tail}"
         )
 
