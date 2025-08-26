@@ -6,11 +6,15 @@ set -euo pipefail
 # By default imports as root unless --db and --user are provided.
 # Requires the container to be running (use ./start_db.sh first).
 
-# Apple container is the only supported CLI
-if command -v container >/dev/null 2>&1; then
+# Select container CLI: honor CONTAINER env (docker|container), else auto-detect
+if [[ "${CONTAINER:-}" == "docker" ]] && command -v docker >/dev/null 2>&1; then
+  CONTAINER_CLI=docker
+elif command -v container >/dev/null 2>&1; then
   CONTAINER_CLI=container
+elif command -v docker >/dev/null 2>&1; then
+  CONTAINER_CLI=docker
 else
-  echo "Error: 'container' CLI is required (https://github.com/apple/container/releases)." >&2
+  echo "Error: neither 'container' nor 'docker' CLI found in PATH." >&2
   exit 1
 fi
 CONTAINER_NAME=mythras-mysql

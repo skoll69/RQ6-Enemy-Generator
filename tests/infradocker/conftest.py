@@ -6,7 +6,7 @@ import pytest
 import sys
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-MAKEFILE_PATH = PROJECT_ROOT / 'Makefile'
+MAKEFILE_PATH = PROJECT_ROOT / 'infra-docker' / 'Makefile'
 ENV_PATH = PROJECT_ROOT / '.env'
 
 
@@ -73,7 +73,7 @@ def _mask_cmd_and_output(cmd: list, out: str | None, err: str | None, env: dict 
 
 def run_logged(cmd, label=None, cwd=None, env=None, timeout=15):
     """Run a command via run() and print command + exit code and outputs.
-    Intended for ensure_apple_run_started to expose what happens.
+    Intended for ensure_docker_run_started to expose what happens.
     """
     code, out, err = run(cmd, cwd=cwd, env=env, timeout=timeout)
     masked_cmd, mout, merr = _mask_cmd_and_output(cmd, out, err, env)
@@ -98,96 +98,78 @@ def env_vars():
 
 
 @pytest.fixture(scope='session')
-def has_container_cli():
-    # Only Apple 'container' CLI is supported in tests; no fallback to Docker.
-    # Detect presence by probing the CLI without using 'system info'.
-    if not shutil.which('container'):
+def has_docker_cli():
+    if not shutil.which('docker'):
         return False
-    code, _out, _err = run(['container', 'list'])
+    code, _out, _err = run(['docker', 'ps'])
     return code == 0
 
 
 @pytest.fixture(scope='session')
-def ensure_apple_run_started(env_vars, has_container_cli):
-    """Ensure a minimal MySQL container setup equivalent to `make apple-run`.
-    - Requires Apple 'container' CLI and MYSQL_ROOT_PASSWORD in .env.
-    - If the container is already running, does nothing.
-    - Otherwise, removes any old container and starts a fresh one with the exact flags.
-    - Waits until the container process accepts exec (not full MySQL readiness), with a longer, more robust timeout.
+def ensure_docker_run_started(env_vars, has_docker_cli):
+    """Ensure a minimal MySQL container is running using docker.
+    - Requires docker CLI and MYSQL_ROOT_PASSWORD in .env.
+    - Removes any old container named mythras-mysql and starts a fresh one.
+    - Waits until docker exec works (container up), with a capped timeout.
     """
-    if not has_container_cli:
-        pytest.skip("Apple 'container' CLI not present; cannot perform apple-run setup in tests")
-    cli = 'container'
+    if not has_docker_cli:
+        pytest.skip("docker CLI not present; cannot perform docker-run setup in tests")
+
+    cli = 'docker'
+    name = 'mythras-mysql'
     root_pw = env_vars.get('MYSQL_ROOT_PASSWORD')
     if not root_pw:
-        pytest.skip("MYSQL_ROOT_PASSWORD not set in .env; cannot perform apple-run setup in tests")
+        pytest.skip("MYSQL_ROOT_PASSWORD not set in .env; cannot perform docker-run setup in tests")
 
-    # Do not use 'container system info' or 'system start' here. We'll rely on list/run/exec probes.
+    # Pre-clean
+    run_logged([cli, 'rm', '-f', name], label='docker.rm')
 
-    # If container already running, return quickly (match by name and state from list output)
-    code, out, err = run_logged([cli, 'list', '--all'], label='ac.list.all')
-    if code == 0:
-        for i, line in enumerate((out or '').splitlines()):
-            if i == 0:
-                continue
-            if 'mythras-mysql' in line and 'running' in line.lower():
-                return  # Already running
-
-    # Remove any stale container and start a new one
-    run_logged([cli, 'kill', 'mythras-mysql'], label='ac.kill')
-    run_logged([cli, 'rm', 'mythras-mysql'], label='ac.rm')
+    # Start detached
     env = os.environ.copy()
     env['MYSQL_ROOT_PASSWORD'] = root_pw
-    host_port = env_vars.get('DB_PORT', env_vars.get('MYSQL_PORT', '3307'))
+    _code, _out, _err = run_logged([
+        cli, 'run', '--name', name,
+        '-p', '127.0.0.1:3307:3306',
+        '-e', f"MYSQL_ROOT_PASSWORD={root_pw}",
+        '-d', 'docker.io/library/mysql:8'
+    ], label='docker.run', env=env, timeout=30)
 
-    # Start container (non-blocking from test perspective). Short timeout (15s); logs will show if it times out.
-    _code, _out, _err = run_logged([cli, 'run', '--name', 'mythras-mysql', '--publish', '127.0.0.1:3307:3306', '--env', f"MYSQL_ROOT_PASSWORD={root_pw}", 'docker.io/library/mysql:8'], label='ac.run', env=env, timeout=15)
-
-    # Wait until exec works (container is up). Total wait capped at 15 seconds.
+    # Wait until MySQL responds: first docker exec works, then mysqladmin ping or simple query
     import time
     start = time.time()
-    deadline = 15  # seconds
-    attempt = 0
-    last_state_print = 0
+    deadline = 60
+    # Step 1: wait for exec true
     while time.time() - start < deadline:
-        attempt += 1
-        # Log the first exec probe to show the exact command/result; later attempts rely on state lines
-        if attempt == 1:
-            code, _o, _e = run_logged([cli, 'exec', 'mythras-mysql', 'sh', '-c', 'true'], label='ac.exec.probe')
-        else:
-            code, _o, _e = run([cli, 'exec', 'mythras-mysql', 'sh', '-c', 'true'])
+        code, _o, _e = run([cli, 'exec', name, 'sh', '-c', 'true'])
+        if code == 0:
+            break
+        time.sleep(0.5)
+    else:
+        pytest.skip("docker-run container did not become available to exec within timeout")
+
+    # Step 2: wait for mysql readiness
+    start2 = time.time()
+    while time.time() - start2 < 60:
+        # Try mysqladmin ping, then fallback to SELECT 1
+        code, _o, _e = run([cli, 'exec', name, 'sh', '-c', f"MYSQL_PWD='{root_pw}' mysqladmin ping -uroot --silent"], timeout=5)
         if code == 0:
             return
-        # Every 3 seconds, print container state to help debugging slow startups
-        now = time.time()
-        if now - last_state_print > 3:
-            last_state_print = now
-            # Avoid relying on inspect formatting which may differ; use list output for a rough status line
-            _c2, list_out, _ = run_logged([cli, 'list', '--all'], label='ac.list.all.wait')
-            st = 'unknown'
-            if _c2 == 0:
-                for i, l in enumerate((list_out or '').splitlines()):
-                    if i == 0:
-                        continue
-                    if 'mythras-mysql' in l:
-                        st = l
-                        break
-            print(f"[ensure_apple_run_started] waiting for exec (attempt {attempt}) - state: {st}")
-        time.sleep(0.5)
+        code2, _o2, _e2 = run([cli, 'exec', name, 'sh', '-c', f"MYSQL_PWD='{root_pw}' mysql -N -B -uroot -e 'SELECT 1'"], timeout=5)
+        if code2 == 0:
+            return
+        time.sleep(1)
 
-    pytest.skip("apple-run-like container did not become available to exec within timeout; check 'make db-doctor'")
+    # If not ready, still proceed but tests may skip; provide diagnostics hint
+    print("[ensure_docker_run_started] MySQL did not report ready within 60s; continuing.", file=sys.stderr)
+    return
 
 
 @pytest.fixture(scope='session')
-def ensure_db_user_exists(env_vars, ensure_apple_run_started):
-    """Ensure DB user/database exist in the running MySQL container before any tests.
-    Logging is very verbose to aid diagnostics. Skips gracefully if prerequisites are missing.
-    """
+def ensure_db_user_exists(env_vars, ensure_docker_run_started):
+    """Ensure DB user/database exist in the running MySQL docker container before any tests."""
     import time
 
-    cli = 'container' if shutil.which('container') else ('docker' if shutil.which('docker') else None)
-    if not cli:
-        pytest.skip("No container or docker CLI present on this system")
+    cli = 'docker'
 
     db_user = env_vars.get('DB_USER')
     db_pass = env_vars.get('DB_PASSWORD', '')
@@ -233,19 +215,19 @@ FLUSH PRIVILEGES;
 
     if code != 0:
         try:
-            _c1, clist, _e1 = run([cli, 'list', '--all'])
+            _c1, clist, _e1 = run([cli, 'ps', '-a'])
             clist_tail = '\n'.join((clist or '').splitlines()[-5:])
         except Exception:
-            clist_tail = '(no container list available)'
+            clist_tail = '(no docker ps available)'
         try:
             _c2, logs, _e2 = run([cli, 'logs', 'mythras-mysql'])
             logs_tail = '\n'.join((logs or '').splitlines()[-50:])
         except Exception:
             logs_tail = '(no logs available)'
         pytest.skip(
-            "Failed to ensure DB user before tests.\n" +
+            "Failed to ensure DB user before docker tests.\n" +
             f"Exit: {code}\nSTDOUT:\n{out}\nSTDERR:\n{err}\n" +
-            f"Container list (tail):\n{clist_tail}\nLogs (tail):\n{logs_tail}"
+            f"docker ps -a (tail):\n{clist_tail}\nLogs (tail):\n{logs_tail}"
         )
 
     print("[ensure_db_user_exists] completed successfully.", file=sys.stderr)
@@ -253,28 +235,17 @@ FLUSH PRIVILEGES;
 
 @pytest.fixture(scope='session', autouse=True)
 def _autouse_run_db_user_setup(ensure_db_user_exists):
-    """Autouse session bootstrap to ensure DB user exists before any tests.
-    This will trigger ensure_db_user_exists at session start. Extensive logs are printed by the callee.
-    """
-    print("[autouse] ensured DB user setup has been invoked.", file=sys.stderr)
+    print("[autouse] ensured DB user setup (docker) has been invoked.", file=sys.stderr)
     return None
+
 
 # --- Auto-upload dump before tests (if present) ---
 @pytest.fixture(scope='session')
-def ensure_dump_uploaded(env_vars, ensure_db_user_exists, has_container_cli):
-    """If dump.sql exists at the project root, import it into the running MySQL
-    container before any tests are executed.
-
-    Notes:
-    - Uses Apple 'container' CLI via Makefile target 'upload-dump-compat'.
-    - Skips gracefully (no exception) if prerequisites are missing.
-    - Produces extensive logs to stderr for visibility in pytest output.
-    """
+def ensure_dump_uploaded(env_vars, ensure_db_user_exists, has_docker_cli):
     import time
-    import shutil
 
-    if not has_container_cli:
-        print("[ensure_dump_uploaded] container CLI not present; skipping dump upload.", file=sys.stderr)
+    if not has_docker_cli:
+        print("[ensure_dump_uploaded] docker CLI not present; skipping dump upload.", file=sys.stderr)
         return
 
     project_root = PROJECT_ROOT
@@ -293,13 +264,12 @@ def ensure_dump_uploaded(env_vars, ensure_db_user_exists, has_container_cli):
     if root_pw and ((root_pw.startswith("'") and root_pw.endswith("'")) or (root_pw.startswith('"') and root_pw.endswith('"'))):
         root_pw = root_pw[1:-1]
 
-    print(f"[ensure_dump_uploaded] {time.strftime('%Y-%m-%d %H:%M:%S')} starting dump upload...", file=sys.stderr)
+    print(f"[ensure_dump_uploaded] {time.strftime('%Y-%m-%d %H:%M:%S')} starting dump upload (docker)...", file=sys.stderr)
     print(f"[ensure_dump_uploaded] dump file: {dump_path}", file=sys.stderr)
 
-    # Execute Makefile target that handles MySQL 8 compatibility
-    # Pass target DB explicitly to ensure mysql connects to the correct database
-    code, out, err = run(['make', 'upload-dump-compat', f'ARGS=--db {db_name}'], timeout=600)
-    print(f"[ensure_dump_uploaded] make upload-dump-compat exit={code}", file=sys.stderr)
+    # Execute docker Makefile target with -f
+    code, out, err = run(['make', '-f', str(MAKEFILE_PATH), 'upload-dump-compat', f'ARGS=--db {db_name}'], timeout=600)
+    print(f"[ensure_dump_uploaded] make -f infra-docker/Makefile upload-dump-compat exit={code}", file=sys.stderr)
     if out:
         print(f"[ensure_dump_uploaded] stdout:\n{out}", file=sys.stderr)
     if err:
@@ -309,9 +279,9 @@ def ensure_dump_uploaded(env_vars, ensure_db_user_exists, has_container_cli):
         print("[ensure_dump_uploaded] Warning: upload-dump-compat failed; tests may skip if data not present.", file=sys.stderr)
         return
 
-    # Quick verification: show table count for visibility (non-fatal)
+    # Quick verification: show table count (non-fatal)
     vcode, vout, verr = run([
-        'container', 'exec', '-i', 'mythras-mysql', 'sh', '-c',
+        'docker', 'exec', '-i', 'mythras-mysql', 'sh', '-c',
         f"MYSQL_PWD='{root_pw}' mysql -N -B -uroot {db_name} -e 'SHOW TABLES;'"
     ], timeout=60)
     if vcode == 0:
@@ -328,23 +298,17 @@ def ensure_dump_uploaded(env_vars, ensure_db_user_exists, has_container_cli):
 
 @pytest.fixture(scope='session', autouse=True)
 def _autouse_upload_dump(ensure_dump_uploaded):
-    """Autouse bootstrap to ensure dump upload happens before any tests."""
-    print("[autouse] ensured dump upload setup has been invoked.", file=sys.stderr)
+    print("[autouse] ensured dump upload setup (docker) has been invoked.", file=sys.stderr)
     return None
 
 
 # --- Generate statistics after dump upload, before tests ---
 @pytest.fixture(scope='session')
-def ensure_stats_generated(env_vars, ensure_dump_uploaded, has_container_cli):
-    """Generate a statistics file (tables + row counts) just before tests start.
-    - Depends on ensure_dump_uploaded so it runs after a successful (or attempted) import.
-    - Uses Makefile target 'generate-stats' which defaults to DB_NAME from .env.
-    - Logs extensively; non-fatal on failure (prints warning and returns).
-    """
+def ensure_stats_generated(env_vars, ensure_dump_uploaded, has_docker_cli):
     import time
 
-    if not has_container_cli:
-        print("[ensure_stats_generated] container CLI not present; skipping stats generation.", file=sys.stderr)
+    if not has_docker_cli:
+        print("[ensure_stats_generated] docker CLI not present; skipping stats generation.", file=sys.stderr)
         return
 
     db_name = env_vars.get('DB_NAME')
@@ -353,11 +317,12 @@ def ensure_stats_generated(env_vars, ensure_dump_uploaded, has_container_cli):
         print("[ensure_stats_generated] DB_NAME/MYSQL_ROOT_PASSWORD not set in .env; skipping stats generation.", file=sys.stderr)
         return
 
-    # Normalize quotes for safety (if user left them in .env)
+    # Normalize quotes for safety
     if root_pw and ((root_pw.startswith("'") and root_pw.endswith("'")) or (root_pw.startswith('"') and root_pw.endswith('"'))):
         root_pw = root_pw[1:-1]
 
     print(f"[ensure_stats_generated] {time.strftime('%Y-%m-%d %H:%M:%S')} generating stats...", file=sys.stderr)
+    # Reuse root Makefile target (generic)
     code, out, err = run(['make', 'generate-stats'], timeout=300)
     print(f"[ensure_stats_generated] make generate-stats exit={code}", file=sys.stderr)
     if out:
@@ -373,6 +338,5 @@ def ensure_stats_generated(env_vars, ensure_dump_uploaded, has_container_cli):
 
 @pytest.fixture(scope='session', autouse=True)
 def _autouse_generate_stats(ensure_stats_generated):
-    """Autouse to ensure stats are generated as the last step before tests."""
-    print("[autouse] ensured stats generation has been invoked.", file=sys.stderr)
+    print("[autouse] ensured stats generation (docker) has been invoked.", file=sys.stderr)
     return None

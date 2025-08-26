@@ -4,19 +4,18 @@ import pytest
 from .conftest import run, MAKEFILE_PATH
 
 REQUIRED_TARGETS = [
-    'start-db', 'env-new-start', 'sql',
+    'start-db', 'sql',
     'mysql-shell', 'mysql-shell-root', 'mysql-shell-db', 'mysql-shell-app',
     'upload-dump', 'upload-dump-debug', 'upload-dump-compat', 'upload-dump-compat-debug',
     'mysql-create-user', 'mysql-fix-auth',
-    'ps-ac', 'ps-ac-all', 'logs-db', 'logs-db-follow',
-    'apple-env-check', 'apple-free-port-3307', 'apple-pre-remove', 'apple-show-cmd', 'apple-run', 'apple-post-check', 'apple-run-minimal',
+    'ps-docker', 'logs-db', 'logs-db-follow',
     'git-repair',
 ]
 
 
 @pytest.mark.infra
 def test_makefile_exists_and_contains_targets(project_root):
-    assert MAKEFILE_PATH.exists(), 'Makefile not found at project root.'
+    assert MAKEFILE_PATH.exists(), 'infra-docker/Makefile not found.'
     content = MAKEFILE_PATH.read_text(encoding='utf-8', errors='ignore')
     missing = []
     for t in REQUIRED_TARGETS:
@@ -24,30 +23,30 @@ def test_makefile_exists_and_contains_targets(project_root):
         pat = re.compile(rf"^\s*{re.escape(t)}\s*:\s*$", re.MULTILINE)
         if not pat.search(content):
             missing.append(t)
-    assert not missing, f"Required Make targets missing from Makefile: {missing}"
+    assert not missing, f"Required Make targets missing from infra-docker/Makefile: {missing}"
 
 
 @pytest.mark.infra
 @pytest.mark.parametrize('target', [
-    'ps-ac', 'ps-ac-all', 'apple-show-cmd', 'db-doctor', 'git-repair',
+    'ps-docker', 'git-repair',
 ])
 def test_dry_run_basic_targets(target):
-    code, out, err = run(['make', '-n', target])
-    assert code == 0, f"make -n {target} failed: {err or out}"
+    code, out, err = run(['make', '-n', '-f', str(MAKEFILE_PATH), target])
+    assert code == 0, f"make -n -f infra-docker/Makefile {target} failed: {err or out}"
     assert isinstance(out, str)
 
 
 @pytest.mark.infra
 @pytest.mark.parametrize('target, expect_substrings', [
-    ('env-new-start', ['container run', 'MYSQL_ROOT_PASSWORD']),
     ('mysql-create-user', ['CREATE USER', 'caching_sha2_password']),
     ('mysql-fix-auth', ['ALTER USER', 'caching_sha2_password']),
     ('sql', ['mysql']),
 ])
+
 def test_make_dry_run_commands_include_expected_parts(target, expect_substrings):
-    code, out, err = run(['make', '-n', target])
+    code, out, err = run(['make', '-n', '-f', str(MAKEFILE_PATH), target])
     # Some recipes echo via shell; dry-run still should parse without stopping.
-    assert code == 0, f"make -n {target} failed to parse: {err or out}"
+    assert code == 0, f"make -n -f infra-docker/Makefile {target} failed to parse: {err or out}"
     combined = (out or '') + (err or '')
     for s in expect_substrings:
         assert s in combined, f"Expected '{s}' to appear in dry-run output of {target}"
@@ -55,13 +54,11 @@ def test_make_dry_run_commands_include_expected_parts(target, expect_substrings)
 
 @pytest.mark.infra
 @pytest.mark.live_db
-def test_live_ps_ac_detects_state_if_cli_present(has_container_cli):
-    if not has_container_cli:
-        pytest.skip("Apple 'container' CLI not present on this system (no Docker fallback in tests)")
-    code, out, err = run(['make', 'ps-ac'])
-    # This should run and print the list (even if container is not running)
-    assert code == 0, f"make ps-ac failed: {err or out}"
-    # Echo the tail of the list to test output for visibility
+def test_live_ps_docker_detects_state_if_cli_present(has_docker_cli):
+    if not has_docker_cli:
+        pytest.skip("docker CLI not present on this system")
+    code, out, err = run(['make', '-f', str(MAKEFILE_PATH), 'ps-docker'])
+    assert code == 0, f"make -f infra-docker/Makefile ps-docker failed: {err or out}"
     lines = (out or '').splitlines()
-    print("\n[make ps-ac] tail:\n" + "\n".join(lines[-5:] if lines else []))
-    assert 'ID' in out
+    print("\n[make -f infra-docker/Makefile ps-docker] tail:\n" + "\n".join(lines[-5:] if lines else []))
+    assert 'CONTAINER' in (out or '').upper() or 'IMAGE' in (out or '').upper()
