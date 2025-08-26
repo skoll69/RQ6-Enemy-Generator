@@ -28,7 +28,7 @@ def test_dump_uploaded_verifies_weapons_table_docker(has_docker_cli, ensure_dock
         clist_tail = '\n'.join((clist or '').splitlines()[-5:])
         pytest.fail(
             "MySQL container 'mythras-mysql' does not appear to be running.\n"
-            "Hint: run 'make -f infra-docker/Makefile start-db' first.\n"
+            "Hint: run 'make start-db' first.\n"
             f"[docker ps -a] tail:\n{clist_tail}"
         )
 
@@ -113,8 +113,8 @@ def test_dump_uploaded_verifies_weapons_table_docker(has_docker_cli, ensure_dock
 
     msg = [
         "Could not verify that dump has been uploaded to the database (as root, docker).",
-        "- Ensure dump.sql exists at project root and run: make -f infra-docker/Makefile upload-dump-compat",
-        "- Or start DB: make -f infra-docker/Makefile start-db",
+        "- Ensure dump.sql exists at project root and run: make upload-dump-compat",
+        "- Or start DB: make start-db",
         "- You can force failure instead of skip with FORCE_VERIFY_DUMP=1",
         f"Last error: {err}",
     ]

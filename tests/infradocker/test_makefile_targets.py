@@ -15,7 +15,7 @@ REQUIRED_TARGETS = [
 
 @pytest.mark.infra
 def test_makefile_exists_and_contains_targets(project_root):
-    assert MAKEFILE_PATH.exists(), 'infra-docker/Makefile not found.'
+    assert MAKEFILE_PATH.exists(), 'Root Makefile not found.'
     content = MAKEFILE_PATH.read_text(encoding='utf-8', errors='ignore')
     missing = []
     for t in REQUIRED_TARGETS:
@@ -23,7 +23,7 @@ def test_makefile_exists_and_contains_targets(project_root):
         pat = re.compile(rf"^\s*{re.escape(t)}\s*:\s*$", re.MULTILINE)
         if not pat.search(content):
             missing.append(t)
-    assert not missing, f"Required Make targets missing from infra-docker/Makefile: {missing}"
+    assert not missing, f"Required Make targets missing from Makefile: {missing}"
 
 
 @pytest.mark.infra
@@ -32,7 +32,7 @@ def test_makefile_exists_and_contains_targets(project_root):
 ])
 def test_dry_run_basic_targets(target):
     code, out, err = run(['make', '-n', '-f', str(MAKEFILE_PATH), target])
-    assert code == 0, f"make -n -f infra-docker/Makefile {target} failed: {err or out}"
+    assert code == 0, f"make -n -f Makefile {target} failed: {err or out}"
     assert isinstance(out, str)
 
 
@@ -46,7 +46,7 @@ def test_dry_run_basic_targets(target):
 def test_make_dry_run_commands_include_expected_parts(target, expect_substrings):
     code, out, err = run(['make', '-n', '-f', str(MAKEFILE_PATH), target])
     # Some recipes echo via shell; dry-run still should parse without stopping.
-    assert code == 0, f"make -n -f infra-docker/Makefile {target} failed to parse: {err or out}"
+    assert code == 0, f"make -n -f Makefile {target} failed to parse: {err or out}"
     combined = (out or '') + (err or '')
     for s in expect_substrings:
         assert s in combined, f"Expected '{s}' to appear in dry-run output of {target}"
@@ -58,7 +58,7 @@ def test_live_ps_docker_detects_state_if_cli_present(has_docker_cli):
     if not has_docker_cli:
         pytest.skip("docker CLI not present on this system")
     code, out, err = run(['make', '-f', str(MAKEFILE_PATH), 'ps-docker'])
-    assert code == 0, f"make -f infra-docker/Makefile ps-docker failed: {err or out}"
+    assert code == 0, f"make -f Makefile ps-docker failed: {err or out}"
     lines = (out or '').splitlines()
-    print("\n[make -f infra-docker/Makefile ps-docker] tail:\n" + "\n".join(lines[-5:] if lines else []))
+    print("\n[make ps-docker] tail:\n" + "\n".join(lines[-5:] if lines else []))
     assert 'CONTAINER' in (out or '').upper() or 'IMAGE' in (out or '').upper()

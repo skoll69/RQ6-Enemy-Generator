@@ -6,7 +6,7 @@ import pytest
 import sys
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-MAKEFILE_PATH = PROJECT_ROOT / 'infra-docker' / 'Makefile'
+MAKEFILE_PATH = PROJECT_ROOT / 'Makefile'
 ENV_PATH = PROJECT_ROOT / '.env'
 
 
@@ -267,9 +267,9 @@ def ensure_dump_uploaded(env_vars, ensure_db_user_exists, has_docker_cli):
     print(f"[ensure_dump_uploaded] {time.strftime('%Y-%m-%d %H:%M:%S')} starting dump upload (docker)...", file=sys.stderr)
     print(f"[ensure_dump_uploaded] dump file: {dump_path}", file=sys.stderr)
 
-    # Execute docker Makefile target with -f
+    # Execute Makefile target with -f (root Makefile)
     code, out, err = run(['make', '-f', str(MAKEFILE_PATH), 'upload-dump-compat', f'ARGS=--db {db_name}'], timeout=600)
-    print(f"[ensure_dump_uploaded] make -f infra-docker/Makefile upload-dump-compat exit={code}", file=sys.stderr)
+    print(f"[ensure_dump_uploaded] make -f Makefile upload-dump-compat exit={code}", file=sys.stderr)
     if out:
         print(f"[ensure_dump_uploaded] stdout:\n{out}", file=sys.stderr)
     if err:

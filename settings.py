@@ -75,20 +75,22 @@ if not DB_NAME:
         "Set DB_NAME and other DB_* variables in .env or environment."
     )
 
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": DB_NAME,
+        "NAME": os.environ.get("DB_NAME", "mythras_eg"),
         "USER": os.environ.get("DB_USER", "mythras_eg"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+        "PASSWORD": os.environ["DB_PASSWORD"],
         "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
         "PORT": os.environ.get("DB_PORT", "3307"),
         "OPTIONS": {
             "charset": "utf8mb4",
             "init_command": "SET sql_mode='STRICT_ALL_TABLES'",
             "connect_timeout": 5,
-            "ssl": {"disabled": True},  # while debugging
-
+            "read_timeout": 5,
+            "write_timeout": 5,
+            "ssl": {},
         },
     }
 }

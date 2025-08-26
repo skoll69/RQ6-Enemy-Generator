@@ -8,10 +8,10 @@ from .conftest import MAKEFILE_PATH
 @pytest.mark.infra
 def test_makefile_has_no_duplicate_targets():
     """
-    Verify infra-docker/Makefile does not contain duplicate target headers.
+    Verify root Makefile does not contain duplicate target headers.
     """
-    makefile_path = MAKEFILE_PATH if MAKEFILE_PATH.exists() else Path('infra-docker/Makefile')
-    assert makefile_path.exists(), 'infra-docker/Makefile not found.'
+    makefile_path = MAKEFILE_PATH if MAKEFILE_PATH.exists() else Path('Makefile')
+    assert makefile_path.exists(), 'Root Makefile not found.'
 
     content = makefile_path.read_text(encoding='utf-8', errors='ignore').splitlines()
 

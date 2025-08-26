@@ -107,5 +107,12 @@ scripts-chmod:
 	chmod +x *.sh tools/*.sh 2>/dev/null || true
 
 # Utility
+show-running-container show-container:
+	@echo "Showing status for container: $(CONTAINER_NAME)"
+	@$(DOCKER) ps --filter "name=$(CONTAINER_NAME)" --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"
+
+ps-docker-running:
+	@$(DOCKER) ps --filter "status=running"
+
 git-repair:
 	bash ./tools/git_repair.sh

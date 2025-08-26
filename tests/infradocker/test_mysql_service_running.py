@@ -31,7 +31,7 @@ def test_mysql_service_running_docker(has_docker_cli, ensure_docker_run_started)
             tail = '(no logs available)'
         pytest.fail(
             "MySQL service is not running in docker container 'mythras-mysql'.\n"
-            "Hint: run 'make -f infra-docker/Makefile start-db' first.\n"
+            "Hint: run 'make start-db' first.\n"
             f"docker ps -a (tail):\n{clist_tail}\n"
             f"Recent logs (tail):\n{tail}"
         )
