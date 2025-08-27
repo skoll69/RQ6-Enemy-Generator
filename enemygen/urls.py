@@ -28,7 +28,7 @@ urlpatterns = [
 
     url('^' + ROOT + r'enemies/$', views.index, name='index'),
     url('^' + ROOT + r'simple_index/$', views.simple_index),
-    url('^' + ROOT + r'index_json/$', views.index_json),
+    url('^' + ROOT + r'index_json/$', views.index_json, name='index_json'),
     url('^' + ROOT + r'parties/$', views.party_index, name='party_index'),
     url('^' + ROOT + r'party_index/$', views.party_index),  # Old one. Kept in case somebody has bookmarked it
     url('^' + ROOT + r'party_index_json/$', views.party_index_json),
