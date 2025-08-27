@@ -139,7 +139,11 @@ Notes:
   - macOS host -> Apple container root import: zcat dump.sql.gz | container exec -i mythras-mysql mysql -uroot -p"$MYSQL_ROOT_PASSWORD"
 
 4) Point Django to the database in .env and run migrations if needed:
-- python manage.py migrate
+- If your DB was created from a dump and already contains Django tables (e.g., django_content_type), run:
+  - python manage.py migrate_safe
+  - or: python manage.py migrate --fake-initial
+- Otherwise (empty DB), run:
+  - python manage.py migrate
 
 5) Start the dev server:
 - python manage.py runserver
@@ -406,3 +410,30 @@ Manual steps (if you prefer):
 - Ensure HEAD points to a default branch: git symbolic-ref HEAD refs/heads/main
 
 If the directory is on a protected filesystem (e.g., read-only or restricted by corporate security tools), move the project to a writable location (like your home directory) or adjust the protection settings.
+
+
+
+## Management command: taggit_dedup
+
+If you see an IntegrityError during migrate similar to:
+
+- django.db.utils.IntegrityError: (1062, "Duplicate entry '12-37-3' for key 'taggit_taggeditem.taggit_taggeditem_content_type_id_object_id_tag_id_..._uniq'")
+
+it means your database already contains duplicate rows in django-taggit’s taggit_taggeditem table that violate the unique constraint on (content_type_id, object_id, tag_id).
+
+Use the provided management command to safely deduplicate them:
+
+- Preview only (no changes):
+  - python manage.py taggit_dedup --dry-run
+- Perform deduplication (keeps the lowest id per unique triple):
+  - python manage.py taggit_dedup
+
+After a successful run, re-run migrations (if you were blocked by this error):
+- python manage.py migrate_safe
+- or: python manage.py migrate --fake-initial
+
+Troubleshooting:
+- Ensure you run the command from the project root (where manage.py is located).
+- Ensure INSTALLED_APPS includes enemygen (it does by default in settings.py), since the command lives under enemygen/management/commands.
+- List available commands to verify it’s discovered:
+  - python manage.py help | grep taggit_dedup
