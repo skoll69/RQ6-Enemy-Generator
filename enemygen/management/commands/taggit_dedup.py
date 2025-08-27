@@ -73,7 +73,7 @@ class Command(BaseCommand):
 
         if dry_run:
             self.stdout.write(
-                self.style.warning(
+                self.style.WARNING(
                     f"Dry-run complete: {total_groups} duplicate groups found. Would delete {total_deleted} rows."
                 )
             )

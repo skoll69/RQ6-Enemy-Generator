@@ -297,6 +297,11 @@ Notes about Apple container (macOS):
 Alternative (Django’s built-in test runner):
 - python manage.py test
 
+PyCharm test discovery tips:
+- Ensure the project’s default test runner is set to pytest (Settings/Preferences > Tools > Python Integrated Tools > Testing > Default test runner = pytest).
+- Tests live under both tests/ and enemygen/tests/. We provide __init__.py in enemygen/tests to help IDE discovery.
+- Our pytest.ini sets testpaths = tests enemygen/tests so running pytest in any tool should pick them up.
+
 ## AWS Setup reminder list
 
 * Add IPv6 to the VPC
@@ -350,10 +355,13 @@ FLUSH PRIVILEGES;"
 
 After creating the user/database, ensure your Django environment matches:
 - DB_NAME=mythras_eg
-- DB_USER=mythras_eg
-- DB_PASSWORD=the_password_you_set
+- db_user=mythras_eg        # preferred; lowercase key now supported
+- db_password=the_password_you_set  # preferred; lowercase key now supported
 - DB_HOST=127.0.0.1
 - DB_PORT=3306
+
+Notes:
+- For backward compatibility, you can still use DB_USER/DB_PASSWORD. If both lowercase and uppercase are set, lowercase (db_user/db_password) take precedence.
 
 Then run:
 - python manage.py checkdb   # should print Database connection OK
@@ -437,3 +445,42 @@ Troubleshooting:
 - Ensure INSTALLED_APPS includes enemygen (it does by default in settings.py), since the command lives under enemygen/management/commands.
 - List available commands to verify it’s discovered:
   - python manage.py help | grep taggit_dedup
+
+
+
+## Important: Tests use the normal database (no separate test_ DB)
+
+This project is configured to use the normal application database for tests as well.
+- Django setting: DATABASES['default']['TEST'] = { 'MIRROR': 'default' }
+- Effect: The test runner will NOT create a separate test_<dbname> database; it will operate on the same DB defined by DB_NAME (e.g., mythras_eg).
+
+Caution:
+- Running tests can INSERT/UPDATE/DELETE data. Run tests only against a disposable copy or backup your data first.
+- For safer local testing, point DB_NAME in your .env to a clone (e.g., mythras_eg_dev) before running tests.
+
+You can verify connectivity before running tests:
+  - python manage.py checkdb
+
+Tip: If your DB already contains data and you want tests to avoid loading the baseline fixture, set an environment variable:
+  - SKIP_TEST_LOADDATA=1 pytest -q
+
+ Running tests:
+- Install dev requirements: `pip install -r requirements_dev.txt`
+- Run all tests: `pytest`
+- Quieter output: `pytest -q`
+- Speed up repeated runs by keeping the test DB after first creation: `pytest --keepdb`
+- If you want Django to (re)create the test DB explicitly on a run, use: `pytest --create-db`
+
+
+
+
+## Important: Tests use the normal database (no separate test_ DB)
+
+This project is configured to use the normal application database for tests as well.
+- Django setting: DATABASES['default']['TEST'] = { 'MIRROR': 'default' }
+- Effect: The test runner will NOT create a separate test_<dbname> database; it will operate on the same DB defined by DB_NAME (e.g., mythras_eg).
+
+Caution:
+- Running tests can INSERT/UPDATE/DELETE data. Run tests only against a disposable copy or backup your data first.
+- For safer local testing, point DB_NAME in your .env to a clone (e.g., mythras_eg_dev) before running tests.
+

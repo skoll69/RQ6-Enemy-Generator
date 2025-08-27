@@ -8,6 +8,7 @@ from .conftest import run, env_vars
 
 @pytest.mark.infra
 @pytest.mark.live_db
+@pytest.mark.skip(reason="temporarily skipped per issue: skip test_dump_rowcount_csv_matches_database")
 def test_dump_rowcount_csv_matches_database(has_docker_cli, ensure_docker_run_started, ensure_dump_uploaded, env_vars):
     """
     Generate dump_rowcount.csv from dump.sql and compare each table's expected rowcount

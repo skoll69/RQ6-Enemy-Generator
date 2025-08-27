@@ -76,12 +76,20 @@ if not DB_NAME:
     )
 
 
+# Support both uppercase (legacy) and lowercase (requested) env keys for DB credentials
+_DB_USER = os.environ.get("db_user") or os.environ.get("DB_USER") or "mythras_eg"
+_DB_PASSWORD = os.environ.get("db_password") or os.environ.get("DB_PASSWORD")
+if not _DB_PASSWORD:
+    raise RuntimeError(
+        "Database password is not set. Please add db_password (preferred) or DB_PASSWORD to your .env or environment."
+    )
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": os.environ.get("DB_NAME", "mythras_eg"),
-        "USER": os.environ.get("DB_USER", "mythras_eg"),
-        "PASSWORD": os.environ["DB_PASSWORD"],
+        "USER": _DB_USER,
+        "PASSWORD": _DB_PASSWORD,
         "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
         "PORT": os.environ.get("DB_PORT", "3308"),
         "OPTIONS": {
@@ -91,6 +99,10 @@ DATABASES = {
             "read_timeout": 5,
             "write_timeout": 5,
             "ssl": {},
+        },
+        # Use the same database for tests (no separate test_ database)
+        "TEST": {
+            "MIRROR": "default",
         },
     }
 }
