@@ -46,7 +46,7 @@ urlpatterns = [
     url('^' + ROOT + r'set_filter/$', views.set_filter, name='set_filter'),
     url('^' + ROOT + r'set_party_filter/$', views.set_party_filter, name='set_party_filter'),
     url('^' + ROOT + r'feature_items/(?P<feature_id>\d+)/$', views.feature_items, name='feature_items'),
-    url('^' + ROOT + r'generate_enemies_json/$', views.generate_enemies_json),
+    url('^' + ROOT + r'generate_enemies_json/$', views.generate_enemies_json, name='generate_enemies_json'),
     url('^' + ROOT + r'generate_party_json/$', views.generate_party_json),
 
     url('^' + ROOT + r'pdf_export/$', views.pdf_export, name='pdf_export'),
