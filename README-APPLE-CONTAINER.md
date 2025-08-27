@@ -1,4 +1,6 @@
-# Apple container (macOS) - Appendix
+# Apple container (macOS)
+
+This guide covers running MySQL for this project using Apple's container CLI on macOS. If you are using Docker or a Docker-compatible runtime, use readme.md instead.
 
 This document contains all Apple container specific instructions that were previously embedded in the main readme. If you are using Docker (or Rancher Desktop with a docker-compatible CLI), you can ignore this file and follow the main readme instead.
 
@@ -64,16 +66,13 @@ If you want the MySQL container to automatically import your dump on first initi
 
 ## Quick test with Apple container
 
-- Start MySQL (required syntax; reads password from your shell env or .env): see command above.
-- Or via Makefile-applecontainer: make start-db (it runs the exact command above)
+- Start MySQL (see command above)
 - cp .env.example .env
-- make checkdb
-- make migrate
-- Place your SQL dump at project root as 'dump.sql'.
-- ./upload_dump.sh or make upload-dump
-- To enable MySQL 8 compatibility normalization: make upload-dump-compat
-- make run to start Django dev server
-- ./stop_db.sh or ./stop_db_nocompose.sh to stop the DB
+- python manage.py checkdb
+- python manage.py migrate
+- Optional: import a dump via ./upload_dump.sh or make upload-dump
+- python manage.py runserver
+- Stop DB: ./stop_db_nocompose.sh or ./stop_db.sh
 
 ## Viewing container logs (Apple container)
 - container logs mythras-mysql
@@ -90,7 +89,7 @@ Run ad-hoc MySQL queries inside the running container:
 - make mysql-shell-root
 
 
-## Appendix: Apple container (macOS)
+## Reference notes
 
 This appendix has been moved to README-APPLE-CONTAINER.md to keep the main README focused on the docker-based workflow used by the Makefile and infradocker tests.
 
