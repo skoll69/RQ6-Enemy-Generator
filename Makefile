@@ -94,7 +94,9 @@ logs-db-follow:
 	$(DOCKER) logs -f $(CONTAINER_NAME)
 
 # Minimal run using docker
-apple-run-minimal docker-run-minimal:
+# Apple-container alias removed; use docker-run-minimal only in this Makefile
+
+docker-run-minimal:
 	@ENV_FILE=.env; \
 	if [ -f "$$ENV_FILE" ]; then export $$(grep -E '^(MYSQL_ROOT_PASSWORD)=' "$$ENV_FILE" 2>/dev/null || true); fi; \
 	: $${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required in .env or environment}; \
