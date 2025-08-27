@@ -120,6 +120,7 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = str(BASE_DIR / "static_root")
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"

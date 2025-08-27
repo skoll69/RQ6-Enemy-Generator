@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block content %}
 <div id="search_container">
     <input id="search" size="60" type="text" /> <button id="search_button">Search</button>
@@ -55,7 +55,7 @@
 </div>
 {% endif %}
 <div id="searching">
-    <img src="/static/images/loading.gif" height="80" width="80" />
+    <img src="{% static 'images/loading.gif' %}" height="80" width="80" />
 </div>
 {% include 'enemy_template_list.html' %}
 
