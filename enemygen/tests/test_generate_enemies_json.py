@@ -57,17 +57,34 @@ def test_generate_enemies_json_amount_1_contains_expected_fields(client, load_da
     assert len(payload) == 1, "amount=1 should produce a single generated enemy"
 
     enemy = payload[0]
+
+    # Structured logging header
+    print("[generate_enemies_json] Verifying JSON vs DB for template:")
+    print(f"  - template.id (DB): {et.id}")
+    print(f"  - template.name (DB): {et.name}")
+    print(f"  - request URL: {url}?id={et.id}&amount=1")
+
     # Core scalar fields from DB
+    print("[fields] name: JSON['name'] should start with DB et.name")
+    print(f"  JSON name: {enemy.get('name')}  |  DB et.name: {et.name}")
     assert enemy["name"].startswith(et.name[:1])  # name may include suffix like _1
+
+    print("[fields] cult_rank: JSON['cult_rank'] should equal DB et.cult_rank (numeric)")
+    print(f"  JSON cult_rank: {enemy.get('cult_rank')}  |  DB et.cult_rank: {getattr(et, 'cult_rank', None)}")
     assert enemy["cult_rank"] == getattr(et, "cult_rank", enemy["cult_rank"])  # numeric rank
+
+    print("[fields] notes: JSON['notes'] should equal DB et.notes or empty if None")
+    print(f"  JSON notes: {enemy.get('notes', '')!r}  |  DB et.notes: {(et.notes or '')!r}")
     assert enemy.get("notes", "") == (et.notes or "")
 
     # Stats: names should reflect EnemyStat links (values are randomized)
     expected_stat_names = list(
         EnemyStat.objects.filter(enemy_template=et).select_related("stat").values_list("stat__name", flat=True)
     )
-    # Some data sets may not have explicit EnemyStat rows for each stat; ensure at least a subset match
     returned_stat_names = {list(d.keys())[0] for d in enemy.get("stats", []) if isinstance(d, dict) and d}
+    print("[stats] Expected stat names from DB vs returned JSON stat names")
+    print(f"  DB stat names: {sorted(expected_stat_names)}")
+    print(f"  JSON stat names: {sorted(returned_stat_names)}")
     for sname in expected_stat_names:
         assert sname in returned_stat_names, f"Missing stat name in JSON: {sname}"
 
@@ -76,6 +93,9 @@ def test_generate_enemies_json_amount_1_contains_expected_fields(client, load_da
         EnemySkill.objects.filter(enemy_template=et).select_related("skill").values_list("skill__name", flat=True)
     )
     returned_skill_names = {list(d.keys())[0] for d in enemy.get("skills", []) if isinstance(d, dict) and d}
+    print("[skills] Expected skill names from DB vs returned JSON skill names")
+    print(f"  DB skill names: {sorted(expected_skill_names)}")
+    print(f"  JSON skill names: {sorted(returned_skill_names)}")
     for sk in expected_skill_names:
         assert sk in returned_skill_names, f"Missing skill in JSON: {sk}"
 
@@ -86,28 +106,44 @@ def test_generate_enemies_json_amount_1_contains_expected_fields(client, load_da
         )
     )
     returned_hl_names = {d.get("name") for d in enemy.get("hit_locations", []) if isinstance(d, dict)}
+    print("[hit_locations] Expected HL names from DB vs returned JSON HL names")
+    print(f"  DB HL names: {sorted(expected_hl_names)}")
+    print(f"  JSON HL names: {sorted(returned_hl_names)}")
     for hl in expected_hl_names:
         assert hl in returned_hl_names, f"Missing hit location in JSON: {hl}"
 
     # Spells lists must be present (may be empty)
+    print("[spells] Ensuring keys exist and are lists: 'folk_spells','theism_spells','sorcery_spells','mysticism_spells'")
     for key in ("folk_spells", "theism_spells", "sorcery_spells", "mysticism_spells"):
+        print(f"  key: {key}  |  present: {key in enemy}  |  type: {type(enemy.get(key)).__name__}")
         assert key in enemy
         assert isinstance(enemy[key], list)
 
     # Combat styles structure (may be empty) must have expected shape if present
     if enemy.get("combat_styles"):
+        print("[combat_styles] First combat style structure and first weapon keys (if any)")
         assert isinstance(enemy["combat_styles"], list)
         cs0 = enemy["combat_styles"][0]
+        print(f"  CS name: {cs0.get('name')}  |  weapons count: {len(cs0.get('weapons') or [])}")
         assert "name" in cs0 and "weapons" in cs0
         if cs0.get("weapons"):
             w0 = cs0["weapons"][0]
+            present_keys = sorted(list(w0.keys()))
+            expected_keys = ["name", "damage", "ap", "hp", "size", "reach", "effects", "type"]
+            print(f"  First weapon keys JSON: {present_keys}  |  expected to include: {expected_keys}")
             # spot-check some keys from views_lib.enemy_as_json
             for k in ("name", "damage", "ap", "hp", "size", "reach", "effects", "type"):
                 assert k in w0
+    else:
+        print("[combat_styles] No combat styles returned in JSON (allowed)")
 
     # Attributes should be present (dict)
+    print("[attributes] JSON['attributes'] should be a dict")
+    print(f"  attributes type: {type(enemy.get('attributes')).__name__}  | keys: {sorted(list(enemy.get('attributes', {}).keys()))}")
     assert "attributes" in enemy and isinstance(enemy["attributes"], dict)
 
     # Cults/features/spirits should be lists (may be empty)
+    print("[lists] Ensuring list types for 'cults','features','spirits'")
     for key in ("cults", "features", "spirits"):
+        print(f"  key: {key}  |  type: {type(enemy.get(key)).__name__}  |  length: {len(enemy.get(key) or [])}")
         assert key in enemy and isinstance(enemy[key], list)
