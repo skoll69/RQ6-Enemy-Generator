@@ -137,6 +137,15 @@ STATIC_ROOT = str(BASE_DIR / "static_root")
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
+# Define a writable temp directory for HTML/PDF/PNG generation (required by views_lib and ajax)
+TEMP = str(BASE_DIR / "temp")
+# Ensure the directory exists to avoid runtime errors when writing temp files
+try:
+    os.makedirs(TEMP, exist_ok=True)
+except Exception:
+    # If directory creation fails (permissions, etc.), proceed; file ops may fail later with clearer errors
+    pass
+
 # Speed up tests by creating tables directly from models (no migrations for enemygen)
 #MIGRATION_MODULES = {"enemygen": None}
 

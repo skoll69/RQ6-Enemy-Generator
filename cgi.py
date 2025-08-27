@@ -14,6 +14,7 @@ symbols are required by dependencies in this project.
 from __future__ import annotations
 from typing import Tuple, Dict
 import html
+import re
 
 
 def parse_header(line: str) -> Tuple[str, Dict[str, str]]:
@@ -57,3 +58,31 @@ def escape(s: str, quote: bool = True) -> str:
     cgi.escape(s, quote=True) -> html.escape(s, quote=quote)
     """
     return html.escape(s, quote=quote)
+
+
+# Django <4.1 (and other libs) may call cgi.valid_boundary during multipart parsing.
+# The original implementation validated that a MIME boundary consists of allowed
+# characters. Provide a conservative port that matches common Django expectations.
+_VALID_BOUNDARY_RE = re.compile(r"^[ -~]{0,200}$")  # visible ASCII, up to 200 chars
+
+
+def valid_boundary(s: str) -> bool:
+    """Return True if 's' is a syntactically valid multipart boundary.
+
+    Compatible with legacy cgi.valid_boundary behavior used by Django 3.2,
+    allowing visible ASCII without control characters and reasonable length.
+    """
+    if not isinstance(s, str):
+        try:
+            s = s.decode("utf-8", errors="ignore")
+        except Exception:
+            return False
+    if not s:
+        return False
+    # Disallow CR/LF and other control chars; allow visible ASCII only
+    if not _VALID_BOUNDARY_RE.match(s):
+        return False
+    # Must not contain spaces at ends
+    if s[0].isspace() or s[-1].isspace():
+        return False
+    return True

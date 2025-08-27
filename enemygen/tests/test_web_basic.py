@@ -4,7 +4,6 @@ from django.urls import reverse
 
 pytestmark = pytest.mark.django_db
 
-@pytest.mark.skip(reason="temporarily skipped per issue: skip test_generate_enemies_post_minimal")
 @pytest.fixture(scope="session")
 def load_data(django_db_setup, django_db_blocker):
     """
