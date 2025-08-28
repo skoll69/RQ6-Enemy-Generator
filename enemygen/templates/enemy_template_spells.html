@@ -35,7 +35,7 @@
                 {% else %}
                 <input id="custom_spell_{{spell.id}}" class="data number" type="number" min="0" max="9999" item_id="{{spell.id}}"
                     parent_id="{{et.id}}" item_type="et_custom_spell_prob" value="{{ spell.probability }}" />
-                <img src="/static/minus.png" width="16" height="16" class="del_item" item_id="{{ spell.id }}" item_type="et_custom_spell" />
+                <img src="{% static 'minus.png' %}" width="16" height="16" class="del_item" item_id="{{ spell.id }}" item_type="et_custom_spell" />
                 {% endif %}
             </td>
             {% if not forloop.first and forloop.counter|divisibleby:"4" %}</tr>
@@ -85,7 +85,7 @@
                     {% else %}
                     <input id="custom_spell_{{spell.id}}" class="data number" type="number" min="0" max="9999" item_id="{{spell.id}}"
                         parent_id="{{et.id}}" item_type="et_custom_spell_prob" value="{{ spell.probability }}" />
-                    <img src="/static/minus.png" width="16" height="16" class="del_item" item_id="{{ spell.id }}" item_type="et_custom_spell" />
+                    <img src="{% static 'minus.png' %}" width="16" height="16" class="del_item" item_id="{{ spell.id }}" item_type="et_custom_spell" />
                     {% endif %}
                 </td>
                 {% if not forloop.first and forloop.counter|divisibleby:"4" %}
@@ -134,7 +134,7 @@
                     {% else %}
                     <input id="custom_spell_{{spell.id}}" class="data number" type="number" min="0" max="9999" item_id="{{spell.id}}"
                         parent_id="{{et.id}}" item_type="et_custom_spell_prob" value="{{ spell.probability }}" />
-                    <img src="/static/minus.png" width="16" height="16" class="del_item" item_id="{{ spell.id }}" item_type="et_custom_spell" />
+                    <img src="{% static 'minus.png' %}" width="16" height="16" class="del_item" item_id="{{ spell.id }}" item_type="et_custom_spell" />
                     {% endif %}
                 </td>
                 {% if not forloop.first and forloop.counter|divisibleby:"3" %}
@@ -183,7 +183,7 @@
                     {% else %}
                     <input id="custom_spell_{{spell.id}}" class="data number" type="number" min="0" max="9999" item_id="{{spell.id}}"
                         parent_id="{{et.id}}" item_type="et_custom_spell_prob" value="{{ spell.probability }}" />
-                    <img src="/static/minus.png" width="16" height="16" class="del_item" item_id="{{ spell.id }}" item_type="et_custom_spell" />
+                    <img src="{% static 'minus.png' %}" width="16" height="16" class="del_item" item_id="{{ spell.id }}" item_type="et_custom_spell" />
                     {% endif %}
                 </td>
                 {% if not forloop.first and forloop.counter|divisibleby:"3" %}
@@ -215,7 +215,7 @@
                 <td><a href="{% url 'enemy_template' spirit.spirit.id %}">{{ spirit.name }}</a></td>
                 <td><input id="spirit_{{spirit.id}}" class="data number" type="number" min="0" max="9999" item_id="{{spirit.id}}"
                         parent_id="{{et.id}}" item_type="et_spirit_prob" value="{{ spirit.probability }}" /></td>
-                <td><img src="/static/minus.png" width="16" height="16" class="del_item" item_id="{{ spirit.id }}" item_type="et_spirit" /></td>
+                <td><img src="{% static 'minus.png' %}" width="16" height="16" class="del_item" item_id="{{ spirit.id }}" item_type="et_spirit" /></td>
             </tr>
             {% endfor %}
 

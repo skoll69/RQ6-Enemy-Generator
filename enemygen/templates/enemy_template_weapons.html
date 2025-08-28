@@ -181,7 +181,7 @@ $('.weapon_selector').click(function(event){
         <td class="ap_hp" {% if weapon.natural_weapon %}style="display: none;"{% endif %}><input id="custom_weapon_hp_{{weapon.id}}" class="data number" type="number" min="0" max="100" item_id="{{weapon.id}}" item_type="et_custom_weapon_hp" value="{{weapon.hp}}"></td>
         <td class="ap_hp" colspan="2" {% if not weapon.natural_weapon %}style="display: none;"{% endif %}><input id="custom_weapon_ap_hp_as_per_{{weapon.id}}" class="data" type="text" size="7" item_id="{{weapon.id}}" item_type="et_custom_weapon_ap_hp_as_per" value="{{ weapon.ap_hp_as_per }}" /></td>
         <td><input id="custom_weapon_prob_{{weapon.id}}" class="data number" type="number" min="0" max="9999" item_id="{{weapon.id}}" item_type="et_custom_weapon_prob" value="{{ weapon.probability }}" /></td>
-        <td><img src="/static/minus.png" width="23" height="23" class="del_item" item_id="{{ weapon.id }}" item_type="custom_weapon"/></td>
+        <td><img src="{% static 'minus.png' %}" width="23" height="23" class="del_item" item_id="{{ weapon.id }}" item_type="custom_weapon"/></td>
     </tr>
     {% endfor %}
     </table>

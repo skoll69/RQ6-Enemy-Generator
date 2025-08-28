@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 
@@ -49,9 +50,9 @@ $(window).resize(set_width)
         <tr>
             <td style="height: 22px; width: 22px; position: relative;">
                 {% if et.starred %}
-                    <img et_id={{ et.id }} class="star" height="22" width="22" src="/static/images/star_filled.png" style="position: absolute; top: 0px;"/>
+                    <img et_id={{ et.id }} class="star" height="22" width="22" src="{% static 'images/star_filled.png' %}" style="position: absolute; top: 0px;"/>
                 {% else %}
-                    <img et_id={{ et.id }} class="star" height="22" width="22" src="/static/images/star_empty.png" style="position: absolute; top: 0px;"/>
+                    <img et_id={{ et.id }} class="star" height="22" width="22" src="{% static 'images/star_empty.png' %}" style="position: absolute; top: 0px;"/>
                 {% endif %}
             </td>
             <td><a class="edit_item" href="{% url 'enemy_template' et.id %}">{{ et.name }}</a>{% if not et.published %} *{% endif %}</td>

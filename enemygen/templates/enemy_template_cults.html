@@ -8,7 +8,7 @@ Amount:
 <tr>
     <td><a href="{% url 'enemy_template' cult.cult.id %}">{{ cult.name }}</a></td>
     <td><input id="cult_{{cult.id}}" class="data number" type="number" min="0" max="9999" item_id="{{cult.id}}" parent_id="{{et.id}}" item_type="et_cult_prob" value="{{ cult.probability }}" /></td>
-    <td><img src="/static/minus.png" width="16" height="16" class="del_item" item_id="{{ cult.id }}" item_type="et_cult" /></td>
+    <td><img src="{% static 'minus.png' %}" width="16" height="16" class="del_item" item_id="{{ cult.id }}" item_type="et_cult" /></td>
 </tr>
 {% endfor %}
 

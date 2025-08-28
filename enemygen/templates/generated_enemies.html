@@ -1,6 +1,7 @@
 {% load markdown %}
 <html>
 <head>
+{% load static %}
 <title>RQ: {% if party %}{{ party.name }}{% else %}{{ enemies.0.name }}{% endif %}</title>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -216,7 +217,7 @@ div#png_export{
 <div class="enemy_container"> <!-- Spirit begins -->
     <span id="enemy_{{ forloop.counter }}" class="template_name editable" contenteditable>{{ enemy.name }}</span>
     {% if generated_html %}
-    <a href="{% url 'enemy_template' enemy.et.id %}"><img class="template_link" src="/static/images/link.png" height="12" width="12" /></a>
+    <a href="{% url 'enemy_template' enemy.et.id %}"><img class="template_link" src="{% static 'images/link.png' %}" height="12" width="12" /></a>
     {% endif %}
 <table class="enemy_table">
     <tr>
@@ -354,7 +355,7 @@ div#png_export{
     <tr><td colspan="3">
         <span id="enemy_{{ forloop.counter }}" class="template_name editable" contenteditable>{{ enemy.name }}</span>
         {% if generated_html %}
-        <a href="{% url 'enemy_template' enemy.et.id %}"><img class="template_link" src="/static/images/link.png" height="12" width="12" /></a>
+        <a href="{% url 'enemy_template' enemy.et.id %}"><img class="template_link" src="{% static 'images/link.png' %}" height="12" width="12" /></a>
         {% endif %}
     </td></tr>
     <tr><td valign="top">
