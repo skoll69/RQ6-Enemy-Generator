@@ -2,7 +2,7 @@ beautifulsoup4==4.12.3
 cairocffi==1.2.0
 CairoSVG==2.7.0
 cffi==1.17.1
-colorama==0.4.3
+colorama>=0.4.6
 configparser==4.0.2
 cryptography==44.0.1
 cssselect==0.9.1

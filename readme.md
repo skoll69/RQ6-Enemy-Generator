@@ -145,36 +145,42 @@ Notes:
 - If your dump already contains CREATE DATABASE/USE statements, it will create/populate as defined in the file.
 - For large dumps or existing volumes, consider the manual import methods in the previous section.
 
-## Tests: Pytest (Recommended)
+## Tests: Running with tox (recommended)
 
-Run the test suite with pytest for the best developer experience.
+We provide a tox configuration to run both pytest and Django’s unittest runner.
+Assumption: your database/container is already up and reachable; tox does not start services.
 
-Before running tests on macOS, ensure the Apple container system service is started first:
-- make test-ready
-  - This runs ac-start-service under the hood (container system start) so infra tests won’t fail due to XPC connection errors.
+Basic usage:
+- Install tox: pip install tox
+- Ensure DB env vars are set (or rely on .env autoload by Django settings):
+  - DB_NAME, db_user/DB_USER, db_password/DB_PASSWORD, DB_HOST, DB_PORT
+- Run everything: tox
+  - This runs pytest with -vv and then Django’s unittest runner (scoped to enemygen.tests)
 
-- Install dev dependencies (includes pytest and plugins):
-  - pip install -r requirements_dev.txt
-- Run all tests (verbose output):
-  - pytest
-- Quieter output:
-  - pytest -q
-- Run a single file or test:
-  - pytest tests/infra/test_makefile_targets.py
-  - pytest tests/infra/test_makefile_targets.py::test_live_ps_ac_detects_state_if_cli_present
-- Use markers:
-  - Exclude infrastructure tests: pytest -m "not infra"
-  - Only infrastructure tests: pytest -m infra
-- Select by keyword:
-  - pytest -k makefile
+Tips:
+- Pass extra pytest options via PYTEST_ADDOPTS, e.g.: PYTEST_ADDOPTS="-k makefile -q" tox
+- Include only infra tests: PYTEST_ADDOPTS="-m infra" tox
+- Exclude infra tests: PYTEST_ADDOPTS="-m 'not infra'" tox
+- Keep DB between runs: PYTEST_ADDOPTS="--keepdb" tox
+
+macOS (Apple container) note before running infra tests:
+- make test-ready  # starts the Apple container system service to avoid XPC errors
+
+Direct pytest usage (optional):
+- Install dev dependencies: pip install -r requirements_dev.txt
+- Run all tests verbosely: pytest -vv
+- Quieter: pytest -q
+- Single file/test: pytest tests/infradocker/test_makefile_targets.py::test_live_ps_docker_detects_state_if_cli_present
+- Marker selection: pytest -m infra  (or -m "not infra")
+- Keyword selection: pytest -k makefile
 
 Alternative (Django’s built-in test runner):
-- python manage.py test
+- python manage.py test enemygen.tests --verbosity=2
 
-PyCharm test discovery tips:
-- Ensure the project’s default test runner is set to pytest (Settings/Preferences > Tools > Python Integrated Tools > Testing > Default test runner = pytest).
-- Tests live under both tests/ and enemygen/tests/. We provide __init__.py in enemygen/tests to help IDE discovery.
-- Our pytest.ini sets testpaths = tests enemygen/tests so running pytest in any tool should pick them up.
+PyCharm tips:
+- Set default test runner to pytest (Settings/Preferences > Tools > Python Integrated Tools > Testing)
+- Tests live under tests/ and enemygen/tests/
+- pytest.ini sets: testpaths = tests enemygen/tests
 
 ## AWS Setup reminder list
 

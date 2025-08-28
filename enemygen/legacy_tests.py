@@ -102,8 +102,8 @@ class TestEnemyTemplate(TestCase):
     fixtures = ('enemygen_testdata.json',)
 
     def test_01_create(self):
-        user = User(username='username')
-        user.save()
+        # Use get_or_create to avoid duplicate username errors when tests share the same DB
+        user, _ = User.objects.get_or_create(username='username')
         ruleset = Ruleset.objects.get(id=1)
         self.assertEqual(ruleset.name, 'RuneQuest 6')
         race = Race.objects.get(id=1)
@@ -378,8 +378,8 @@ class TestJson(TestCase):
 
 
 def get_enemy_template():
-    user = User(username='username')
-    user.save()
+    # Idempotent user creation to avoid unique constraint errors across tests/runs
+    user, _ = User.objects.get_or_create(username='username')
     ruleset = Ruleset.objects.get(id=1)
     if ruleset.name != 'RuneQuest 6':
         raise Exception("Ruleset doesn't match")
