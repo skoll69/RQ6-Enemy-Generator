@@ -31,6 +31,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE = (
+    'mythras_eg.middleware.SimpleCorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -43,6 +44,8 @@ MIDDLEWARE = (
 ROOT_URLCONF = 'mythras_eg.urls'
 
 DEFAULT_AUTO_FIELD='django.db.models.AutoField' 
+
+CORS_ALLOWED_ORIGINS = []
 
 TEMPLATES = [
     {
