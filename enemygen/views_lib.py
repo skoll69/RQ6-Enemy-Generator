@@ -2,7 +2,7 @@
 
 from enemygen.models import Ruleset, EnemyTemplate, Race
 from enemygen.models import SpellAbstract, EnemySpell, CustomSpell, ChangeLog
-from enemygen.models import Weapon, CombatStyle, EnemyWeapon, CustomWeapon, Party, AdditionalFeatureList
+from enemygen.models import Weapon, CombatStyle, EnemyWeapon, CustomWeapon, Party, AdditionalFeatureList, EnemySkill
 
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
@@ -346,9 +346,22 @@ def as_json(enemies):
     return json.dumps(out)
 
 def enemy_as_json(e):
+    # Normalize cult_rank to a numeric value; default to 0 when missing/None
+    cult_rank_val = getattr(e, 'cult_rank', None)
+    try:
+        # Handle common string cases like 'None' or ''
+        if cult_rank_val in (None, ''):
+            cult_rank_num = 0
+        elif isinstance(cult_rank_val, str) and cult_rank_val.lower() == 'none':
+            cult_rank_num = 0
+        else:
+            cult_rank_num = int(cult_rank_val)
+    except Exception:
+        cult_rank_num = 0
+
     out = {
         'name': e.name,
-        'cult_rank': e.cult_rank,
+        'cult_rank': cult_rank_num,
         'stats': [{s['name']: s['value']} for s in e.stats_list],
         'skills': [{s['name']: s['value']} for s in e.skills],
         'folk_spells': [s.name for s in e.folk_spells],
@@ -366,6 +379,17 @@ def enemy_as_json(e):
         'cults': [c.name for c in e.cults],
         'spirits': [enemy_as_json(s) for s in e.spirits],
     }
+    # Ensure all defined EnemySkill names for the template are present in JSON, even if not included for rolling
+    try:
+        expected_skill_names = list(EnemySkill.objects.filter(enemy_template=e.et).select_related('skill').values_list('skill__name', flat=True))
+        present_skill_names = {list(d.keys())[0] for d in out['skills']}
+        for sk_name in expected_skill_names:
+            if sk_name not in present_skill_names:
+                out['skills'].append({sk_name: 0})  # default value if not rolled/included
+    except Exception:
+        # If anything goes wrong, do not block JSON generation
+        pass
+
     if hasattr(e, 'natural_armor'):
         out['natural_armor'] = e.natural_armor
     return out

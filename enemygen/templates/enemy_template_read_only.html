@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}RQ: {{ et.name }}{% endblock %}
 
@@ -24,9 +25,9 @@
 <h3 style="display: inline;">
     {{ et.name }}
     {% if et.starred %}
-        <img et_id={{ et.id }} class="star" height="22" width="22" src="/static/images/star_filled.png" />
+        <img et_id={{ et.id }} class="star" height="22" width="22" src="{% static 'images/star_filled.png' %}" />
     {% else %}
-        <img et_id={{ et.id }} class="star" height="22" width="22" src="/static/images/star_empty.png" {% if not user.is_authenticated %}title="Log in to Star favorites"{% endif %} />
+        <img et_id={{ et.id }} class="star" height="22" width="22" src="{% static 'images/star_empty.png' %}" {% if not user.is_authenticated %}title="Log in to Star favorites"{% endif %} />
     {% endif %}
 </h3>
 <span class="generated_amount">(Generated {{ et.generated }} times)</span>

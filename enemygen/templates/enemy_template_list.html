@@ -1,3 +1,4 @@
+{% load static %}
 <div id="enemy_template_list_container">
 <table id="enemy_template_list" class="index_list">
     {% include 'enemy_list_table_head.html' %}
@@ -5,9 +6,9 @@
         <tr>
             <td>
                 {% if et.starred %}
-                    <img et_id="{{ et.id }}" class="star" height="22" width="22" src="/static/images/star_filled.png" />
+                    <img et_id="{{ et.id }}" class="star" height="22" width="22" src="{% static 'images/star_filled.png' %}" />
                 {% else %}
-                    <img et_id="{{ et.id }}" class="star" height="22" width="22" src="/static/images/star_empty.png" {% if not user.is_authenticated %}title="Log in to Star favorites"{% endif %} />
+                    <img et_id="{{ et.id }}" class="star" height="22" width="22" src="{% static 'images/star_empty.png' %}" {% if not user.is_authenticated %}title="Log in to Star favorites"{% endif %} />
                 {% endif %}
             </td>
             <td><a class="edit_item" href="{% url 'enemy_template' et.id %}">{{ et.name }}</a> {% if not et.published %}<b>*</b>{% endif %}</td>

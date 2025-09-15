@@ -7,3 +7,5 @@ temp/
 dump.sql
 .venv
 */__pycache__
+!/.env
+!/dump.sql

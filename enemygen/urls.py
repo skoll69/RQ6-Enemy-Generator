@@ -1,9 +1,12 @@
 from django.urls import re_path as url
 from django.conf import settings
+from django.contrib import admin
+from django.urls import path, include
+
 
 from enemygen import views
 from enemygen import ajax
-
+from enemygen.reg_views import MyRegistrationView
 try:
     ROOT = settings.WEB_ROOT
 except:
@@ -11,9 +14,21 @@ except:
 
 urlpatterns = [
     url('^' + ROOT + r'$', views.home, name='home'),
+    # -> added after manage.py runserver complains about not finding the registration
+
+
+    url(r'^accounts/register/$', MyRegistrationView.as_view(), name='registration_register'),
+    # this above is mandatory?
+    #url(r'^admin/', admin.site.urls),
+    path("accounts/", include("django.contrib.auth.urls")),
+
+    path("admin/", admin.site.urls),
+
+    # <- added after manage.py runserver complains about not finding the registration
+
     url('^' + ROOT + r'enemies/$', views.index, name='index'),
     url('^' + ROOT + r'simple_index/$', views.simple_index),
-    url('^' + ROOT + r'index_json/$', views.index_json),
+    url('^' + ROOT + r'index_json/$', views.index_json, name='index_json'),
     url('^' + ROOT + r'parties/$', views.party_index, name='party_index'),
     url('^' + ROOT + r'party_index/$', views.party_index),  # Old one. Kept in case somebody has bookmarked it
     url('^' + ROOT + r'party_index_json/$', views.party_index_json),
@@ -31,7 +46,7 @@ urlpatterns = [
     url('^' + ROOT + r'set_filter/$', views.set_filter, name='set_filter'),
     url('^' + ROOT + r'set_party_filter/$', views.set_party_filter, name='set_party_filter'),
     url('^' + ROOT + r'feature_items/(?P<feature_id>\d+)/$', views.feature_items, name='feature_items'),
-    url('^' + ROOT + r'generate_enemies_json/$', views.generate_enemies_json),
+    url('^' + ROOT + r'generate_enemies_json/$', views.generate_enemies_json, name='generate_enemies_json'),
     url('^' + ROOT + r'generate_party_json/$', views.generate_party_json),
 
     url('^' + ROOT + r'pdf_export/$', views.pdf_export, name='pdf_export'),
