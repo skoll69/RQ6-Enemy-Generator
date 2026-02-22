@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.conf import settings
 from django.utils.datastructures import MultiValueDictKeyError
+from django.views.decorators.http import require_GET
 
 from enemygen.models import EnemyTemplate, Race, Party, ChangeLog, AdditionalFeatureList
 from enemygen.views_lib import get_ruleset, get_context, get_et_context, get_enemies, get_generated_party
@@ -38,6 +39,7 @@ def simple_index(request):
     return render(request, 'simple_index.html', context)
 
 
+@require_GET
 def index_json(request):
     out = []
     for et in get_enemy_templates(get_filter(request), request.user):
@@ -59,7 +61,7 @@ def party_index(request):
     context['parties'] = get_party_templates(party_filter)
     return render(request, 'party_index.html', context)
 
-
+@require_GET
 def party_index_json(request):
     out = []
     for party in get_party_templates(get_party_filter(request)):
