@@ -379,3 +379,13 @@ def _trim(image_path):
     bbox = diff.getbbox()
     im = im.crop(bbox)
     im.save(image_path)
+
+def sanitize_html_path(html_path):
+    file_name = os.path.basename(html_path)
+    if file_name != html_path or os.path.splitext(file_name)[1].lower() != '.html':
+        return None
+    temp_root = os.path.abspath(settings.TEMP)
+    full_path = os.path.abspath(os.path.join(temp_root, file_name))
+    if os.path.commonpath([temp_root, full_path]) != temp_root or not os.path.isfile(full_path):
+        return None
+    return file_name

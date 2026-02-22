@@ -248,7 +248,10 @@ def set_party_filter(request):
 
 def pdf_export(request):
     if request.GET and request.GET.get('action') == 'pdf_export':
-        pdf_path = lib.generate_pdf(request.GET.get('generated_html'))
+        file_name = lib.sanitize_html_path(request.GET.get('generated_html'))
+        if not file_name:
+            return redirect('home')
+        pdf_path = lib.generate_pdf(file_name)
         file_name, extension = os.path.splitext(os.path.basename(pdf_path))
         file_name = '_'.join(file_name.split('_')[:-1])  # Remove the last unique identifier from file name
         file_name = file_name.replace(',', '')
@@ -263,7 +266,10 @@ def pdf_export(request):
 
 def png_export(request):
     if request.GET and request.GET.get('action') == 'png_export':
-        png_paths = lib.generate_pngs(request.GET.get('generated_html'))
+        file_name = lib.sanitize_html_path(request.GET.get('generated_html'))
+        if not file_name:
+            return redirect('home')
+        png_paths = lib.generate_pngs(file_name)
         new_paths = []
         for path in png_paths:
             fileName = os.path.basename(path)
