@@ -10,7 +10,6 @@ class SimpleCorsMiddleware:
         response = self.get_response(request)
 
         origin = request.META.get("HTTP_ORIGIN")
-        print(origin)
         if origin in self.allowed_origins:
             response["Access-Control-Allow-Origin"] = origin
             response["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
