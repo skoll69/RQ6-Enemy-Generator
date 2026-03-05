@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <script>
@@ -18,7 +19,7 @@
             var filter_name = $('filter_name').val();
             add_filter(filter_name, filter_text);
             $('#tag_container').append('<div class="tag">' + new_value + '         \
-        <img class="del_tag" src="/static/images/del_tag.png" \
+        <img class="del_tag" src="{% static 'images/del_tag.png' %}" \
                 et_id="{{ et.id }}" value="'+ new_value + '"                           \
                 onmouseover="this.src=\'/static/images/del_tag_hover.png\'"      \
                 onmouseout="this.src=\'/static/images/del_tag.png\'"             \
@@ -52,9 +53,9 @@
 <div id="tag_container">
     {% for tag in et.get_tags %}
     <div class="tag">{{ tag }}
-        <img class="del_tag" src="/static/images/del_tag.png" et_id="{{ et.id }}" value="{{ tag.name }}"
-            onmouseover="this.src='/static/images/del_tag_hover.png'" onmouseout="this.src='/static/images/del_tag.png'"
-            onmouseup="this.src='/static/images/del_tag.png'" onmousedown="this.src='/static/images/del_tag_active.png'" />
+        <img class="del_tag" src="{% static 'images/del_tag.png' %}" et_id="{{ et.id }}" value="{{ tag.name }}"
+            onmouseover="this.src='{% static 'images/del_tag_hover.png' %}'" onmouseout="this.src='{% static 'images/del_tag.png' %}'"
+            onmouseup="this.src='{% static 'images/del_tag.png' %}'" onmousedown="this.src='{% static 'images/del_tag_active.png' %}'" />
     </div>
     {% endfor %}
 </div>
@@ -70,7 +71,7 @@ Filter:
 
 <h3>Change your password</h3>
 
-<button type="button" onclick="window.location = '{% url \'password_change\' %}'">Change password</button>
+<button type="button" onclick="window.location = '{% url 'password_change' %}'">Change password</button>
 
 
 

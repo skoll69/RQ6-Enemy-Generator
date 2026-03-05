@@ -1,25 +1,28 @@
+{% load static %}
 <!DOCTYPE HTML>
 <html>
 <head>
     <title>{% block title %}Mythras Encounter Generator{% endblock %}</title>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js"></script>
-    <script src="/static/js/complete.ly.1.0.1.js?v=1"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js"></script>
+    <script src="{% static 'js/complete.ly.1.0.1.js' %}?v=1"></script>
     {% if 'template' not in request.path %}
-        <script src="/static/js/tquery/core.js?v=1"></script>
+      <script src="{% static 'js/tquery/core.js' %}?v=1"></script>
     {% endif %}
-    <script src="/static/js/helpers.js?v=1"></script>
+    <script src="{% static 'js/helpers.js' %}?v=1"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="/static/js/enemygen.js?v=14"></script>
-    <link rel="stylesheet" type="text/css" href="/static/base.css?v=7">
-    <link rel="stylesheet" type="text/css" href="/static/print.css" media="print">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <script src="{% static 'js/enemygen.js' %}?v=14"></script>
+
+    <link rel="stylesheet" href="{% static 'base.css' %}?v=7" />
+    <link rel="stylesheet" href="{% static 'print.css' %}" media="print" />
+
+    <link rel="icon" href="{% static 'favicon.ico' %}">
 </head>
 <body><div id="main_container">
 
 <div id="header">
     <a href="http://www.thedesignmechanism.com/" target=_new>
-    <img src="/static/images/mythras.png" /></a>
+    <img src="{% static 'images/mythras.png' %}" /></a>
     <span style="position: relative; top: -33px;">Encounter Generator</span>
 </div>
 

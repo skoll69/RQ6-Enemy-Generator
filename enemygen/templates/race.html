@@ -51,7 +51,7 @@
         <td><input id="hl_name_{{hl.id}}" class="data" type="text" size="10" item_id="{{hl.id}}" item_type="race_hl_name" value="{{ hl.name }}" /></td>
         <td><input id="hl_armor_{{hl.id}}" class="data" type="text" size="3" item_id="{{hl.id}}" item_type="race_hl_armor" value="{{ hl.armor }}" /></td>
         <td><input id="hl_hp_mod_{{hl.id}}" class="data" type="text" size="10" item_id="{{hl.id}}" item_type="race_hl_hp_modifier" value="{{ hl.hp_modifier }}" /></td>
-        <td><img src="/static/minus.png" width="23" height="23" class="del_item" item_id="{{ hl.id }}" item_type="hit_location" /></td>
+        <td><img src="{% static 'minus.png' %}" width="23" height="23" class="del_item" item_id="{{ hl.id }}" item_type="hit_location" /></td>
     </tr>
 {% endfor %}
 </table>

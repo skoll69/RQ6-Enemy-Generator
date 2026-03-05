@@ -1,8 +1,8 @@
 beautifulsoup4==4.12.3
 cairocffi==1.2.0
 CairoSVG==2.7.0
-cffi==1.15.1
-colorama==0.4.3
+cffi==1.17.1
+colorama>=0.4.6
 configparser==4.0.2
 cryptography==44.0.1
 cssselect==0.9.1
@@ -29,3 +29,5 @@ soupsieve==2.4
 tinycss2==1.1.0
 WeasyPrint==52.3
 webencodings==0.5.1
+python-dotenv==1.0.1
+sqlparse==0.5.1

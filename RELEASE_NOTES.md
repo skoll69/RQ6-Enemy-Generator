@@ -1,0 +1,42 @@
+
+Overall 
+- run the dev environment (at first the MySQL) in Docker container
+- make the html files to show up properly in dev environment by using django native instead of strict static
+- add pytest tests for the docker infra
+- add tests for the first django functionalities
+- make sure that the tests setup the dev environment properly for the container
+- Use 3308 for the mysql container
+- some experimental work on automating the row count and testing of the dump. turned off at the moment
+- some experimental work on using also the apple container 3.0 - turned off for now
+- updating the readme
+- figured out that django version needs 3.10 not 3.11.
+- 
+--- Individual commits ---
+
+- Printing the fields found if one uses pytest -s (f3d97e6) by Hannu Kokko
+- readme updates (af256a9) by Hannu Kokko
+- generate_enemy_json test (7e1e0be) by Hannu Kokko
+- index_json test (fa22e67) by Hannu Kokko
+- Second set of initial django tests (ac30245) by Hannu Kokko
+- First set of django tests (9361c62) by Hannu Kokko
+- tuning (76951ec) by Hannu Kokko
+- clean up tag table. (84808fa) by Hannu Kokko
+- make the styles work in dev server (b0fcebd) by Hannu Kokko
+- manage.py runserver works. but missing the nice background (8de09b5) by Hannu Kokko
+- 3308 is the default now for the containers (fe70762) by Hannu Kokko
+- works but rowcounts are still wrong for some (d446ef6) by Hannu Kokko
+- works but rowcounts are still wrong for some (c3128f0) by Hannu Kokko
+- row count testing (863a349) by Hannu Kokko
+- row count testing (f81ff1f) by Hannu Kokko
+- sanity test (d4c4e29) by Hannu Kokko
+- Updated the tests (b073811) by Hannu Kokko
+- Manage.py works with docker 3308 (b8bb18d) by Hannu Kokko
+- rancher / Docker support (b4eb49e) by Hannu Kokko
+- timeouts (0279d2f) by Hannu Kokko
+- wsgi done. migrates done. (8c024d9) by Hannu Kokko
+- the count is generated during the test run (654632e) by Hannu Kokko
+- the count works (3eaaa7d) by Hannu Kokko
+- Tests work (d3d501f) by Hannu Kokko
+- dump upload in scripts working (cf2c54d) by Hannu Kokko
+- dump upload in scripts working (78e614b) by Hannu Kokko
+- Intermediate step. tests still failing (6f46e7c) by Hannu Kokko

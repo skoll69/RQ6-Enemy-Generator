@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}RQ: {{ et.name }}{% endblock %}
 
@@ -29,12 +30,12 @@ $(document).ready(function(){
         for (i in tags){
             var tag = tags[i].trim();
             $('#tag_container').append('<div class="tag">'+tag+'         \
-            <img class="del_tag" src="/static/images/del_tag.png" \
+            <img class="del_tag" src="{% static 'images/del_tag.png' %}" \
                     et_id="{{ et.id }}" value="'+tag+'"                           \
-                    onmouseover="this.src=\'/static/images/del_tag_hover.png\'"      \
-                    onmouseout="this.src=\'/static/images/del_tag.png\'"             \
-                    onmouseup="this.src=\'/static/images/del_tag.png\'"              \
-                    onmousedown="this.src=\'/static/images/del_tag_active.png\'" />  \
+                    onmouseover="this.src=\'{% static 'images/del_tag_hover.png' %}\'"      \
+                    onmouseout="this.src=\'{% static 'images/del_tag.png' %}\'"             \
+                    onmouseup="this.src=\'{% static 'images/del_tag.png' %}\'"              \
+                    onmousedown="this.src=\'{% static 'images/del_tag_active.png' %}\'" />  \
                   </div>');
             $('.del_tag').click(function(event){
                 deltag(event);
@@ -116,9 +117,9 @@ $(document).ready(function(){
 <h3 style="display: inline;">
     Enemy details
     {% if et.starred %}
-        <img et_id={{ et.id }} class="star" height="22" width="22" src="/static/images/star_filled.png" />
+        <img et_id={{ et.id }} class="star" height="22" width="22" src="{% static 'images/star_filled.png' %}" />
     {% else %}
-        <img et_id={{ et.id }} class="star" height="22" width="22" src="/static/images/star_empty.png" />
+        <img et_id={{ et.id }} class="star" height="22" width="22" src="{% static 'images/star_empty.png' %}" />
     {% endif %}
 </h3>
 <span class="generated_amount">(Generated {{ et.generated }} times)</span>
@@ -142,12 +143,12 @@ $(document).ready(function(){
     <td><div id="tag_container">
         {% for tag in et.get_tags %}
             <div class="tag">{{ tag }}
-            <img class="del_tag" src="/static/images/del_tag.png"
+            <img class="del_tag" src="{% static 'images/del_tag.png' %}"
                  et_id="{{ et.id }}" value="{{ tag }}"
-                 onmouseover="this.src='/static/images/del_tag_hover.png'"
-                 onmouseout="this.src='/static/images/del_tag.png'"
-                 onmouseup="this.src='/static/images/del_tag.png'"
-                 onmousedown="this.src='/static/images/del_tag_active.png'" />
+                 onmouseover="this.src='{% static 'images/del_tag_hover.png' %}'"
+                 onmouseout="this.src='{% static 'images/del_tag.png' %}'"
+                 onmouseup="this.src='{% static 'images/del_tag.png' %}'"
+                 onmousedown="this.src='{% static 'images/del_tag_active.png' %}'" />
             </div>
         {% endfor %}
         </div>
@@ -248,7 +249,7 @@ $(document).ready(function(){
     <tr>
         <td>{{ f.name }}</td>
         <td><input id="et_feature_{{f.id}}" class="data" type="text" size="30" item_id="{{f.id}}" item_type="et_feature_prob" value="{{ f.probability }}" />%</td>
-        <td><img src="/static/minus.png" width="23" height="23" class="del_item" item_id="{{ f.id }}" item_type="et_additional_feature" /></td>
+        <td><img src="{% static 'minus.png' %}" width="23" height="23" class="del_item" item_id="{{ f.id }}" item_type="et_additional_feature" /></td>
         <td><a href="{% url 'feature_items' f.feature_list.id %}">View items</a></td>
     </tr>
 {% endfor %}
@@ -272,7 +273,7 @@ $(document).ready(function(){
             <tr>
                 <td>{{ feature.feature.feature_list.name }}</td>
                 <td>{{ feature.feature.name }}</td>
-                <td><img src="/static/minus.png" width="23" height="23" class="del_item" item_id="{{ feature.id }}" item_type="et_nonrandom_feature" /></td>
+                <td><img src="{% static 'minus.png' %}" width="23" height="23" class="del_item" item_id="{{ feature.id }}" item_type="et_nonrandom_feature" /></td>
             </tr>
         {% endfor %}
         </table>

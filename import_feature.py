@@ -1,5 +1,5 @@
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mythras_eg.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 import django
 django.setup()
 from enemygen.models import AdditionalFeatureList, AdditionalFeatureItem
