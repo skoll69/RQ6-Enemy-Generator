@@ -41,7 +41,8 @@ def get_context(request):
                'all_et_tags': sorted(list(EnemyTemplate.tags.all()), key=lambda x: x.name),
                'all_party_tags': sorted(list(Party.tags.all()), key=lambda x: x.name)
                }
-    if (datetime.date.today() - ChangeLog.objects.all().reverse()[0].publish_date).days < 14:
+    recent_change = ChangeLog.objects.order_by('-publish_date').first()
+    if recent_change and (datetime.date.today() - recent_change.publish_date).days < 14:
         context['recent_changes'] = True
     return context
 

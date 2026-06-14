@@ -20,7 +20,7 @@ from .models import EnemyTemplate, _Enemy, _Spirit, Ruleset, StatAbstract, Race,
 from .models import EnemyStat, EnemySkill, SkillAbstract, EnemySpell
 from .models import CombatStyle, Weapon
 from .enemygen_lib import select_random_item, replace_die_set
-from .views_lib import as_json
+from .views_lib import as_json, get_context
 
 class TestDice(TestCase):
     def test_1_die_to_tuple(self):
@@ -100,6 +100,19 @@ class TestDice(TestCase):
         self.assertEqual(clean('DEX+10+d10-20'), 'DEX+1d10-10')
         self.assertEqual(clean('DEX+10+d10-5-5'), 'DEX+1d10')
         self.assertEqual(clean('STR+DEX+20+5D10+-4D10+2D10+-4D10+2D10'), 'STR+DEX+1d10+20')
+
+
+class TestViewsLib(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_get_context_without_changelog_rows(self):
+        request = self.factory.get("/")
+        request.session = {}
+
+        context = get_context(request)
+
+        self.assertNotIn('recent_changes', context)
 
 
 class TestEnemyTemplate(TestCase):
