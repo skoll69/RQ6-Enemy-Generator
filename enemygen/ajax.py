@@ -10,7 +10,7 @@ from enemygen.models import CombatStyle, Weapon, CustomSpell, EnemyWeapon, Custo
 from enemygen.models import Race, RaceStat, HitLocation, CustomSkill, Party, TemplateToParty, EnemySpirit
 from enemygen.models import EnemyAdditionalFeatureList, PartyAdditionalFeatureList, AdditionalFeatureList
 from enemygen.models import EnemyNonrandomFeature, PartyNonrandomFeature, EnemyCult
-from enemygen.views_lib import weapons
+from enemygen.views_lib import sanitize_html_path, weapons
 from enemygen.dice import Dice
 from enemygen.enemygen_lib import to_bool
 
@@ -635,18 +635,25 @@ def change_template(request):
                value        - new value
     """
     body = json.loads(request.body)
-    html_file = html.unescape(settings.TEMP + os.path.sep + body['html_file'])
+    file_name = sanitize_html_path(html.unescape(body.get('html_file', '')))
+    if not file_name:
+        return JsonResponse({'success': False, 'error': 'Invalid html file'}, status=400)
+    html_file = os.path.join(settings.TEMP, file_name)
     id = body['id']
     value = body['value']
     with open(html_file, 'r') as ff:
         soup = BeautifulSoup(ff, 'html.parser')
     span_tag = soup.find('span', {'id': id})
-    klasses = ' '.join(span_tag['class'])
-    new_tag = BeautifulSoup('<span id="%s" class="%s">%s</span>' % (id, klasses, value), 'html.parser').span
-    soup.find('span', {'id': id}).replaceWith(new_tag)
+    if not span_tag:
+        return JsonResponse({'success': False, 'error': 'Target span not found'}, status=404)
+    new_tag = soup.new_tag('span', id=id)
+    if span_tag.has_attr('class'):
+        new_tag['class'] = span_tag['class']
+    new_tag.string = value
+    span_tag.replaceWith(new_tag)
     with open(html_file, 'w') as ff:
         ff.write(soup.prettify())
-    return JsonResponse({'html_file': html_file})
+    return JsonResponse({'success': True, 'html_file': html_file})
 
 
 def toggle_star(request, et_id):

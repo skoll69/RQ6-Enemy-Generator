@@ -11,9 +11,14 @@ from django.http import HttpResponse
 
 from collections import OrderedDict
 import json
+import os
+import tempfile
 
 from mythras_eg.middleware import SimpleCorsMiddleware
+from django.conf import settings
+from django.test import override_settings
 
+from .ajax import change_template
 from .dice import Dice, _die_to_tuple, clean
 
 from .models import EnemyTemplate, _Enemy, _Spirit, Ruleset, StatAbstract, Race, SpellAbstract
@@ -113,6 +118,62 @@ class TestViewsLib(TestCase):
         context = get_context(request)
 
         self.assertNotIn('recent_changes', context)
+
+
+class TestAjax(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.override = override_settings(TEMP=self.temp_dir.name)
+        self.override.enable()
+
+    def tearDown(self):
+        self.override.disable()
+        self.temp_dir.cleanup()
+
+    def test_change_template_updates_generated_html(self):
+        html_path = os.path.join(settings.TEMP, 'generated.html')
+        with open(html_path, 'w') as ff:
+            ff.write('<span id="enemy_name" class="editable name">Old</span>')
+
+        request = self.factory.post('/rest/change_template/', {
+            'html_file': 'generated.html',
+            'id': 'enemy_name',
+            'value': '<New Name>',
+        }, content_type='application/json')
+
+        response = change_template(request)
+
+        self.assertEqual(response.status_code, 200)
+        with open(html_path, 'r') as ff:
+            html = ff.read()
+        self.assertIn('&lt;New Name&gt;', html)
+        self.assertIn('class="editable name"', html)
+
+    def test_change_template_rejects_path_traversal(self):
+        request = self.factory.post('/rest/change_template/', {
+            'html_file': '../generated.html',
+            'id': 'enemy_name',
+            'value': 'New Name',
+        }, content_type='application/json')
+
+        response = change_template(request)
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_change_template_returns_error_when_span_missing(self):
+        html_path = os.path.join(settings.TEMP, 'generated.html')
+        with open(html_path, 'w') as ff:
+            ff.write('<span id="enemy_name">Old</span>')
+        request = self.factory.post('/rest/change_template/', {
+            'html_file': 'generated.html',
+            'id': 'missing',
+            'value': 'New Name',
+        }, content_type='application/json')
+
+        response = change_template(request)
+
+        self.assertEqual(response.status_code, 404)
 
 
 class TestEnemyTemplate(TestCase):
