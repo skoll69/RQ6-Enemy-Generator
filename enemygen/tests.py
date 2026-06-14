@@ -16,7 +16,7 @@ from mythras_eg.middleware import SimpleCorsMiddleware
 
 from .dice import Dice, _die_to_tuple, clean
 
-from .models import EnemyTemplate, _Enemy, Ruleset, StatAbstract, Race, SpellAbstract
+from .models import EnemyTemplate, _Enemy, _Spirit, Ruleset, StatAbstract, Race, SpellAbstract
 from .models import EnemyStat, EnemySkill, SkillAbstract, EnemySpell
 from .models import CombatStyle, Weapon
 from .enemygen_lib import select_random_item, replace_die_set
@@ -248,6 +248,21 @@ class TestEnemy(TestCase):
         self.assertEquals(enemy.attributes['damage_modifier'], '+2d6')
         enemy._calculate_damage_modifier(65, 65)
         self.assertEquals(enemy.attributes['damage_modifier'], '+2d10+1d4')
+
+    def test_spirit_damage_uses_spectral_combat(self):
+        class EM:
+            name = 'name'
+            get_cult_rank = 1
+            notes = ''
+            is_spirit = True
+
+        enemy = _Spirit(EM())
+        enemy.skills_dict = {'Spectral Combat': 40}
+        enemy.attributes = {}
+
+        enemy._calculate_spirit_damage()
+
+        self.assertEquals(enemy.attributes['spirit_damage'], '1d4')
         
     def test_hit_locations(self):
         et = get_enemy_template()

@@ -1690,7 +1690,7 @@ class _Spirit(_Enemy):
     def _calculate_spirit_damage(self):
         damage_table = ['0', '1d2', '1d4', '1d6', '1d8', '1d10', '2d6', '1d8+1d6', '2d8', '1d10+1d8', '2d10',
                         '2d10+1d2', '2d10+1d4', '2d10+1d6', '2d10+1d8', '3d10', '3d10+1d2', '3d10+1d4']
-        skill = self.skills_dict.get('Spectral combat', 0)
+        skill = self.skills_dict.get('Spectral Combat', 0)
         index = _divide_round_up(skill, 20)
         try:
             spirit_damage = damage_table[index]
