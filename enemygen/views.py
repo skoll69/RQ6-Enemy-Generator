@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.conf import settings
 from django.utils.datastructures import MultiValueDictKeyError
+from django.views.decorators.http import require_GET
 
 from enemygen.models import EnemyTemplate, Race, Party, ChangeLog, AdditionalFeatureList
 from enemygen.views_lib import get_ruleset, get_context, get_et_context, get_enemies, get_generated_party
@@ -38,6 +39,7 @@ def simple_index(request):
     return render(request, 'simple_index.html', context)
 
 
+@require_GET
 def index_json(request):
     out = []
     for et in get_enemy_templates(get_filter(request), request.user):
@@ -56,13 +58,13 @@ def home(request):
 def party_index(request):
     party_filter = get_party_filter(request)
     context = get_context(request)
-    context['parties'] = get_party_templates(party_filter)
+    context['parties'] = get_party_templates(party_filter, request.user)
     return render(request, 'party_index.html', context)
 
-
+@require_GET
 def party_index_json(request):
     out = []
-    for party in get_party_templates(get_party_filter(request)):
+    for party in get_party_templates(get_party_filter(request), request.user):
         party_json = {
             'name': party.name, 'owner': party.owner.username, 'tags': party.get_tags(), 'id': party.id, 'templates': []
         }
@@ -170,6 +172,8 @@ def enemy_template(request, enemy_template_id):
     template = 'enemy_template.html'
     et = get_object_or_404(EnemyTemplate.objects.select_related('race'), id=enemy_template_id)
     et.starred = et.is_starred(request.user)
+    if not et.published and et.owner != request.user:
+        raise Http404
     if et.is_cult:
         template = 'enemy_template_cult.html'
     if et.owner != request.user:
@@ -191,6 +195,8 @@ def party(request, party_id):
     template = 'party.html'
     context = get_context(request)
     pt = get_object_or_404(Party, id=party_id)
+    if not pt.published and pt.owner != request.user:
+        raise Http404
     context.update(get_party_context(pt))
     if context['party'].owner != request.user:
         template = 'party_read_only.html'
@@ -248,7 +254,10 @@ def set_party_filter(request):
 
 def pdf_export(request):
     if request.GET and request.GET.get('action') == 'pdf_export':
-        pdf_path = lib.generate_pdf(request.GET.get('generated_html'))
+        file_name = lib.sanitize_html_path(request.GET.get('generated_html'))
+        if not file_name:
+            return redirect('home')
+        pdf_path = lib.generate_pdf(file_name)
         file_name, extension = os.path.splitext(os.path.basename(pdf_path))
         file_name = '_'.join(file_name.split('_')[:-1])  # Remove the last unique identifier from file name
         file_name = file_name.replace(',', '')
@@ -263,7 +272,10 @@ def pdf_export(request):
 
 def png_export(request):
     if request.GET and request.GET.get('action') == 'png_export':
-        png_paths = lib.generate_pngs(request.GET.get('generated_html'))
+        file_name = lib.sanitize_html_path(request.GET.get('generated_html'))
+        if not file_name:
+            return redirect('home')
+        png_paths = lib.generate_pngs(file_name)
         new_paths = []
         for path in png_paths:
             fileName = os.path.basename(path)

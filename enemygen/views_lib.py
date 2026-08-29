@@ -15,11 +15,6 @@ import os
 import random
 import datetime
 import json
-try:
-    from weasyprint import HTML, CSS
-    from PIL import Image, ImageChops
-except:
-    pass
 
 def get_filter(request):
     return request.session.get('filter', None)
@@ -41,7 +36,8 @@ def get_context(request):
                'all_et_tags': sorted(list(EnemyTemplate.tags.all()), key=lambda x: x.name),
                'all_party_tags': sorted(list(Party.tags.all()), key=lambda x: x.name)
                }
-    if (datetime.date.today() - ChangeLog.objects.all().reverse()[0].publish_date).days < 14:
+    recent_change = ChangeLog.objects.order_by('-publish_date').first()
+    if recent_change and (datetime.date.today() - recent_change.publish_date).days < 14:
         context['recent_changes'] = True
     return context
 
@@ -61,11 +57,16 @@ def get_et_context(et):
     return context
 
 
-def get_party_templates(filtr=None):
+def get_party_templates(filtr=None, user=None):
     if filtr and filtr != 'None':
         parties = list(Party.objects.filter(tags__name__in=[filtr, ], published=True))
     else:
         parties = list(Party.objects.filter(published=True))
+    if user and user.is_authenticated:
+        unpubl = Party.objects.filter(published=False, owner=user)
+        if filtr and filtr != 'None':
+            unpubl = unpubl.filter(tags__name__in=[filtr, ])
+        parties.extend(list(unpubl))
     return parties
 
 
@@ -312,6 +313,8 @@ def _get_html_prefix(context):
 
 def generate_pdf(html_path):
     """ Generates a PDF based on the given html file """
+    from weasyprint import HTML
+
     html_path = os.path.join(settings.TEMP, html_path)
     pdf_path = html_path.replace('.html', '.pdf')
     HTML(html_path).write_pdf(pdf_path)
@@ -320,6 +323,8 @@ def generate_pdf(html_path):
 
 def generate_pngs(html_path):
     """ Generates png-images out of the generated_html """
+    from weasyprint import HTML, CSS
+
     with open(os.path.join(settings.TEMP, html_path).encode('utf-8'), 'r') as ff:
         soup = BeautifulSoup(ff, 'html.parser')
     enemies = soup.find_all('div', {'class': 'enemy_container'})
@@ -372,6 +377,8 @@ def enemy_as_json(e):
 
 def _trim(image_path):
     """ Removes the border from the given image """
+    from PIL import Image, ImageChops
+
     im = Image.open(image_path)
     im = im.crop(im.getbbox())  # Trims the transparent border if any
     bg = Image.new(im.mode, im.size, im.getpixel((0,0)))  # 3rd argument is the color of the first pixel
@@ -379,3 +386,13 @@ def _trim(image_path):
     bbox = diff.getbbox()
     im = im.crop(bbox)
     im.save(image_path)
+
+def sanitize_html_path(html_path):
+    file_name = os.path.basename(html_path)
+    if file_name != html_path or os.path.splitext(file_name)[1].lower() != '.html':
+        return None
+    temp_root = os.path.abspath(settings.TEMP)
+    full_path = os.path.abspath(os.path.join(temp_root, file_name))
+    if os.path.commonpath([temp_root, full_path]) != temp_root or not os.path.isfile(full_path):
+        return None
+    return file_name

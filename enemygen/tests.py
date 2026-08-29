@@ -5,41 +5,50 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 from django.test import TestCase
+from django.test import RequestFactory, SimpleTestCase
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 
 from collections import OrderedDict
 import json
+import os
+import tempfile
 
+from mythras_eg.middleware import SimpleCorsMiddleware
+from django.conf import settings
+from django.test import override_settings
+
+from .ajax import change_template
 from .dice import Dice, _die_to_tuple, clean
 
-from .models import EnemyTemplate, _Enemy, Ruleset, StatAbstract, Race, SpellAbstract
+from .models import EnemyTemplate, _Enemy, _Spirit, Ruleset, StatAbstract, Race, SpellAbstract
 from .models import EnemyStat, EnemySkill, SkillAbstract, EnemySpell
 from .models import CombatStyle, Weapon
 from .enemygen_lib import select_random_item, replace_die_set
-from .views_lib import as_json
+from .views_lib import as_json, get_context
 
 class TestDice(TestCase):
     def test_1_die_to_tuple(self):
-        self.assertEquals(_die_to_tuple('d6'), (1, 6, 1))
-        self.assertEquals(_die_to_tuple('D6'), (1, 6, 1))
-        self.assertEquals(_die_to_tuple('+D6'), (1, 6, 1))
-        self.assertEquals(_die_to_tuple('-D6'), (-6, -1, 1))
+        self.assertEqual(_die_to_tuple('d6'), (1, 6, 1))
+        self.assertEqual(_die_to_tuple('D6'), (1, 6, 1))
+        self.assertEqual(_die_to_tuple('+D6'), (1, 6, 1))
+        self.assertEqual(_die_to_tuple('-D6'), (-6, -1, 1))
         
-        self.assertEquals(_die_to_tuple('2D6'), (1, 6, 2))
-        self.assertEquals(_die_to_tuple('12D6'), (1, 6, 12))
-        self.assertEquals(_die_to_tuple('+3D8'), (1, 8, 3))
-        self.assertEquals(_die_to_tuple('-2D6'), (-6, -1, 2))
+        self.assertEqual(_die_to_tuple('2D6'), (1, 6, 2))
+        self.assertEqual(_die_to_tuple('12D6'), (1, 6, 12))
+        self.assertEqual(_die_to_tuple('+3D8'), (1, 8, 3))
+        self.assertEqual(_die_to_tuple('-2D6'), (-6, -1, 2))
         
     def test_2_dissect(self):
-        self.assertEquals(Dice('D6')._dissect(), [(1, 6, 1), ])
-        self.assertEquals(Dice('d6')._dissect(), [(1, 6, 1), ])
-        self.assertEquals(Dice('d6+1')._dissect(), [(1, 6, 1), 1])
-        self.assertEquals(Dice('d6-1')._dissect(), [(1, 6, 1), -1])
-        self.assertEquals(Dice('50+d6-1')._dissect(), [50, (1, 6, 1), -1])
-        self.assertEquals(Dice('50-d6')._dissect(), [50, (-6, -1, 1)])
-        self.assertEquals(Dice('2D6-D4')._dissect(), [(1, 6, 2), (-4, -1, 1)])
-        self.assertEquals(Dice('2D6-D4+5')._dissect(), [(1, 6, 2), (-4, -1, 1), 5])
-        self.assertEquals(Dice('2D6-D4-5')._dissect(), [(1, 6, 2), (-4, -1, 1), -5])
+        self.assertEqual(Dice('D6')._dissect(), [(1, 6, 1), ])
+        self.assertEqual(Dice('d6')._dissect(), [(1, 6, 1), ])
+        self.assertEqual(Dice('d6+1')._dissect(), [(1, 6, 1), 1])
+        self.assertEqual(Dice('d6-1')._dissect(), [(1, 6, 1), -1])
+        self.assertEqual(Dice('50+d6-1')._dissect(), [50, (1, 6, 1), -1])
+        self.assertEqual(Dice('50-d6')._dissect(), [50, (-6, -1, 1)])
+        self.assertEqual(Dice('2D6-D4')._dissect(), [(1, 6, 2), (-4, -1, 1)])
+        self.assertEqual(Dice('2D6-D4+5')._dissect(), [(1, 6, 2), (-4, -1, 1), 5])
+        self.assertEqual(Dice('2D6-D4-5')._dissect(), [(1, 6, 2), (-4, -1, 1), -5])
         
     def test_3_dice(self):
         self.assertTrue(1 <= Dice('D6').roll() <= 6)
@@ -71,12 +80,12 @@ class TestDice(TestCase):
         self.assertTrue(12 <= Dice('12D6').roll() <= 72)
         
     def test_4_max_roll(self):
-        self.assertEquals(Dice('5').max_roll(), 5)
-        self.assertEquals(Dice('D100').max_roll(), 100)
-        self.assertEquals(Dice('5D100').max_roll(), 500)
-        self.assertEquals(Dice('5D100+13').max_roll(), 513)
-        self.assertEquals(Dice('5D100-D100').max_roll(), 499)
-        self.assertEquals(Dice('12D6').max_roll(), 72)
+        self.assertEqual(Dice('5').max_roll(), 5)
+        self.assertEqual(Dice('D100').max_roll(), 100)
+        self.assertEqual(Dice('5D100').max_roll(), 500)
+        self.assertEqual(Dice('5D100+13').max_roll(), 513)
+        self.assertEqual(Dice('5D100-D100').max_roll(), 499)
+        self.assertEqual(Dice('12D6').max_roll(), 72)
 
 
     def test_5_clean(self):
@@ -98,6 +107,75 @@ class TestDice(TestCase):
         self.assertEqual(clean('STR+DEX+20+5D10+-4D10+2D10+-4D10+2D10'), 'STR+DEX+1d10+20')
 
 
+class TestViewsLib(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_get_context_without_changelog_rows(self):
+        request = self.factory.get("/")
+        request.session = {}
+
+        context = get_context(request)
+
+        self.assertNotIn('recent_changes', context)
+
+
+class TestAjax(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.override = override_settings(TEMP=self.temp_dir.name)
+        self.override.enable()
+
+    def tearDown(self):
+        self.override.disable()
+        self.temp_dir.cleanup()
+
+    def test_change_template_updates_generated_html(self):
+        html_path = os.path.join(settings.TEMP, 'generated.html')
+        with open(html_path, 'w') as ff:
+            ff.write('<span id="enemy_name" class="editable name">Old</span>')
+
+        request = self.factory.post('/rest/change_template/', {
+            'html_file': 'generated.html',
+            'id': 'enemy_name',
+            'value': '<New Name>',
+        }, content_type='application/json')
+
+        response = change_template(request)
+
+        self.assertEqual(response.status_code, 200)
+        with open(html_path, 'r') as ff:
+            html = ff.read()
+        self.assertIn('&lt;New Name&gt;', html)
+        self.assertIn('class="editable name"', html)
+
+    def test_change_template_rejects_path_traversal(self):
+        request = self.factory.post('/rest/change_template/', {
+            'html_file': '../generated.html',
+            'id': 'enemy_name',
+            'value': 'New Name',
+        }, content_type='application/json')
+
+        response = change_template(request)
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_change_template_returns_error_when_span_missing(self):
+        html_path = os.path.join(settings.TEMP, 'generated.html')
+        with open(html_path, 'w') as ff:
+            ff.write('<span id="enemy_name">Old</span>')
+        request = self.factory.post('/rest/change_template/', {
+            'html_file': 'generated.html',
+            'id': 'missing',
+            'value': 'New Name',
+        }, content_type='application/json')
+
+        response = change_template(request)
+
+        self.assertEqual(response.status_code, 404)
+
+
 class TestEnemyTemplate(TestCase):
     fixtures = ('enemygen_testdata.json',)
 
@@ -105,17 +183,17 @@ class TestEnemyTemplate(TestCase):
         user = User(username='username')
         user.save()
         ruleset = Ruleset.objects.get(id=1)
-        self.assertEquals(ruleset.name, 'RuneQuest 6')
+        self.assertEqual(ruleset.name, 'RuneQuest 6')
         race = Race.objects.get(id=1)
-        self.assertEquals(race.name, 'Human')
+        self.assertEqual(race.name, 'Human')
         et = EnemyTemplate.create(user, ruleset, race, 'Template Name')
-        self.assertEquals(et.name, 'Template Name')
+        self.assertEqual(et.name, 'Template Name')
         self.assertTrue(isinstance(et.stats[0], EnemyStat))
-        self.assertEquals(et.stats[0].name, 'STR')
-        self.assertEquals(et.stats[0].die_set, '3d6')
+        self.assertEqual(et.stats[0].name, 'STR')
+        self.assertEqual(et.stats[0].die_set, '3d6')
         self.assertTrue(isinstance(et.skills[0], EnemySkill))
-        self.assertEquals(et.skills[0].name, 'Acrobatics')
-        self.assertEquals(et.skills[0].die_set, 'STR+DEX')
+        self.assertEqual(et.skills[0].name, 'Acrobatics')
+        self.assertEqual(et.skills[0].die_set, 'STR+DEX')
         self.assertTrue(et.combat_styles[0].name, "Primary Combat Style")
 
     def test_12_generate(self):
@@ -126,20 +204,20 @@ class TestEnemyTemplate(TestCase):
         self.assertTrue(isinstance(enemy.skills, list))
         self.assertTrue(isinstance(enemy.skills[0], dict))
         self.assertTrue(isinstance(enemy.stats['STR'], int))
-        self.assertEquals(enemy.skills[0]['name'], 'Athletics')
+        self.assertEqual(enemy.skills[0]['name'], 'Athletics')
         self.assertTrue(isinstance(enemy.skills[0]['value'], int))
         
     def test_13_generate_2(self):
         et = get_enemy_template()
-        self.assertEquals(et.skills[17].name, 'Evade')
+        self.assertEqual(et.skills[17].name, 'Evade')
         skill = et.skills[17]
         skill.die_set = 'STR+DEX+50'
         skill.save()
-        self.assertEquals(et.stats[0].name, 'STR')
+        self.assertEqual(et.stats[0].name, 'STR')
         stat = et.stats[0]
         stat.die_set = '2+2D4'
         stat.save()
-        self.assertEquals(et.stats[3].name, 'DEX')
+        self.assertEqual(et.stats[3].name, 'DEX')
         stat = et.stats[3]
         stat.die_set = '10+D3'
         stat.save()
@@ -147,25 +225,25 @@ class TestEnemyTemplate(TestCase):
         enemy = et.generate()
         self.assertTrue(4 <= enemy.stats['STR'] <= 10)
         self.assertTrue(11 <= enemy.stats['DEX'] <= 13)
-        self.assertEquals(enemy.skills[3]['name'], 'Evade')
-        self.assertEquals(enemy.skills[3]['value'], enemy.stats['DEX'] + enemy.stats['STR'] + 50)
+        self.assertEqual(enemy.skills[3]['name'], 'Evade')
+        self.assertEqual(enemy.skills[3]['value'], enemy.stats['DEX'] + enemy.stats['STR'] + 50)
         
     def test_14_generate_check_spells(self):
         et = get_enemy_template()
         et.folk_spell_amount = '2'
-        self.assertEquals(len(et.folk_spells), 0)
+        self.assertEqual(len(et.folk_spells), 0)
         EnemySpell(enemy_template=et, spell=SpellAbstract.objects.get(name='Alarm'), probability=1).save()
         EnemySpell(enemy_template=et, spell=SpellAbstract.objects.get(name='Avert'), probability=1).save()
 
         enemy = et.generate()
-        self.assertEquals(len(enemy.folk_spells), 2)
+        self.assertEqual(len(enemy.folk_spells), 2)
         
         self.assertTrue(enemy.folk_spells[0].name in ('Alarm', 'Avert'))
         self.assertTrue(enemy.folk_spells[1].name in ('Alarm', 'Avert'))
         
     def test_15_generate_check_attributes(self):
         et = get_enemy_template()
-        self.assertEquals(et.ruleset.name, 'RuneQuest 6')
+        self.assertEqual(et.ruleset.name, 'RuneQuest 6')
         enemy = et.generate()
         
         action_points = enemy.attributes['action_points']
@@ -186,11 +264,11 @@ class TestEnemyTemplate(TestCase):
                         (damage_modifier == '+1d6' and 36 <= str_siz <= 40)
                         )
                        
-        self.assertEquals(enemy.attributes['magic_points'], enemy.stats['POW'])
+        self.assertEqual(enemy.attributes['magic_points'], enemy.stats['POW'])
         
         sr = (enemy.stats['INT'] + enemy.stats['DEX']) // 2
         sr = '%s(%s-0)' % (sr, sr)
-        self.assertEquals(enemy.attributes['strike_rank'], sr)
+        self.assertEqual(enemy.attributes['strike_rank'], sr)
         
     def notest_16_generate_check_weapon_styles(self):
         # Fix this test!!!!!!!!!!!!!!!
@@ -200,9 +278,9 @@ class TestEnemyTemplate(TestCase):
         cs1.weapon_options.add(Weapon.objects.get(name="Broadsword"))
         enemy = et.generate()
         
-        self.assertEquals(enemy.combat_styles[0]['name'], "Primary Combat Style")
-        self.assertEquals(enemy.combat_styles[0]['value'], enemy.stats['STR']+enemy.stats['DEX'])
-        self.assertEquals(enemy.combat_styles[0]['weapons'][0].name, 'Broadsword')
+        self.assertEqual(enemy.combat_styles[0]['name'], "Primary Combat Style")
+        self.assertEqual(enemy.combat_styles[0]['value'], enemy.stats['STR']+enemy.stats['DEX'])
+        self.assertEqual(enemy.combat_styles[0]['weapons'][0].name, 'Broadsword')
 
 
 class TestEnemy(TestCase):
@@ -211,8 +289,8 @@ class TestEnemy(TestCase):
     def test_enemy_get_stats(self):
         et = get_enemy_template()
         enemy = _Enemy(et).generate()
-        self.assertEquals(enemy.get_stats[0]['name'], 'STR')
-        self.assertEquals(enemy.get_stats[1]['name'], 'CON')
+        self.assertEqual(enemy.get_stats[0]['name'], 'STR')
+        self.assertEqual(enemy.get_stats[1]['name'], 'CON')
         self.assertTrue(isinstance(enemy.get_stats[0]['value'], int))
         
     def test_calculate_damage_modifier(self):
@@ -227,31 +305,46 @@ class TestEnemy(TestCase):
         enemy.attributes = {}
 
         enemy._calculate_damage_modifier(2, 2)
-        self.assertEquals(enemy.attributes['damage_modifier'], '-1d8')
+        self.assertEqual(enemy.attributes['damage_modifier'], '-1d8')
         enemy._calculate_damage_modifier(2, 3)
-        self.assertEquals(enemy.attributes['damage_modifier'], '-1d8')
+        self.assertEqual(enemy.attributes['damage_modifier'], '-1d8')
         enemy._calculate_damage_modifier(12, 14)
-        self.assertEquals(enemy.attributes['damage_modifier'], '+1d2')
+        self.assertEqual(enemy.attributes['damage_modifier'], '+1d2')
         enemy._calculate_damage_modifier(20, 11)
-        self.assertEquals(enemy.attributes['damage_modifier'], '+1d4')
+        self.assertEqual(enemy.attributes['damage_modifier'], '+1d4')
         enemy._calculate_damage_modifier(20, 15)
-        self.assertEquals(enemy.attributes['damage_modifier'], '+1d4')
+        self.assertEqual(enemy.attributes['damage_modifier'], '+1d4')
         enemy._calculate_damage_modifier(40, 11)
-        self.assertEquals(enemy.attributes['damage_modifier'], '+1d12')
+        self.assertEqual(enemy.attributes['damage_modifier'], '+1d12')
         enemy._calculate_damage_modifier(40, 20)
-        self.assertEquals(enemy.attributes['damage_modifier'], '+1d12')
+        self.assertEqual(enemy.attributes['damage_modifier'], '+1d12')
         enemy._calculate_damage_modifier(40, 21)
-        self.assertEquals(enemy.attributes['damage_modifier'], '+2d6')
+        self.assertEqual(enemy.attributes['damage_modifier'], '+2d6')
         enemy._calculate_damage_modifier(65, 65)
-        self.assertEquals(enemy.attributes['damage_modifier'], '+2d10+1d4')
+        self.assertEqual(enemy.attributes['damage_modifier'], '+2d10+1d4')
+
+    def test_spirit_damage_uses_spectral_combat(self):
+        class EM:
+            name = 'name'
+            get_cult_rank = 1
+            notes = ''
+            is_spirit = True
+
+        enemy = _Spirit(EM())
+        enemy.skills_dict = {'Spectral Combat': 40}
+        enemy.attributes = {}
+
+        enemy._calculate_spirit_damage()
+
+        self.assertEqual(enemy.attributes['spirit_damage'], '1d4')
         
     def test_hit_locations(self):
         et = get_enemy_template()
         enemy = _Enemy(et).generate()
         
         self.assertTrue(isinstance(enemy.hit_locations, list))
-        self.assertEquals(enemy.hit_locations[0]['name'], 'Right leg')
-        self.assertEquals(enemy.hit_locations[0]['range'], '01-03')
+        self.assertEqual(enemy.hit_locations[0]['name'], 'Right leg')
+        self.assertEqual(enemy.hit_locations[0]['range'], '01-03')
 
     def test_hit_locations_hp(self):
         et = get_enemy_template()
@@ -261,28 +354,28 @@ class TestEnemy(TestCase):
         enemy.stats['CON'] = 2
         enemy.stats['SIZ'] = 2
         enemy._add_hit_locations()
-        self.assertEquals(enemy.hit_locations[0]['hp'], 1)  # Leg
-        self.assertEquals(enemy.hit_locations[3]['hp'], 3)  # Chest
+        self.assertEqual(enemy.hit_locations[0]['hp'], 1)  # Leg
+        self.assertEqual(enemy.hit_locations[3]['hp'], 3)  # Chest
         
         enemy.hit_locations = []
         enemy.stats['CON'] = 11
         enemy.stats['SIZ'] = 11
         enemy._add_hit_locations()
-        self.assertEquals(enemy.hit_locations[0]['hp'], 5)  # Leg
-        self.assertEquals(enemy.hit_locations[2]['hp'], 6)  # Abdomen
-        self.assertEquals(enemy.hit_locations[3]['hp'], 7)  # Chest
-        self.assertEquals(enemy.hit_locations[5]['hp'], 4)  # Arm
-        self.assertEquals(enemy.hit_locations[6]['hp'], 5)  # Head
+        self.assertEqual(enemy.hit_locations[0]['hp'], 5)  # Leg
+        self.assertEqual(enemy.hit_locations[2]['hp'], 6)  # Abdomen
+        self.assertEqual(enemy.hit_locations[3]['hp'], 7)  # Chest
+        self.assertEqual(enemy.hit_locations[5]['hp'], 4)  # Arm
+        self.assertEqual(enemy.hit_locations[6]['hp'], 5)  # Head
         
         enemy.hit_locations = []
         enemy.stats['CON'] = 22
         enemy.stats['SIZ'] = 22
         enemy._add_hit_locations()
-        self.assertEquals(enemy.hit_locations[0]['hp'], 9)  # Leg
-        self.assertEquals(enemy.hit_locations[2]['hp'], 10)  # Abdomen
-        self.assertEquals(enemy.hit_locations[3]['hp'], 11)  # Chest
-        self.assertEquals(enemy.hit_locations[5]['hp'], 8)  # Arm
-        self.assertEquals(enemy.hit_locations[6]['hp'], 9)  # Head
+        self.assertEqual(enemy.hit_locations[0]['hp'], 9)  # Leg
+        self.assertEqual(enemy.hit_locations[2]['hp'], 10)  # Abdomen
+        self.assertEqual(enemy.hit_locations[3]['hp'], 11)  # Chest
+        self.assertEqual(enemy.hit_locations[5]['hp'], 8)  # Arm
+        self.assertEqual(enemy.hit_locations[6]['hp'], 9)  # Head
 
 
 class TestEnemySkill(TestCase):
@@ -295,7 +388,7 @@ class TestEnemySkill(TestCase):
         es.die_set = 'STR+DEX+2D4'
         es.save()
         replace_with = {'STR': 10, 'DEX': 20}
-        self.assertEquals(replace_die_set(es.die_set, replace_with), '10+20+2D4')
+        self.assertEqual(replace_die_set(es.die_set, replace_with), '10+20+2D4')
         
     def test_2_roll(self):
         skill = SkillAbstract.objects.get(id=1)
@@ -336,7 +429,7 @@ class TestMisc(TestCase):
     
     def test_select_random_spell(self):
         et = get_enemy_template()
-        self.assertEquals(len(et.folk_spells), 0)
+        self.assertEqual(len(et.folk_spells), 0)
         EnemySpell(enemy_template=et, spell=SpellAbstract.objects.get(name='Alarm'), probability=1).save()
         EnemySpell(enemy_template=et, spell=SpellAbstract.objects.get(name='Avert'), probability=1).save()
         
@@ -359,7 +452,7 @@ class TestMisc(TestCase):
 
         exclude = (spells[0], spells[1])
         random_spell = select_random_item(spells, exclude)
-        self.assertEquals(random_spell, spells[2])
+        self.assertEqual(random_spell, spells[2])
 
 
 class TestJson(TestCase):
@@ -375,6 +468,53 @@ class TestJson(TestCase):
         self.assertEqual(edict[0]['combat_styles'][0]['name'], 'Primary Combat Style')
         self.assertEqual(list(edict[0]['skills'][2].keys())[0], 'Endurance')
         self.assertEqual(edict[0]['skills'][2]['Endurance'], enemy.skills_dict['Endurance'])
+
+
+class TestPublicCors(SimpleTestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_public_json_endpoint_adds_cors_headers(self):
+        middleware = SimpleCorsMiddleware(lambda request: HttpResponse("[]"))
+        response = middleware(self.factory.get("/index_json/"))
+
+        self.assertEqual(response["Access-Control-Allow-Origin"], "*")
+        self.assertEqual(response["Access-Control-Allow-Methods"], "GET, OPTIONS")
+        self.assertEqual(response["Access-Control-Allow-Headers"], "Accept, Content-Type")
+
+    def test_public_json_endpoint_allows_options_preflight(self):
+        middleware = SimpleCorsMiddleware(lambda request: HttpResponse(status=405))
+        response = middleware(self.factory.options("/generate_enemies_json/"))
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response["Access-Control-Allow-Origin"], "*")
+        self.assertEqual(response["Access-Control-Allow-Methods"], "GET, OPTIONS")
+        self.assertEqual(response["Access-Control-Allow-Headers"], "Accept, Content-Type")
+
+    def test_generated_json_endpoints_allow_query_params(self):
+        middleware = SimpleCorsMiddleware(lambda request: HttpResponse("{}"))
+
+        for path in (
+            "/generate_enemies_json/?id=1&amount=2",
+            "/generate_party_json/?id=1",
+        ):
+            response = middleware(self.factory.get(path))
+            self.assertEqual(response["Access-Control-Allow-Origin"], "*")
+            self.assertEqual(response["Access-Control-Allow-Methods"], "GET, OPTIONS")
+            self.assertEqual(response["Access-Control-Allow-Headers"], "Accept, Content-Type")
+
+    def test_generated_json_preflight_allows_query_params(self):
+        middleware = SimpleCorsMiddleware(lambda request: HttpResponse(status=405))
+
+        for path in (
+            "/generate_enemies_json/?id=1&amount=2",
+            "/generate_party_json/?id=1",
+        ):
+            response = middleware(self.factory.options(path))
+            self.assertEqual(response.status_code, 204)
+            self.assertEqual(response["Access-Control-Allow-Origin"], "*")
+            self.assertEqual(response["Access-Control-Allow-Methods"], "GET, OPTIONS")
+            self.assertEqual(response["Access-Control-Allow-Headers"], "Accept, Content-Type")
 
 
 def get_enemy_template():
