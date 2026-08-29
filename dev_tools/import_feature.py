@@ -1,4 +1,9 @@
 import os
+import sys
+
+# Add project root to sys.path to allow importing mythras_eg.settings and enemygen
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mythras_eg.settings")
 import django
 django.setup()
@@ -28,12 +33,12 @@ def main():
             except AdditionalFeatureItem.DoesNotExist:
                 AdditionalFeatureItem(name=row, feature_list=flist).save()
                 i += 1
-            except:
-                print row
+            except Exception as e:
+                print(row)
                 raise
             
-    print "Processed %s items." % j
-    print "Imported %s items." % i
+    print("Processed %s items." % j)
+    print("Imported %s items." % i)
 
 if __name__ == '__main__':
     main()

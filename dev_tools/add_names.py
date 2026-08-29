@@ -1,3 +1,12 @@
+import os
+import sys
+import django
+
+# Add project root to sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mythras_eg.settings")
+django.setup()
+
 name_list_name = 'Orlanthi males'
 names_file = open('orlanthi_males.txt')
 names = names_file.read().split('\r\n')
