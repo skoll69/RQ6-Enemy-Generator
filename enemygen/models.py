@@ -312,12 +312,10 @@ class EnemyTemplate(models.Model):
         else:
             return _Enemy(self).generate(suffix)
 
-    def increment_used(self):
-        """ Increments the used-count by one. """
-        self.used += 1
-        self.save()
-        
     def get_tags(self):
+        """ Returns a sorted list of tag names. Uses prefetched tags if available. """
+        if hasattr(self, '_prefetched_objects_cache') and 'tags' in self._prefetched_objects_cache:
+            return sorted([tag.name for tag in self.tags.all()])
         return sorted(list(self.tags.names()))
     
     @property
@@ -515,6 +513,11 @@ class EnemyTemplate(models.Model):
             combat_style.set_value(combat_style.die_set + bonus)
 
     def is_starred(self, user):
+        """ Returns True if the template is starred by the user. 
+            Uses the 'starred' attribute if it has been pre-populated (e.g. by annotation).
+        """
+        if hasattr(self, 'starred'):
+            return self.starred
         if user.is_authenticated:
             try:
                 Star.objects.get(user=user, template=self)
@@ -528,8 +531,11 @@ class EnemyTemplate(models.Model):
         
     @classmethod
     def get_starred(cls, user):
+        """ Returns a list of templates starred by the user, with related data prefetched. """
         if user.is_authenticated:
-            stars = Star.objects.filter(user=user).order_by('template__rank', 'template__name')
+            stars = Star.objects.filter(user=user).order_by('template__rank', 'template__name')\
+                                .select_related('template', 'template__race', 'template__owner')\
+                                .prefetch_related('template__tags')
             return [star.template for star in stars]
         else:
             return []
@@ -615,8 +621,11 @@ class Party(models.Model):
             raise ValidationError
             
     def get_tags(self):
+        """ Returns a sorted list of tag names. Uses prefetched tags if available. """
+        if hasattr(self, '_prefetched_objects_cache') and 'tags' in self._prefetched_objects_cache:
+            return sorted([tag.name for tag in self.tags.all()])
         return sorted(list(self.tags.names()))
-        
+
     def add_additional_feature(self, feature_list_id):
         PartyAdditionalFeatureList.create(party=self, feature_list_id=feature_list_id)
         
