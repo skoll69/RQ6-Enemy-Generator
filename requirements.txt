@@ -1,6 +1,6 @@
 beautifulsoup4==4.12.3
 cairocffi==1.2.0
-CairoSVG==2.7.0
+CairoSVG==2.9.0
 cffi==1.15.1
 colorama==0.4.3
 configparser==4.0.2
