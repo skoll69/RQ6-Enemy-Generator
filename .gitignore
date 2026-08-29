@@ -9,3 +9,8 @@ dump.sql
 */__pycache__
 tos3.bat
 get-dump.bat
+local_dump.sql
+local_data_only.sql
+data_only.sql
+db.sqlite3
+*.sqlite3
