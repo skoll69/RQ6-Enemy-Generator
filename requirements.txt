@@ -11,7 +11,7 @@ defusedxml==0.7.0
 Django==3.2.25
 django-extensions==3.0
 django-registration==3.2
-django-taggit==1.3
+django-taggit==4.0.0
 enum34==1.1.5
 gunicorn==23.0.0
 html5lib==1.1
