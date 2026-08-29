@@ -1,12 +1,12 @@
 # pylint: disable=no-member
 
-from enemygen.models import Ruleset, EnemyTemplate, Race
+from enemygen.models import Ruleset, EnemyTemplate, Race, Star
 from enemygen.models import SpellAbstract, EnemySpell, CustomSpell, ChangeLog
 from enemygen.models import Weapon, CombatStyle, EnemyWeapon, CustomWeapon, Party, AdditionalFeatureList
 
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Exists, OuterRef
 from django.conf import settings
 
 from bs4 import BeautifulSoup
@@ -101,15 +101,15 @@ def get_enemy_templates(filtr, user):
     if filtr and filtr != 'None':
         templates = templates.filter(tags__name__in=[filtr])
 
+    # For authenticated users, annotate with 'starred' status from the database
+    if user.is_authenticated:
+        templates = templates.annotate(
+            starred=Exists(Star.objects.filter(template=OuterRef('pk'), user=user))
+        )
+
     # Order by published status (True first) then by rank
     # This maintains the original behavior: public templates first, then user's private ones
     templates = templates.order_by('-published', 'rank')
-
-    # Manually set the 'starred' attribute for now
-    # Stage 3 will move this to a database annotation for O(1) queries
-    if user.is_authenticated:
-        for et in templates:
-            et.starred = et.is_starred(user)
 
     return templates
 
