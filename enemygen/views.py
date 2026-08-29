@@ -172,6 +172,8 @@ def enemy_template(request, enemy_template_id):
     template = 'enemy_template.html'
     et = get_object_or_404(EnemyTemplate.objects.select_related('race'), id=enemy_template_id)
     et.starred = et.is_starred(request.user)
+    if not et.published and et.owner != request.user:
+        raise Http404
     if et.is_cult:
         template = 'enemy_template_cult.html'
     if et.owner != request.user:
@@ -193,6 +195,8 @@ def party(request, party_id):
     template = 'party.html'
     context = get_context(request)
     pt = get_object_or_404(Party, id=party_id)
+    if not pt.published and pt.owner != request.user:
+        raise Http404
     context.update(get_party_context(pt))
     if context['party'].owner != request.user:
         template = 'party_read_only.html'
