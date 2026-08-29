@@ -15,11 +15,6 @@ import os
 import random
 import datetime
 import json
-try:
-    from weasyprint import HTML, CSS
-    from PIL import Image, ImageChops
-except:
-    pass
 
 def get_filter(request):
     return request.session.get('filter', None)
@@ -318,6 +313,8 @@ def _get_html_prefix(context):
 
 def generate_pdf(html_path):
     """ Generates a PDF based on the given html file """
+    from weasyprint import HTML
+
     html_path = os.path.join(settings.TEMP, html_path)
     pdf_path = html_path.replace('.html', '.pdf')
     HTML(html_path).write_pdf(pdf_path)
@@ -326,6 +323,8 @@ def generate_pdf(html_path):
 
 def generate_pngs(html_path):
     """ Generates png-images out of the generated_html """
+    from weasyprint import HTML, CSS
+
     with open(os.path.join(settings.TEMP, html_path).encode('utf-8'), 'r') as ff:
         soup = BeautifulSoup(ff, 'html.parser')
     enemies = soup.find_all('div', {'class': 'enemy_container'})
@@ -378,6 +377,8 @@ def enemy_as_json(e):
 
 def _trim(image_path):
     """ Removes the border from the given image """
+    from PIL import Image, ImageChops
+
     im = Image.open(image_path)
     im = im.crop(im.getbbox())  # Trims the transparent border if any
     bg = Image.new(im.mode, im.size, im.getpixel((0,0)))  # 3rd argument is the color of the first pixel
