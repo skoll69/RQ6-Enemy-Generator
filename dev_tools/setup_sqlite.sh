@@ -1,7 +1,42 @@
 #!/bin/bash
 
 # Mythras Encounter Generator - SQLite Setup Script
-# This script automates the environment setup for local development.
+#
+# Purpose:
+#   Automates the environment setup for local development using SQLite instead of MySQL.
+#
+# When to run:
+#   - During initial project setup on a new developer machine.
+#   - When you need to reset your local database and environment to a clean state.
+#
+# Why to run:
+#   - To quickly get a working Django environment without the overhead of setting up a MySQL server.
+#   - Ensures all developers have a consistent local baseline.
+#
+# Input:
+#   - requirements.txt (Python dependencies)
+#   - enemygen_testdata.json (Default small test fixture)
+#
+# Output:
+#   - temp/ directory (for generated PDFs/files)
+#   - mythras_eg/settings.py (Local Django configuration, if not present)
+#   - db.sqlite3 (Initialized SQLite database)
+#
+# End result:
+#   A fully functional local development environment reachable at 127.0.0.1:8000.
+#
+# Pre-conditions:
+#   - Python 3 and pip installed.
+#   - Internet access to install dependencies.
+#
+# Developer info:
+#   - This script creates a 'dev' version of settings.py if one doesn't exist.
+#   - It defaults to the small 'enemygen_testdata.json' fixture (approx. 2000 objects).
+#   - To use production data, follow the migration steps in SQLITE_DEV.md.
+#
+# Usage:
+#   chmod +x dev_tools/setup_sqlite.sh
+#   ./dev_tools/setup_sqlite.sh
 
 set -e
 

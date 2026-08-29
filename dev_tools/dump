@@ -1,1 +1,36 @@
+#!/bin/bash
+
+# Mythras Encounter Generator - Database Dump Script
+#
+# Purpose:
+#   Creates a raw MySQL dump of the 'mythras_eg' database.
+#
+# When to run:
+#   - When you need to pull fresh data from a production or staging MySQL database for local testing.
+#
+# Why to run:
+#   - To obtain the source file required for the SQLite migration pipeline.
+#
+# Input:
+#   - A running MySQL database named 'mythras_eg'.
+#
+# Output:
+#   - dev_tools/local_dump.sql (MySQL formatted SQL dump).
+#
+# End result:
+#   A local file containing the complete schema and data from the MySQL instance.
+#
+# Pre-conditions:
+#   - local MySQL client installed (`mysqldump`).
+#   - Access to the target database and permission to execute dumps.
+#   - `sudo` access (depending on your local MySQL configuration).
+#
+# Developer info:
+#   - The output file `local_dump.sql` is git-ignored to prevent leaking production data.
+#   - This file is the primary input for `smart_import.py` and `convert_dump.py`.
+#
+# Usage:
+#   chmod +x dev_tools/dump
+#   ./dev_tools/dump
+
 sudo mysqldump mythras_eg > dev_tools/local_dump.sql

@@ -154,6 +154,50 @@ Destroying test database for alias 'default'...
 
 ---
 
+### Development Tools & Workflow
+
+The `dev_tools/` directory contains several scripts to manage the SQLite environment and data lifecycle.
+
+#### Tool Relationship Diagram
+
+```mermaid
+graph TD
+    MySQL[(MySQL Database)] -->|dump| DUMP[dev_tools/dump]
+    DUMP -->|local_dump.sql| SMART[dev_tools/smart_import.py]
+    DUMP -->|local_dump.sql| CONV[dev_tools/convert_dump.py]
+    
+    CONV -->|local_data_only.sql| SQLITE_CMD[sqlite3 db.sqlite3]
+    SMART -->|import| SQLITE[(db.sqlite3)]
+    SQLITE_CMD -->|import| SQLITE
+    
+    SETUP[dev_tools/setup_sqlite.sh] -->|migrate| SQLITE
+    SETUP -->|loaddata| SQLITE
+    FIXTURE[enemygen_testdata.json] -->|loaddata| SETUP
+    
+    SQLITE -->|verify| VERIFY[dev_tools/verify_migration.py]
+    SQLITE -->|count| COUNT[dev_tools/count_rows.py]
+    
+    TXT[Text Files .txt] -->|import| NAMES[dev_tools/add_names.py]
+    TXT -->|import| FEAT[dev_tools/import_feature.py]
+    NAMES -->|populate| SQLITE
+    FEAT -->|populate| SQLITE
+```
+
+#### Tool Summary
+
+| Tool | Purpose | Input | Output |
+| :--- | :--- | :--- | :--- |
+| `setup_sqlite.sh` | Automated environment setup | `requirements.txt`, `enemygen_testdata.json` | `db.sqlite3`, `settings.py`, `temp/` |
+| `dump` | Create MySQL data dump | MySQL 'mythras_eg' database | `local_dump.sql` |
+| `smart_import.py` | Intelligent data migration | `local_dump.sql`, `db.sqlite3` | Populated `db.sqlite3` |
+| `convert_dump.py` | MySQL to SQLite SQL converter | `local_dump.sql` | `local_data_only.sql` |
+| `verify_migration.py` | Data integrity check | `db.sqlite3` | Console report |
+| `count_rows.py` | Database scale summary | `db.sqlite3` | Console row counts |
+| `add_names.py` | Bulk name import | `.txt` file | `AdditionalFeatureItem` entries |
+| `import_feature.py` | Bulk feature/item import | `.txt` file | `AdditionalFeatureList/Item` entries |
+
+---
+
 ### Switching between MySQL and SQLite
 MySQL is the primary and default database engine for Mythras Encounter Generator. SQLite is provided as an alternative to simplify local development and testing.
 
