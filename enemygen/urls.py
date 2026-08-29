@@ -27,7 +27,6 @@ urlpatterns = [
     url('^' + ROOT + r'statistics/$', views.statistics, name='statistics'),
     url('^' + ROOT + r'about/$', views.about, name='about'),
     url('^' + ROOT + r'whats_new/$', views.whats_new, name='whats_new'),
-    url('^' + ROOT + r'account/$', views.account, name='account'),
     url('^' + ROOT + r'set_filter/$', views.set_filter, name='set_filter'),
     url('^' + ROOT + r'set_party_filter/$', views.set_party_filter, name='set_party_filter'),
     url('^' + ROOT + r'feature_items/(?P<feature_id>\d+)/$', views.feature_items, name='feature_items'),
