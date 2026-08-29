@@ -74,7 +74,7 @@ Update the `EnemyTemplate` and `Star` models to support efficient batch fetching
 - Update `EnemyTemplate.get_starred` class method to include `select_related('template', 'template__race', 'template__owner')` and `prefetch_related('template__tags')`.
 - Run unit tests to ensure no regressions in basic functionality.
 
-### * Step 2: Stage 2: Consolidate template query in views_lib
+### ✓ Step 2: Stage 2: Consolidate template query in views_lib
 Consolidate the main template fetching logic in `enemygen/views_lib.py`.
 
 - Update `get_enemy_templates` to use a single `QuerySet` instead of extending lists.
@@ -82,7 +82,7 @@ Consolidate the main template fetching logic in `enemygen/views_lib.py`.
 - Apply `select_related('race', 'owner')` and `prefetch_related('tags')` to the queryset.
 - Ensure the result set maintains the existing ordering (published first, then user's private templates, both by rank).
 
-###   Step 3: Stage 3: Implement database-level Star annotation
+### * Step 3: Stage 3: Implement database-level Star annotation
 Move the Star status check from a Python loop into the database query.
 
 - Update `get_enemy_templates` to use `annotate(starred=Exists(...))` for authenticated users.

@@ -80,23 +80,37 @@ def get_party_context(party):
 
 
 def get_enemy_templates(filtr, user):
-    published_templates = EnemyTemplate.objects.filter(published=True).order_by('rank').exclude(race__name='Cult').select_related('race')
-    if filtr and filtr not in ('None', 'Starred'):
-        templates = list(published_templates.filter(tags__name__in=[filtr, ]))
-    elif filtr == 'Starred':
-        templates = EnemyTemplate.get_starred(user)
-    else:
-        templates = list(published_templates)
+    """ Returns the list of EnemyTemplates based on the filter and user.
+        Consolidated into a single query to avoid N+1 problems.
+    """
+    if filtr == "Starred":
+        return EnemyTemplate.get_starred(user)
+
+    # Start with a base queryset excluding Cults, joining Race and Owner, and prefetching Tags
+    templates = EnemyTemplate.objects.exclude(race__name='Cult').select_related('race', 'owner').prefetch_related('tags')
+
+    # Apply publication and ownership filters
     if user.is_authenticated:
-        # Add the unpublished templates of the logged-in user
-        unpubl = EnemyTemplate.objects.filter(published=False, owner=user).order_by('rank').exclude(race__name='Cult').select_related('race')
-        if filtr:
-            templates.extend(list(unpubl.filter(tags__name__in=[filtr, ])))
-        else:
-            templates.extend(list(unpubl))
-        # Add stars (We can't call is_starred with the user parameter in Django template)
+        # Authenticated users see published templates and their own private ones
+        templates = templates.filter(Q(published=True) | Q(published=False, owner=user))
+    else:
+        # Anonymous users only see published templates
+        templates = templates.filter(published=True)
+
+    # Apply tag filter if requested
+    if filtr and filtr != 'None':
+        templates = templates.filter(tags__name__in=[filtr])
+
+    # Order by published status (True first) then by rank
+    # This maintains the original behavior: public templates first, then user's private ones
+    templates = templates.order_by('-published', 'rank')
+
+    # Manually set the 'starred' attribute for now
+    # Stage 3 will move this to a database annotation for O(1) queries
+    if user.is_authenticated:
         for et in templates:
             et.starred = et.is_starred(user)
+
     return templates
 
 
