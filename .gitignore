@@ -4,11 +4,13 @@ mythras_eg/settings.py
 mythras_eg/settings_prod.py
 temp/
 .vscode
+dump.sql
+.venv
+*/__pycache__
+tos3.bat
+get-dump.bat
 local_dump.sql
 local_data_only.sql
-dump.sql
 data_only.sql
 db.sqlite3
 *.sqlite3
-.venv
-*/__pycache__
