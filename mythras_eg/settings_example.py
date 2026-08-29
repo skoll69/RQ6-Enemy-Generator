@@ -15,6 +15,11 @@ DATABASES = {
 SECRET_KEY = 'dev_secret_key'
 DEBUG = True
 ALLOWED_HOSTS = ['localdev', '127.0.0.1']
+CSRF_TRUSTED_ORIGINS = [
+    'https://mythras.skoll.xyz',
+]
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 ADMINS = ( ('Erkki Lepre', 'erkki.lepre@iki.fi'), )
 
 INSTALLED_APPS = (

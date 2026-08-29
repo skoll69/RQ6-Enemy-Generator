@@ -11,7 +11,7 @@ Hosted project per `readme.md`: `https://mythras.skoll.xyz/`.
 ## Stack
 
 - Python/Django project, tested by the maintainer with Python 3.11.
-- Django 3.2.25, MySQL via `pymysql`, `django-registration`, `django-taggit`, `django-extensions`.
+- Django 4.2.30, MySQL via `pymysql`, `django-registration`, `django-taggit`, `django-extensions`.
 - WeasyPrint and Pillow are used for PDF/PNG export of generated encounter HTML.
 - Frontend is server-rendered Django templates with jQuery/axios helpers in `static/js/enemygen.js`.
 - Settings are not committed; copy `mythras_eg/settings_example.py` to `mythras_eg/settings.py`.
