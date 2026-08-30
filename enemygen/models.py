@@ -516,14 +516,11 @@ class EnemyTemplate(models.Model):
         """ Returns True if the template is starred by the user. 
             Uses the 'starred' attribute if it has been pre-populated (e.g. by annotation).
         """
-        if hasattr(self, 'starred'):
-            return self.starred
-        if user.is_authenticated:
-            try:
-                Star.objects.get(user=user, template=self)
-                return True
-            except Star.DoesNotExist:
-                pass
+        # Robust check for starred status, preferring pre-populated annotation for performance
+        if user and user.is_authenticated:
+            if hasattr(self, 'starred') and self.starred is not None:
+                return self.starred
+            return Star.objects.filter(user=user, template=self).exists()
         return False
             
     def toggle_star(self, user):
@@ -570,8 +567,11 @@ class EnemyTemplate(models.Model):
         """ Returns summary information about the EnemyTemplate in as a dict so that it can be jsoned """
         output = {'name': self.name, 'race': self.race.name, 'rank': self.rank, 'owner': self.owner.username,
                   'tags': self.get_tags(), 'id': self.id}
-        if user:
+        # Explicitly handle the 'starred' attribute to ensure it's always present in AJAX responses
+        if user and user.is_authenticated:
             output['starred'] = self.is_starred(user)
+        else:
+            output['starred'] = False
         return output
 
 

@@ -1,3 +1,6 @@
+"""
+Tests for EnemyTemplate model optimizations, focusing on tag fetching and star status caching.
+"""
 from django.test import TestCase
 from django.contrib.auth.models import User
 from enemygen.models import EnemyTemplate, Ruleset, Race, Star

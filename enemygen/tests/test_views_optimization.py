@@ -1,3 +1,6 @@
+"""
+Tests for Enemy list view optimizations, focusing on visibility, ordering, and performance.
+"""
 from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import User
 from enemygen.models import EnemyTemplate, Ruleset, Race, Star
