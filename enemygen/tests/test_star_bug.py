@@ -80,3 +80,40 @@ class StarBugRegressionTest(TestCase):
                 self.assertTrue(result['starred'], "Starred status missing or False in AJAX search results")
                 found = True
         self.assertTrue(found, "Template not found in search results")
+
+    def test_star_persistence(self):
+        from ..ajax import toggle_star
+        # Initial state: Not starred
+        self.assertFalse(Star.objects.filter(user=self.user, template=self.template).exists())
+        
+        # Toggle star via AJAX
+        request = self.factory.post(f'/rest/toggle_star/{self.template.id}/')
+        request.user = self.user
+        response = toggle_star(request, self.template.id)
+        self.assertEqual(response.status_code, 200)
+        
+        # Verify persistence in DB
+        self.assertTrue(Star.objects.filter(user=self.user, template=self.template).exists())
+        
+        # Verify it shows up as starred in a fresh retrieval
+        fresh_template = EnemyTemplate.objects.get(id=self.template.id)
+        self.assertTrue(fresh_template.is_starred(self.user))
+        
+        # Toggle again to unstar
+        response = toggle_star(request, self.template.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Star.objects.filter(user=self.user, template=self.template).exists())
+
+    def test_get_enemy_templates_starred_annotation(self):
+        from ..views_lib import get_enemy_templates
+        # Star the template
+        Star.objects.create(user=self.user, template=self.template)
+        
+        # Fetch starred templates
+        templates = get_enemy_templates('Starred', self.user)
+        self.assertEqual(templates.count(), 1)
+        
+        # Verify annotation
+        starred_template = templates[0]
+        self.assertTrue(hasattr(starred_template, 'starred'), "Template should have 'starred' attribute when fetched via 'Starred' filter")
+        self.assertTrue(starred_template.starred, "Starred attribute should be True for starred templates")

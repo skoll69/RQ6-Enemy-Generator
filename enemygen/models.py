@@ -1,6 +1,6 @@
 # pylint: disable=no-member
 
-from django.db.models import Q
+from django.db.models import Q, Exists, OuterRef, Value, BooleanField
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -528,14 +528,13 @@ class EnemyTemplate(models.Model):
         
     @classmethod
     def get_starred(cls, user):
-        """ Returns a list of templates starred by the user, with related data prefetched. """
+        """ Returns a QuerySet of templates starred by the user, with related data prefetched and annotated. """
         if user.is_authenticated:
-            stars = Star.objects.filter(user=user).order_by('template__rank', 'template__name')\
-                                .select_related('template', 'template__race', 'template__owner')\
-                                .prefetch_related('template__tags')
-            return [star.template for star in stars]
+            return cls.objects.filter(star__user=user).select_related('race', 'owner').prefetch_related('tags')\
+                              .annotate(starred=Value(True, output_field=BooleanField()))\
+                              .order_by('rank', 'name')
         else:
-            return []
+            return cls.objects.none()
 
     @classmethod
     def search(cls, string, user, rank_filter=None, cult_rank_filter=None):
