@@ -68,3 +68,127 @@ class EnemyTemplateOptimizationTest(TestCase):
         self.template.starred = False
         Star.objects.create(user=self.user, template=self.template)
         self.assertFalse(self.template.is_starred(self.user))
+
+    def test_increment_used(self):
+        """
+        Purpose: Verifies that increment_used() exists and increments the 'used' counter.
+        Requirement: This method is called by views_lib.py during generation but was missing
+        from the model, causing a runtime crash (AttributeError).
+        """
+        initial_used = self.template.used
+        self.template.increment_used()
+        self.assertEqual(self.template.used, initial_used + 1)
+        
+        # Verify persistence — reload from DB
+        self.template.refresh_from_db()
+        self.assertEqual(self.template.used, initial_used + 1)
+
+    def test_get_enemies_calls_increment_used(self):
+        """
+        Purpose: Verifies that get_enemies() in views_lib.py calls increment_used() when increment=True.
+        Requirement: This is the actual call path used by generate_enemies and generate_enemies_json views.
+        """
+        from ..views_lib import get_enemies, determine_enemies
+        
+        initial_used = self.template.used
+        enemy_index = [(self.template, 2)]  # Generate 2 enemies from this template
+        enemies = get_enemies(enemy_index, increment=True)
+        
+        self.assertEqual(len(enemies), 2)
+        self.template.refresh_from_db()
+        self.assertEqual(self.template.used, initial_used + 1)
+
+    def test_get_enemies_no_increment(self):
+        """
+        Purpose: Verifies that get_enemies() does NOT call increment_used() when increment=False.
+        Requirement: The 'dont_increment' POST parameter should skip incrementing.
+        """
+        from ..views_lib import get_enemies
+        
+        initial_used = self.template.used
+        enemy_index = [(self.template, 1)]
+        enemies = get_enemies(enemy_index, increment=False)
+        
+        self.assertEqual(len(enemies), 1)
+        self.template.refresh_from_db()
+        self.assertEqual(self.template.used, initial_used)
+
+    def test_get_generated_party_calls_increment_used(self):
+        """
+        Purpose: Verifies that get_generated_party() calls increment_used() for each template in the party.
+        Requirement: This is the call path used by generate_party and generate_party_json views.
+        """
+        from ..views_lib import get_generated_party
+        from enemygen.models import Party, TemplateToParty
+        
+        initial_used = self.template.used
+        
+        # Create a party with the template
+        party = Party.objects.create(name='Test Party', owner=self.user, published=True)
+        TemplateToParty.objects.create(party=party, template=self.template, amount=2)
+        
+        context = get_generated_party(party)
+        
+        self.assertEqual(len(context['enemies']), 2)
+        self.template.refresh_from_db()
+        self.assertEqual(self.template.used, initial_used + 1)
+
+    def test_increment_used_does_not_save_other_fields(self):
+        """
+        Purpose: Verifies that increment_used() only saves the 'used' field, not other modified fields.
+        Requirement: Uses save(update_fields=['used']) to prevent accidental persistence of unrelated changes.
+        """
+        # Modify an unrelated field in memory
+        original_name = self.template.name
+        self.template.name = 'Temp Modified Name'
+        
+        # Increment used — should NOT persist the name change
+        self.template.increment_used()
+        
+        # Reload from DB — name should be unchanged
+        self.template.refresh_from_db()
+        self.assertEqual(self.template.name, original_name)
+        # But used should be incremented
+        self.assertEqual(self.template.used, 1)
+
+    def test_get_enemies_increments_both_used_and_generated(self):
+        """
+        Purpose: Verifies that a single generation call increments both 'used' and 'generated' counters.
+        Requirement: get_enemies() calls increment_used() and generate(increment=True), so both counters should increase.
+        """
+        from ..views_lib import get_enemies
+        
+        initial_used = self.template.used
+        initial_generated = self.template.generated
+        enemy_index = [(self.template, 1)]
+        enemies = get_enemies(enemy_index, increment=True)
+        
+        self.assertEqual(len(enemies), 1)
+        self.template.refresh_from_db()
+        self.assertEqual(self.template.used, initial_used + 1)
+        self.assertEqual(self.template.generated, initial_generated + 1)
+
+    def test_get_enemies_multiple_templates_increment_independently(self):
+        """
+        Purpose: Verifies that when generating from multiple templates, each template's 'used' counter increments independently.
+        Requirement: Each template gets used += 1 regardless of amount or other templates.
+        """
+        from ..views_lib import get_enemies
+        
+        # Create a second template
+        template2 = EnemyTemplate.create(self.user, self.ruleset, self.race, 'Test Template 2')
+        
+        initial_used_1 = self.template.used
+        initial_used_2 = template2.used
+        
+        # Generate from both templates
+        enemy_index = [(self.template, 2), (template2, 3)]
+        enemies = get_enemies(enemy_index, increment=True)
+        
+        self.assertEqual(len(enemies), 5)  # 2 + 3 enemies total
+        self.template.refresh_from_db()
+        template2.refresh_from_db()
+        
+        # Each template's used counter incremented by 1, not by amount
+        self.assertEqual(self.template.used, initial_used_1 + 1)
+        self.assertEqual(template2.used, initial_used_2 + 1)

@@ -312,6 +312,11 @@ class EnemyTemplate(models.Model):
         else:
             return _Enemy(self).generate(suffix)
 
+    def increment_used(self):
+        """ Increments the 'used' counter for the template. """
+        self.used += 1
+        self.save(update_fields=['used'])
+
     def get_tags(self):
         """ Returns a sorted list of tag names. Uses prefetched tags if available. """
         if hasattr(self, '_prefetched_objects_cache') and 'tags' in self._prefetched_objects_cache:
