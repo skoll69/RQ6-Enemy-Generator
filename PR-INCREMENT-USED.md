@@ -20,12 +20,12 @@ Adds the `increment_used()` method to `EnemyTemplate` that is already called by 
 AttributeError: 'EnemyTemplate' object has no attribute 'increment_used'
 ```
 
-- **After:** All 49 tests pass, including 7 new tests covering every call path and edge case:
+- **After:** All 51 tests pass, including 9 new tests covering every call path, edge case, and external API:
 
 ```
-Found 49 test(s).
+Found 51 test(s).
 ----------------------------------------------------------------------
-Ran 49 tests in 3.218s
+Ran 51 tests in 3.357s
 OK
 ```
 
@@ -37,6 +37,15 @@ OK
 - `test_increment_used_does_not_save_other_fields` — verifies `save(update_fields=['used'])` prevents unrelated in-memory field changes from being persisted.
 - `test_get_enemies_increments_both_used_and_generated` — verifies a single generation call increments both `used` and `generated` counters.
 - `test_get_enemies_multiple_templates_increment_independently` — verifies each template's `used` counter increments independently when generating from multiple templates.
+- `test_generate_enemies_json_api_increments_used` — end-to-end test: hits `/generate_enemies_json/` API, verifies valid JSON response and `used` counter increment.
+- `test_generate_party_json_api_increments_used` — end-to-end test: hits `/generate_party_json/` API, verifies valid JSON response and `used` counter increment.
+
+**External APIs affected:**
+Two JSON API endpoints call generation with `increment=True`, which would crash before this fix:
+- `/generate_enemies_json/` — always increments `used` (no `dont_increment` option).
+- `/generate_party_json/` — always increments `used` via `get_generated_party()`.
+
+The AJAX endpoints in `ajax.py` are **not affected** — they do not call `get_enemies()`, `get_generated_party()`, or `increment_used()`.
 
 ## Merge Danger
 

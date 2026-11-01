@@ -192,3 +192,50 @@ class EnemyTemplateOptimizationTest(TestCase):
         # Each template's used counter incremented by 1, not by amount
         self.assertEqual(self.template.used, initial_used_1 + 1)
         self.assertEqual(template2.used, initial_used_2 + 1)
+
+    def test_generate_enemies_json_api_increments_used(self):
+        """
+        Purpose: Verifies that the generate_enemies_json API endpoint increments the 'used' counter.
+        Requirement: This JSON API always calls get_enemies with increment=True, so the used counter
+        must increment. Before PR 2, this endpoint would crash with AttributeError.
+        """
+        import json
+        from django.test import Client
+        
+        initial_used = self.template.used
+        client = Client()
+        response = client.get(f'/generate_enemies_json/?id={self.template.id}&amount=2')
+        
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(len(data), 2)
+        
+        self.template.refresh_from_db()
+        self.assertEqual(self.template.used, initial_used + 1)
+
+    def test_generate_party_json_api_increments_used(self):
+        """
+        Purpose: Verifies that the generate_party_json API endpoint increments the 'used' counter.
+        Requirement: This JSON API calls get_generated_party which always increments used.
+        Before PR 2, this endpoint would crash with AttributeError.
+        """
+        import json
+        from django.test import Client
+        from enemygen.models import Party, TemplateToParty
+        
+        initial_used = self.template.used
+        
+        # Create a party with the template
+        party = Party.objects.create(name='JSON Test Party', owner=self.user, published=True)
+        TemplateToParty.objects.create(party=party, template=self.template, amount=2)
+        
+        client = Client()
+        response = client.get(f'/generate_party_json/?id={party.id}')
+        
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(len(data['enemies']), 2)
+        self.assertEqual(data['party_name'], 'JSON Test Party')
+        
+        self.template.refresh_from_db()
+        self.assertEqual(self.template.used, initial_used + 1)
