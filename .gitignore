@@ -14,3 +14,7 @@ local_data_only.sql
 data_only.sql
 db.sqlite3
 *.sqlite3
+skills/
+AGENTS.md
+.junie/
+dev_tools/local/
