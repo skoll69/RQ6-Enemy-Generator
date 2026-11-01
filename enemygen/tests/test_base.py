@@ -18,14 +18,15 @@ from mythras_eg.middleware import SimpleCorsMiddleware
 from django.conf import settings
 from django.test import override_settings
 
-from .ajax import change_template
-from .dice import Dice, _die_to_tuple, clean
+# Relative imports for moved test files within the enemygen.tests package
+from ..ajax import change_template
+from ..dice import Dice, _die_to_tuple, clean
 
-from .models import EnemyTemplate, _Enemy, _Spirit, Ruleset, StatAbstract, Race, SpellAbstract
-from .models import EnemyStat, EnemySkill, SkillAbstract, EnemySpell
-from .models import CombatStyle, Weapon
-from .enemygen_lib import select_random_item, replace_die_set
-from .views_lib import as_json, get_context
+from ..models import EnemyTemplate, _Enemy, _Spirit, Ruleset, StatAbstract, Race, SpellAbstract
+from ..models import EnemyStat, EnemySkill, SkillAbstract, EnemySpell
+from ..models import CombatStyle, Weapon
+from ..enemygen_lib import select_random_item, replace_die_set
+from ..views_lib import as_json, get_context
 
 class TestDice(TestCase):
     def test_1_die_to_tuple(self):

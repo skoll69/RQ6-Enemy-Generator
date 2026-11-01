@@ -1,6 +1,6 @@
 # pylint: disable=no-member
 
-from django.db.models import Q
+from django.db.models import Q, Exists, OuterRef, Value, BooleanField
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -312,12 +312,10 @@ class EnemyTemplate(models.Model):
         else:
             return _Enemy(self).generate(suffix)
 
-    def increment_used(self):
-        """ Increments the used-count by one. """
-        self.used += 1
-        self.save()
-        
     def get_tags(self):
+        """ Returns a sorted list of tag names. Uses prefetched tags if available. """
+        if hasattr(self, '_prefetched_objects_cache') and 'tags' in self._prefetched_objects_cache:
+            return sorted([tag.name for tag in self.tags.all()])
         return sorted(list(self.tags.names()))
     
     @property
@@ -515,12 +513,14 @@ class EnemyTemplate(models.Model):
             combat_style.set_value(combat_style.die_set + bonus)
 
     def is_starred(self, user):
-        if user.is_authenticated:
-            try:
-                Star.objects.get(user=user, template=self)
-                return True
-            except Star.DoesNotExist:
-                pass
+        """ Returns True if the template is starred by the user. 
+            Uses the 'starred' attribute if it has been pre-populated (e.g. by annotation).
+        """
+        # Robust check for starred status, preferring pre-populated annotation for performance
+        if user and user.is_authenticated:
+            if hasattr(self, 'starred') and self.starred is not None:
+                return self.starred
+            return Star.objects.filter(user=user, template=self).exists()
         return False
             
     def toggle_star(self, user):
@@ -528,11 +528,13 @@ class EnemyTemplate(models.Model):
         
     @classmethod
     def get_starred(cls, user):
+        """ Returns a QuerySet of templates starred by the user, with related data prefetched and annotated. """
         if user.is_authenticated:
-            stars = Star.objects.filter(user=user).order_by('template__rank', 'template__name')
-            return [star.template for star in stars]
+            return cls.objects.filter(star__user=user).select_related('race', 'owner').prefetch_related('tags')\
+                              .annotate(starred=Value(True, output_field=BooleanField()))\
+                              .order_by('rank', 'name')
         else:
-            return []
+            return cls.objects.none()
 
     @classmethod
     def search(cls, string, user, rank_filter=None, cult_rank_filter=None):
@@ -564,8 +566,11 @@ class EnemyTemplate(models.Model):
         """ Returns summary information about the EnemyTemplate in as a dict so that it can be jsoned """
         output = {'name': self.name, 'race': self.race.name, 'rank': self.rank, 'owner': self.owner.username,
                   'tags': self.get_tags(), 'id': self.id}
-        if user:
+        # Explicitly handle the 'starred' attribute to ensure it's always present in AJAX responses
+        if user and user.is_authenticated:
             output['starred'] = self.is_starred(user)
+        else:
+            output['starred'] = False
         return output
 
 
@@ -615,8 +620,11 @@ class Party(models.Model):
             raise ValidationError
             
     def get_tags(self):
+        """ Returns a sorted list of tag names. Uses prefetched tags if available. """
+        if hasattr(self, '_prefetched_objects_cache') and 'tags' in self._prefetched_objects_cache:
+            return sorted([tag.name for tag in self.tags.all()])
         return sorted(list(self.tags.names()))
-        
+
     def add_additional_feature(self, feature_list_id):
         PartyAdditionalFeatureList.create(party=self, feature_list_id=feature_list_id)
         
