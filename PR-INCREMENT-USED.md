@@ -20,12 +20,12 @@ Adds the `increment_used()` method to `EnemyTemplate` that is already called by 
 AttributeError: 'EnemyTemplate' object has no attribute 'increment_used'
 ```
 
-- **After:** All 51 tests pass, including 9 new tests covering every call path, edge case, and external API:
+- **After:** All 53 tests pass, including 11 new tests covering every call path, edge case, external API, and smoke tests:
 
 ```
-Found 51 test(s).
+Found 53 test(s).
 ----------------------------------------------------------------------
-Ran 51 tests in 3.357s
+Ran 53 tests in 3.532s
 OK
 ```
 
@@ -39,6 +39,8 @@ OK
 - `test_get_enemies_multiple_templates_increment_independently` — verifies each template's `used` counter increments independently when generating from multiple templates.
 - `test_generate_enemies_json_api_increments_used` — end-to-end test: hits `/generate_enemies_json/` API, verifies valid JSON response and `used` counter increment.
 - `test_generate_party_json_api_increments_used` — end-to-end test: hits `/generate_party_json/` API, verifies valid JSON response and `used` counter increment.
+- `test_generate_enemies_view_does_not_crash` — smoke test: verifies the main generation view's code path (`get_enemies` with `increment=True`) does not crash. This test would have caught the `increment_used()` deletion bug.
+- `test_generate_party_view_does_not_crash` — smoke test: verifies the party generation view's code path (`get_generated_party`) does not crash. This test would have caught the `increment_used()` deletion bug.
 
 **External APIs affected:**
 Two JSON API endpoints call generation with `increment=True`, which would crash before this fix:

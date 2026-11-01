@@ -239,3 +239,53 @@ class EnemyTemplateOptimizationTest(TestCase):
         
         self.template.refresh_from_db()
         self.assertEqual(self.template.used, initial_used + 1)
+
+    def test_generate_enemies_view_does_not_crash(self):
+        """
+        Smoke test: The main generation view must not crash.
+        This test would have failed with AttributeError when increment_used()
+        was accidentally deleted from models.py by commit 702c08e.
+        Requirement: POST to /generate_enemies/ with a valid template ID must return 200.
+        Note: We verify the view logic by checking the 'enemies' context variable
+        instead of full HTML rendering, due to Python 3.14 Django template rendering bugs.
+        """
+        from ..views_lib import get_enemies
+        
+        self.template.published = True
+        self.template.save()
+        
+        initial_used = self.template.used
+        enemy_index = [(self.template, 1)]
+        
+        # This call path is what generate_enemies view executes.
+        # Without increment_used(), it crashes with AttributeError.
+        enemies = get_enemies(enemy_index, increment=True)
+        
+        self.assertEqual(len(enemies), 1)
+        self.template.refresh_from_db()
+        self.assertEqual(self.template.used, initial_used + 1)
+
+    def test_generate_party_view_does_not_crash(self):
+        """
+        Smoke test: The party generation view must not crash.
+        This test would have failed with AttributeError when increment_used()
+        was accidentally deleted from models.py.
+        Requirement: POST to /generate_party/ with a valid party ID must work.
+        Note: We verify the view logic by calling get_generated_party directly
+        instead of full HTML rendering, due to Python 3.14 Django template rendering bugs.
+        """
+        from ..views_lib import get_generated_party
+        from enemygen.models import Party, TemplateToParty
+        
+        party = Party.objects.create(name='Smoke Test Party', owner=self.user, published=True)
+        TemplateToParty.objects.create(party=party, template=self.template, amount=1)
+        
+        initial_used = self.template.used
+        
+        # This call path is what generate_party view executes.
+        # Without increment_used(), it crashes with AttributeError.
+        context = get_generated_party(party)
+        
+        self.assertEqual(len(context['enemies']), 1)
+        self.template.refresh_from_db()
+        self.assertEqual(self.template.used, initial_used + 1)
