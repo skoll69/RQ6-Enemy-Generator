@@ -66,9 +66,7 @@ function initialize_enemy_list(){
     var table = new ttable('enemy_template_list');
     table.sorting.enabled = true;
     table.sorting.sortall = false;
-    table.search.enabled = true;
-    table.search.inputID = 'searchinput';
-    table.search.casesensitive = false;
+    table.search.enabled = false;
     table.style.num = false;
     //$('img.sort-img').remove(); // Each time rendertable is called, new set of sort images are added
     table.rendertable();
