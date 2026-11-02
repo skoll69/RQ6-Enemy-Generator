@@ -311,6 +311,7 @@ class EnemyTemplate(models.Model):
             return _Cult(self).generate(suffix)
         else:
             return _Enemy(self).generate(suffix)
+    
 
     def increment_used(self):
         """ Increments the 'used' counter for the template. """
@@ -325,26 +326,29 @@ class EnemyTemplate(models.Model):
     
     @property
     def stats(self):
-        return EnemyStat.objects.filter(enemy_template=self).select_related('stat')
+        return self.enemystat_set.all().select_related('stat')
 
     @property
     def stat_dict(self):
         out = {}
-        for stat in EnemyStat.objects.filter(enemy_template=self):
+        for stat in self.enemystat_set.all():
             out[stat.name] = stat.die_set
         return out
 
     @property
     def skills(self):
+        if hasattr(self, '_skills_cache'):
+            return self._skills_cache
         output = []
-        output.extend(list(EnemySkill.objects.filter(enemy_template=self).select_related('skill')))
-        output.extend(list(CustomSkill.objects.filter(enemy_template=self)))
+        output.extend(list(self.enemyskill_set.all().select_related('skill')))
+        output.extend(list(self.customskill_set.all()))
         output = sorted(output, key=lambda k: k.name)
+        self._skills_cache = output
         return output
         
     @property
     def included_standard_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self, skill__standard=True, include=True).select_related('skill')
+        return self.enemyskill_set.filter(skill__standard=True, include=True).select_related('skill')
         
     @property
     def is_spirit(self):
@@ -360,87 +364,99 @@ class EnemyTemplate(models.Model):
         
     @property
     def raw_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self).select_related('skill')
+        return self.enemyskill_set.all().select_related('skill')
         
     @property
     def standard_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self, skill__standard=True).select_related('skill')
+        return self.enemyskill_set.filter(skill__standard=True).select_related('skill')
         
     @property
     def included_magic_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, skill__magic=True, include=True).select_related('skill')
+        return self.enemyskill_set.filter(skill__standard=False, skill__magic=True, include=True).select_related('skill')
         
     @property
     def magic_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, skill__magic=True).select_related('skill')
+        return self.enemyskill_set.filter(skill__standard=False, skill__magic=True).select_related('skill')
         
     @property
     def included_professional_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, skill__magic=False, include=True).select_related('skill')
+        return self.enemyskill_set.filter(skill__standard=False, skill__magic=False, include=True).select_related('skill')
         
     @property
     def professional_skills(self):
-        return EnemySkill.objects.filter(enemy_template=self, skill__standard=False, skill__magic=False).select_related('skill')
+        return self.enemyskill_set.filter(skill__standard=False, skill__magic=False).select_related('skill')
         
     @property
     def included_custom_skills(self):
-        return CustomSkill.objects.filter(enemy_template=self, include=True)
+        return self.customskill_set.filter(include=True)
         
     @property
     def custom_skills(self):
-        return CustomSkill.objects.filter(enemy_template=self)
+        return self.customskill_set.all()
         
     @property
     def folk_spells(self):
+        if hasattr(self, '_folk_spells_cache'):
+            return self._folk_spells_cache
         output = []
-        output.extend(list(EnemySpell.objects.filter(enemy_template=self, spell__type="folk")))
-        output.extend(list(CustomSpell.objects.filter(enemy_template=self, type="folk", probability__gt=0)))
+        output.extend(list(self.enemyspell_set.filter(spell__type="folk")))
+        output.extend(list(self.customspell_set.filter(type="folk", probability__gt=0)))
+        self._folk_spells_cache = output
         return output
 
     @property
     def theism_spells(self):
+        if hasattr(self, '_theism_spells_cache'):
+            return self._theism_spells_cache
         output = []
-        output.extend(list(EnemySpell.objects.filter(enemy_template=self, spell__type="theism")))
-        output.extend(list(CustomSpell.objects.filter(enemy_template=self, type="theism", probability__gt=0)))
+        output.extend(list(self.enemyspell_set.filter(spell__type="theism")))
+        output.extend(list(self.customspell_set.filter(type="theism", probability__gt=0)))
+        self._theism_spells_cache = output
         return output
 
     @property
     def sorcery_spells(self):
+        if hasattr(self, '_sorcery_spells_cache'):
+            return self._sorcery_spells_cache
         output = []
-        output.extend(list(EnemySpell.objects.filter(enemy_template=self, spell__type="sorcery")))
-        output.extend(list(CustomSpell.objects.filter(enemy_template=self, type="sorcery", probability__gt=0)))
+        output.extend(list(self.enemyspell_set.filter(spell__type="sorcery")))
+        output.extend(list(self.customspell_set.filter(type="sorcery", probability__gt=0)))
+        self._sorcery_spells_cache = output
         return output
         
     @property
     def mysticism_spells(self):
+        if hasattr(self, '_mysticism_spells_cache'):
+            return self._mysticism_spells_cache
         output = []
-        output.extend(list(EnemySpell.objects.filter(enemy_template=self, spell__type="mysticism")))
-        output.extend(list(CustomSpell.objects.filter(enemy_template=self, type="mysticism", probability__gt=0)))
+        output.extend(list(self.enemyspell_set.filter(spell__type="mysticism")))
+        output.extend(list(self.customspell_set.filter(type="mysticism", probability__gt=0)))
+        self._mysticism_spells_cache = output
         return output
         
     @property
     def spirits(self):
-        return EnemySpirit.objects.filter(enemy_template=self)
+        return self.animist.all()
 
     @property
     def cults(self):
-        return EnemyCult.objects.filter(enemy_template=self)
+        return self.enemytemplate.all()
 
     @property
     def hit_locations(self):
-        return EnemyHitLocation.objects.filter(enemy_template=self).select_related('hit_location')
+        return self.enemyhitlocation_set.all().select_related('hit_location')
 
     @property
     def combat_styles(self):
-        return CombatStyle.objects.filter(enemy_template=self)
+        return self.combatstyle_set.all()
         
     @property
     def additional_features(self):
-        return EnemyAdditionalFeatureList.objects.filter(enemy_template=self).select_related('feature_list')
+        return self.enemyadditionalfeaturelist_set.all().select_related('feature_list')
         
     @property
     def nonrandom_features(self):
-        return EnemyNonrandomFeature.objects.filter(enemy_template=self)
+        return self.enemynonrandomfeature_set.all()
         
     def add_additional_feature(self, feature_list_id):
         EnemyAdditionalFeatureList.create(enemy_template=self, feature_list_id=feature_list_id)
@@ -702,31 +718,52 @@ class CombatStyle(models.Model):
     
     @property
     def one_h_options(self):
+        if hasattr(self, '_one_h_cache'):
+            return self._one_h_cache
         output = list(EnemyWeapon.objects.filter(weapon__type='1h-melee', combat_style=self))
         output.extend(list(CustomWeapon.objects.filter(type='1h-melee', combat_style=self)))
+        self._one_h_cache = output
         return output
         
     @property
     def two_h_options(self):
+        if hasattr(self, '_two_h_cache'):
+            return self._two_h_cache
         output = list(EnemyWeapon.objects.filter(weapon__type='2h-melee', combat_style=self))
         output.extend(list(CustomWeapon.objects.filter(type='2h-melee', combat_style=self)))
+        self._two_h_cache = output
         return output
         
     @property
     def ranged_options(self):
+        if hasattr(self, '_ranged_cache'):
+            return self._ranged_cache
         output = list(EnemyWeapon.objects.filter(weapon__type='ranged', combat_style=self))
         output.extend(list(CustomWeapon.objects.filter(type='ranged', combat_style=self)))
+        self._ranged_cache = output
         return output
         
     @property
     def shield_options(self):
+        if hasattr(self, '_shield_cache'):
+            return self._shield_cache
         output = list(EnemyWeapon.objects.filter(weapon__type='shield', combat_style=self))
         output.extend(list(CustomWeapon.objects.filter(type='shield', combat_style=self)))
+        self._shield_cache = output
         return output
         
     @property
     def custom_weapons(self):
-        return CustomWeapon.objects.filter(combat_style=self)
+        if hasattr(self, '_custom_weapons_cache'):
+            return self._custom_weapons_cache
+        qs = list(CustomWeapon.objects.filter(combat_style=self))
+        self._custom_weapons_cache = qs
+        return qs
+    
+    def _clear_weapon_caches(self):
+        """Clear all weapon option caches."""
+        for cache in ('_one_h_cache', '_two_h_cache', '_ranged_cache', '_shield_cache', '_custom_weapons_cache'):
+            self.__dict__.pop(cache, None)
     
     def roll(self, replace):
         die_set = replace_die_set(self.die_set, replace)
@@ -846,6 +883,15 @@ class EnemyWeapon(models.Model):
         ew.save()
         return ew
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.combat_style._clear_weapon_caches()
+
+    def delete(self, *args, **kwargs):
+        cs = self.combat_style
+        super().delete(*args, **kwargs)
+        cs._clear_weapon_caches()
+
     def __lt__(self, other):
         return self.name < other.name
 
@@ -890,6 +936,15 @@ class CustomWeapon(models.Model):
         self.probability = value
         self.save()
     
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.combat_style._clear_weapon_caches()
+
+    def delete(self, *args, **kwargs):
+        cs = self.combat_style
+        super().delete(*args, **kwargs)
+        cs._clear_weapon_caches()
+
     @classmethod
     def create(cls, cs_id, weapontype, name='Custom weapon', probability=1):
         cs = CombatStyle.objects.get(id=cs_id)
@@ -922,9 +977,21 @@ class EnemySkill(models.Model):
         ordering = ['skill', ]
         unique_together = ('enemy_template', 'skill')
     
+    def __str__(self):
+        return self.name
+
     @property
     def name(self):
         return self.skill.name
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.enemy_template.__dict__.pop('_skills_cache', None)
+
+    def delete(self, *args, **kwargs):
+        et = self.enemy_template
+        super().delete(*args, **kwargs)
+        et.__dict__.pop('_skills_cache', None)
 
     def roll(self, replace=None):
         # Ensure, that all valid stats are present in the dict. Some races miss some stats
@@ -955,6 +1022,15 @@ class CustomSkill(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.enemy_template.__dict__.pop('_skills_cache', None)
+
+    def delete(self, *args, **kwargs):
+        et = self.enemy_template
+        super().delete(*args, **kwargs)
+        et.__dict__.pop('_skills_cache', None)
 
     def roll(self, replace=None):
         die_set = replace_die_set(self.die_set, replace)
@@ -1114,7 +1190,23 @@ class EnemySpell(models.Model):
     @property
     def type(self):
         return self.spell.type
-        
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self._clear_spells_cache()
+
+    def delete(self, *args, **kwargs):
+        et = self.enemy_template
+        super().delete(*args, **kwargs)
+        self._clear_spells_cache(et=et)
+
+    def _clear_spells_cache(self, et=None):
+        """Clear spell caches on the parent template."""
+        template = et or self.enemy_template
+        for cache in ('_folk_spells_cache', '_theism_spells_cache',
+                      '_sorcery_spells_cache', '_mysticism_spells_cache'):
+            template.__dict__.pop(cache, None)
+
     def set_probability(self, value):
         self.probability = value
         self.save()
@@ -1135,6 +1227,22 @@ class CustomSpell(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self._clear_spells_cache()
+
+    def delete(self, *args, **kwargs):
+        et = self.enemy_template
+        super().delete(*args, **kwargs)
+        self._clear_spells_cache(et=et)
+
+    def _clear_spells_cache(self, et=None):
+        """Clear spell caches on the parent template."""
+        template = et or self.enemy_template
+        for cache in ('_folk_spells_cache', '_theism_spells_cache',
+                      '_sorcery_spells_cache', '_mysticism_spells_cache'):
+            template.__dict__.pop(cache, None)
 
     @classmethod
     def create(cls, et_id, spelltype):
@@ -1214,12 +1322,17 @@ class AdditionalFeatureList(models.Model):
 
     @property
     def items(self):
-        return AdditionalFeatureItem.objects.filter(feature_list=self)
-        
+        if hasattr(self, '_items_cache'):
+            return self._items_cache
+        qs = list(AdditionalFeatureItem.objects.filter(feature_list=self))
+        self._items_cache = qs
+        return qs
+
     def get_random_item(self):
-        num_items = len(self.items)
+        items = self.items
+        num_items = len(items)
         index = random.randint(0, num_items-1)
-        return self.items[index]
+        return items[index]
     
     def __unicode__(self):
         return '%s - %s' % (self.get_type_display(), self.name)

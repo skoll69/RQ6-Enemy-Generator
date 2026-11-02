@@ -5,12 +5,27 @@ Handles dice.
 import random
 import re
 from collections import OrderedDict
+from functools import lru_cache
+
+
+@lru_cache(maxsize=256)
+def _dissect_cached(dice_set_upper):
+    """Cached version of _dissect to avoid re-parsing common dice strings."""
+    raw_components = re.findall(r"[\+\-]?[\w']+", dice_set_upper)
+    fin_components = []
+    for comp in raw_components:
+        try:
+            comp = int(comp)
+        except ValueError:
+            comp = _die_to_tuple(comp)
+        fin_components.append(comp)
+    return tuple(fin_components)
 
 
 class Dice:
     def __init__(self, dice_set):
         self.dice_set = dice_set.upper()
-        self.components = self._dissect()
+        self.components = _dissect_cached(self.dice_set)
     
     def roll(self):
         output = 0
@@ -32,20 +47,6 @@ class Dice:
                     output += comp[1]
         return output
 
-    def _dissect(self):
-        """ Analyses the input string and splits it into dice roll components.
-            Simple ints's will stay simple int's, dice are split into tuples of 
-            three int's. For excample 10+D6 should result in [10, (1,6,1)]
-        """
-        raw_components = re.findall(r"[\+\-]?[\w']+", self.dice_set)
-        fin_components = []
-        for comp in raw_components:
-            try:
-                comp = int(comp)
-            except ValueError:
-                comp = _die_to_tuple(comp)
-            fin_components.append(comp)
-        return fin_components
 
 
 def clean(dieset):
