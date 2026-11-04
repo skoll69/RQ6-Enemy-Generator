@@ -1,0 +1,4195 @@
+[
+{
+  "model": "auth.group",
+  "pk": 1,
+  "fields": {
+    "name": "race_admin",
+    "permissions": []
+  }
+},
+{
+  "model": "auth.group",
+  "pk": 2,
+  "fields": {
+    "name": "superuser",
+    "permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 26,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$eVofybiRQS6CIgOMHMcPkd$e3bfo53Km4Pa6kU4X5yTIQdwx9lFGqCbotKDp/tL/MY=",
+    "last_login": "2026-08-29T21:19:14.756Z",
+    "is_superuser": false,
+    "username": "hkokko",
+    "first_name": "",
+    "last_name": "",
+    "email": "hannu.kokko@iki.fi",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2013-08-11T18:27:06Z",
+    "groups": [
+      1,
+      2
+    ],
+    "user_permissions": [
+      88,
+      89,
+      90,
+      85,
+      86,
+      87,
+      91,
+      92,
+      93,
+      55,
+      56,
+      57,
+      70,
+      71,
+      72,
+      35,
+      25,
+      26,
+      27
+    ]
+  }
+},
+{
+  "model": "enemygen.enemytemplate",
+  "pk": 1005,
+  "fields": {
+    "name": "Master, Monk of Zamur Khan Monastery",
+    "owner": 26,
+    "ruleset": 1,
+    "race": 1,
+    "folk_spell_amount": "0",
+    "theism_spell_amount": "0",
+    "sorcery_spell_amount": "0",
+    "mysticism_spell_amount": "2d4",
+    "spirit_amount": "0",
+    "cult_amount": null,
+    "generated": 246,
+    "used": 58,
+    "published": true,
+    "natural_armor": false,
+    "rank": 5,
+    "movement": "6",
+    "notes": "**Augment Skill:*** 1 Magic Point per level of Intensity. A level of Intensity improves the success chance of the skill by one grade. For example, increasing a skill from Standard to Easy costs 1 Magic Point; increasing it to Very Easy costs 2, and so on.\n***Invoke Trait:*** 2 Magic Points. All traits have a default Intensity of 1.\n***Enhance Attribute:*** 3 Magic Points per step of increase. Each step is a level of Intensity (for example, enhancing Dam- age Modifier by one step, from 1d2 to 1d4 costs 3 Magic Points; enhancing from 1d2 to 1d6 costs 6 Magic Points and so forth). (RQ6: pg 224)",
+    "cult_rank": 3,
+    "namelist": 57,
+    "weapon_filter": null
+  }
+},
+{
+  "model": "enemygen.race",
+  "pk": 1,
+  "fields": {
+    "name": "Human",
+    "owner": 15,
+    "movement": "6",
+    "special": "",
+    "published": true,
+    "discorporate": false,
+    "elemental": false
+  }
+},
+{
+  "model": "enemygen.ruleset",
+  "pk": 1,
+  "fields": {
+    "name": "RuneQuest 6",
+    "owner": 1,
+    "stats": [
+      1,
+      2,
+      3,
+      4,
+      7,
+      5,
+      6
+    ],
+    "skills": [
+      32,
+      31,
+      33,
+      1,
+      27,
+      2,
+      3,
+      34,
+      35,
+      6,
+      36,
+      7,
+      8,
+      22,
+      26,
+      37,
+      4,
+      38,
+      9,
+      21,
+      10,
+      20,
+      39,
+      40,
+      11,
+      12,
+      23,
+      13,
+      41,
+      42,
+      29,
+      30,
+      43,
+      44,
+      14,
+      15,
+      45,
+      46,
+      24,
+      16,
+      47,
+      25,
+      17,
+      48,
+      49,
+      18,
+      50,
+      51,
+      28,
+      19,
+      5
+    ],
+    "races": [
+      5,
+      2,
+      3,
+      4,
+      1,
+      7,
+      8,
+      6
+    ]
+  }
+},
+{
+  "model": "enemygen.statabstract",
+  "pk": 1,
+  "fields": {
+    "name": "STR",
+    "order": 1
+  }
+},
+{
+  "model": "enemygen.statabstract",
+  "pk": 2,
+  "fields": {
+    "name": "CON",
+    "order": 2
+  }
+},
+{
+  "model": "enemygen.statabstract",
+  "pk": 3,
+  "fields": {
+    "name": "SIZ",
+    "order": 3
+  }
+},
+{
+  "model": "enemygen.statabstract",
+  "pk": 4,
+  "fields": {
+    "name": "DEX",
+    "order": 4
+  }
+},
+{
+  "model": "enemygen.statabstract",
+  "pk": 7,
+  "fields": {
+    "name": "INT",
+    "order": 5
+  }
+},
+{
+  "model": "enemygen.statabstract",
+  "pk": 5,
+  "fields": {
+    "name": "POW",
+    "order": 6
+  }
+},
+{
+  "model": "enemygen.statabstract",
+  "pk": 6,
+  "fields": {
+    "name": "CHA",
+    "order": 7
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 32,
+  "fields": {
+    "name": "Acrobatics",
+    "standard": false,
+    "magic": false,
+    "default_value": "STR+DEX",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 31,
+  "fields": {
+    "name": "Acting",
+    "standard": false,
+    "magic": false,
+    "default_value": "CHA+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 33,
+  "fields": {
+    "name": "Art",
+    "standard": false,
+    "magic": false,
+    "default_value": "POW+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 1,
+  "fields": {
+    "name": "Athletics",
+    "standard": true,
+    "magic": false,
+    "default_value": "STR+DEX",
+    "include": true
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 27,
+  "fields": {
+    "name": "Binding",
+    "standard": false,
+    "magic": true,
+    "default_value": "POW+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 2,
+  "fields": {
+    "name": "Boating",
+    "standard": true,
+    "magic": false,
+    "default_value": "STR+CON",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 3,
+  "fields": {
+    "name": "Brawn",
+    "standard": true,
+    "magic": false,
+    "default_value": "STR+SIZ",
+    "include": true
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 34,
+  "fields": {
+    "name": "Bureaucracy",
+    "standard": false,
+    "magic": false,
+    "default_value": "INT+INT",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 35,
+  "fields": {
+    "name": "Commerce",
+    "standard": false,
+    "magic": false,
+    "default_value": "INT+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 6,
+  "fields": {
+    "name": "Conceal",
+    "standard": true,
+    "magic": false,
+    "default_value": "DEX+POW",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 36,
+  "fields": {
+    "name": "Courtesy",
+    "standard": false,
+    "magic": false,
+    "default_value": "INT+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 7,
+  "fields": {
+    "name": "Dance",
+    "standard": true,
+    "magic": false,
+    "default_value": "DEX+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 8,
+  "fields": {
+    "name": "Deceit",
+    "standard": true,
+    "magic": false,
+    "default_value": "INT+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 22,
+  "fields": {
+    "name": "Devotion",
+    "standard": false,
+    "magic": true,
+    "default_value": "POW+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 37,
+  "fields": {
+    "name": "Disguise",
+    "standard": false,
+    "magic": false,
+    "default_value": "INT+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 4,
+  "fields": {
+    "name": "Endurance",
+    "standard": true,
+    "magic": false,
+    "default_value": "CON+CON",
+    "include": true
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 38,
+  "fields": {
+    "name": "Engineering",
+    "standard": false,
+    "magic": false,
+    "default_value": "INT+INT",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 9,
+  "fields": {
+    "name": "Evade",
+    "standard": true,
+    "magic": false,
+    "default_value": "DEX+DEX",
+    "include": true
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 21,
+  "fields": {
+    "name": "Exhort",
+    "standard": false,
+    "magic": true,
+    "default_value": "INT+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 10,
+  "fields": {
+    "name": "First Aid",
+    "standard": true,
+    "magic": false,
+    "default_value": "DEX+INT",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 20,
+  "fields": {
+    "name": "Folk Magic",
+    "standard": false,
+    "magic": true,
+    "default_value": "POW+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 39,
+  "fields": {
+    "name": "Gambling",
+    "standard": false,
+    "magic": false,
+    "default_value": "INT+POW",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 40,
+  "fields": {
+    "name": "Healing",
+    "standard": false,
+    "magic": false,
+    "default_value": "INT+POW",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 11,
+  "fields": {
+    "name": "Influence",
+    "standard": true,
+    "magic": false,
+    "default_value": "CHA+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 12,
+  "fields": {
+    "name": "Insight",
+    "standard": true,
+    "magic": false,
+    "default_value": "INT+POW",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 23,
+  "fields": {
+    "name": "Invocation",
+    "standard": false,
+    "magic": true,
+    "default_value": "INT+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 13,
+  "fields": {
+    "name": "Locale",
+    "standard": true,
+    "magic": false,
+    "default_value": "INT+INT",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 41,
+  "fields": {
+    "name": "Lockpicking",
+    "standard": false,
+    "magic": false,
+    "default_value": "DEX+DEX",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 42,
+  "fields": {
+    "name": "Mechanisms",
+    "standard": false,
+    "magic": false,
+    "default_value": "DEX+INT",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 29,
+  "fields": {
+    "name": "Meditation",
+    "standard": false,
+    "magic": true,
+    "default_value": "INT+CON",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 30,
+  "fields": {
+    "name": "Mysticism",
+    "standard": false,
+    "magic": true,
+    "default_value": "POW+CON",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 43,
+  "fields": {
+    "name": "Navigation",
+    "standard": false,
+    "magic": false,
+    "default_value": "INT+POW",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 44,
+  "fields": {
+    "name": "Oratory",
+    "standard": false,
+    "magic": false,
+    "default_value": "POW+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 14,
+  "fields": {
+    "name": "Perception",
+    "standard": true,
+    "magic": false,
+    "default_value": "INT+POW",
+    "include": true
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 15,
+  "fields": {
+    "name": "Ride",
+    "standard": true,
+    "magic": false,
+    "default_value": "DEX+POW",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 45,
+  "fields": {
+    "name": "Seamanship",
+    "standard": false,
+    "magic": false,
+    "default_value": "INT+CON",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 46,
+  "fields": {
+    "name": "Seduction",
+    "standard": false,
+    "magic": false,
+    "default_value": "INT+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 24,
+  "fields": {
+    "name": "Shaping",
+    "standard": false,
+    "magic": true,
+    "default_value": "INT+POW",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 16,
+  "fields": {
+    "name": "Sing",
+    "standard": true,
+    "magic": false,
+    "default_value": "CHA+POW",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 47,
+  "fields": {
+    "name": "Sleight",
+    "standard": false,
+    "magic": false,
+    "default_value": "DEX+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 17,
+  "fields": {
+    "name": "Stealth",
+    "standard": true,
+    "magic": false,
+    "default_value": "DEX+INT",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 48,
+  "fields": {
+    "name": "Streetwise",
+    "standard": false,
+    "magic": false,
+    "default_value": "POW+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 49,
+  "fields": {
+    "name": "Survival",
+    "standard": false,
+    "magic": false,
+    "default_value": "CON+POW",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 18,
+  "fields": {
+    "name": "Swim",
+    "standard": true,
+    "magic": false,
+    "default_value": "STR+CON",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 50,
+  "fields": {
+    "name": "Teach",
+    "standard": false,
+    "magic": false,
+    "default_value": "INT+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 51,
+  "fields": {
+    "name": "Track",
+    "standard": false,
+    "magic": false,
+    "default_value": "INT+CON",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 28,
+  "fields": {
+    "name": "Trance",
+    "standard": false,
+    "magic": true,
+    "default_value": "POW+CON",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 19,
+  "fields": {
+    "name": "Unarmed",
+    "standard": true,
+    "magic": false,
+    "default_value": "STR+DEX",
+    "include": true
+  }
+},
+{
+  "model": "enemygen.skillabstract",
+  "pk": 5,
+  "fields": {
+    "name": "Willpower",
+    "standard": true,
+    "magic": false,
+    "default_value": "POW+POW",
+    "include": true
+  }
+},
+{
+  "model": "enemygen.spellabstract",
+  "pk": 195,
+  "fields": {
+    "name": "Augment skill: Athletics",
+    "type": "mysticism",
+    "detail": false,
+    "default_detail": ""
+  }
+},
+{
+  "model": "enemygen.spellabstract",
+  "pk": 201,
+  "fields": {
+    "name": "Augment skill: Evade",
+    "type": "mysticism",
+    "detail": false,
+    "default_detail": ""
+  }
+},
+{
+  "model": "enemygen.spellabstract",
+  "pk": 198,
+  "fields": {
+    "name": "Augment skill: Stealth",
+    "type": "mysticism",
+    "detail": false,
+    "default_detail": ""
+  }
+},
+{
+  "model": "enemygen.spellabstract",
+  "pk": 209,
+  "fields": {
+    "name": "Augment skill: Unarmed",
+    "type": "mysticism",
+    "detail": false,
+    "default_detail": ""
+  }
+},
+{
+  "model": "enemygen.spellabstract",
+  "pk": 230,
+  "fields": {
+    "name": "Enhance: Action Points",
+    "type": "mysticism",
+    "detail": false,
+    "default_detail": ""
+  }
+},
+{
+  "model": "enemygen.spellabstract",
+  "pk": 231,
+  "fields": {
+    "name": "Enhance: Damage Modifier",
+    "type": "mysticism",
+    "detail": false,
+    "default_detail": ""
+  }
+},
+{
+  "model": "enemygen.spellabstract",
+  "pk": 236,
+  "fields": {
+    "name": "Enhance: Strike Rank",
+    "type": "mysticism",
+    "detail": false,
+    "default_detail": ""
+  }
+},
+{
+  "model": "enemygen.spellabstract",
+  "pk": 211,
+  "fields": {
+    "name": "Trait: Arrowcut",
+    "type": "mysticism",
+    "detail": false,
+    "default_detail": ""
+  }
+},
+{
+  "model": "enemygen.spellabstract",
+  "pk": 220,
+  "fields": {
+    "name": "Trait: Formidable Nat. Weapons",
+    "type": "mysticism",
+    "detail": false,
+    "default_detail": ""
+  }
+},
+{
+  "model": "enemygen.spellabstract",
+  "pk": 227,
+  "fields": {
+    "name": "Trait: Pain Control",
+    "type": "mysticism",
+    "detail": false,
+    "default_detail": ""
+  }
+},
+{
+  "model": "enemygen.additionalfeaturelist",
+  "pk": 57,
+  "fields": {
+    "name": "African males",
+    "type": "name"
+  }
+},
+{
+  "model": "enemygen.combatstyle",
+  "pk": 858,
+  "fields": {
+    "name": "Way of the Staff",
+    "die_set": "STR+DEX+50+35",
+    "enemy_template": 1005,
+    "one_h_amount": "0",
+    "two_h_amount": "1",
+    "ranged_amount": "0",
+    "shield_amount": "0"
+  }
+},
+{
+  "model": "enemygen.weapon",
+  "pk": 58,
+  "fields": {
+    "name": "Quarterstaff",
+    "damage": "1d8",
+    "type": "2h-melee",
+    "size": "M",
+    "reach": "L",
+    "ap": 4,
+    "hp": 8,
+    "damage_modifier": true,
+    "special_effects": "Stun Loc",
+    "range": ""
+  }
+},
+{
+  "model": "enemygen.hitlocation",
+  "pk": 1,
+  "fields": {
+    "name": "Right leg",
+    "armor": "0",
+    "range_start": 1,
+    "range_end": 3,
+    "race": 1,
+    "hp_modifier": "0"
+  }
+},
+{
+  "model": "enemygen.hitlocation",
+  "pk": 2,
+  "fields": {
+    "name": "Left leg",
+    "armor": "0",
+    "range_start": 4,
+    "range_end": 6,
+    "race": 1,
+    "hp_modifier": "0"
+  }
+},
+{
+  "model": "enemygen.hitlocation",
+  "pk": 3,
+  "fields": {
+    "name": "Abdomen",
+    "armor": "0",
+    "range_start": 7,
+    "range_end": 9,
+    "race": 1,
+    "hp_modifier": "1"
+  }
+},
+{
+  "model": "enemygen.hitlocation",
+  "pk": 4,
+  "fields": {
+    "name": "Chest",
+    "armor": "0",
+    "range_start": 10,
+    "range_end": 12,
+    "race": 1,
+    "hp_modifier": "2"
+  }
+},
+{
+  "model": "enemygen.hitlocation",
+  "pk": 5,
+  "fields": {
+    "name": "Right arm",
+    "armor": "0",
+    "range_start": 13,
+    "range_end": 15,
+    "race": 1,
+    "hp_modifier": "-1"
+  }
+},
+{
+  "model": "enemygen.hitlocation",
+  "pk": 6,
+  "fields": {
+    "name": "Left arm",
+    "armor": "0",
+    "range_start": 16,
+    "range_end": 18,
+    "race": 1,
+    "hp_modifier": "-1"
+  }
+},
+{
+  "model": "enemygen.hitlocation",
+  "pk": 7,
+  "fields": {
+    "name": "Head",
+    "armor": "0",
+    "range_start": 19,
+    "range_end": 20,
+    "race": 1,
+    "hp_modifier": "0"
+  }
+},
+{
+  "model": "enemygen.enemystat",
+  "pk": 6336,
+  "fields": {
+    "stat": 1,
+    "enemy_template": 1005,
+    "die_set": "2d6+6"
+  }
+},
+{
+  "model": "enemygen.enemystat",
+  "pk": 6337,
+  "fields": {
+    "stat": 2,
+    "enemy_template": 1005,
+    "die_set": "2d6+6"
+  }
+},
+{
+  "model": "enemygen.enemystat",
+  "pk": 6338,
+  "fields": {
+    "stat": 3,
+    "enemy_template": 1005,
+    "die_set": "2d6+6"
+  }
+},
+{
+  "model": "enemygen.enemystat",
+  "pk": 6339,
+  "fields": {
+    "stat": 4,
+    "enemy_template": 1005,
+    "die_set": "2d6+6"
+  }
+},
+{
+  "model": "enemygen.enemystat",
+  "pk": 6340,
+  "fields": {
+    "stat": 7,
+    "enemy_template": 1005,
+    "die_set": "2d6+6"
+  }
+},
+{
+  "model": "enemygen.enemystat",
+  "pk": 6341,
+  "fields": {
+    "stat": 5,
+    "enemy_template": 1005,
+    "die_set": "3d6"
+  }
+},
+{
+  "model": "enemygen.enemystat",
+  "pk": 6342,
+  "fields": {
+    "stat": 6,
+    "enemy_template": 1005,
+    "die_set": "3d6"
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 62693,
+  "fields": {
+    "skill": 32,
+    "enemy_template": 1005,
+    "die_set": "STR+DEX",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 65264,
+  "fields": {
+    "skill": 31,
+    "enemy_template": 1005,
+    "die_set": "CHA+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 67835,
+  "fields": {
+    "skill": 33,
+    "enemy_template": 1005,
+    "die_set": "POW+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22389,
+  "fields": {
+    "skill": 1,
+    "enemy_template": 1005,
+    "die_set": "STR+DEX+50+35",
+    "include": true
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22390,
+  "fields": {
+    "skill": 27,
+    "enemy_template": 1005,
+    "die_set": "POW+CHA+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22391,
+  "fields": {
+    "skill": 2,
+    "enemy_template": 1005,
+    "die_set": "STR+CON+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22392,
+  "fields": {
+    "skill": 3,
+    "enemy_template": 1005,
+    "die_set": "STR+SIZ+50+35",
+    "include": true
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 70406,
+  "fields": {
+    "skill": 34,
+    "enemy_template": 1005,
+    "die_set": "INT+INT",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 72977,
+  "fields": {
+    "skill": 35,
+    "enemy_template": 1005,
+    "die_set": "INT+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22393,
+  "fields": {
+    "skill": 6,
+    "enemy_template": 1005,
+    "die_set": "DEX+POW+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 75548,
+  "fields": {
+    "skill": 36,
+    "enemy_template": 1005,
+    "die_set": "INT+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22394,
+  "fields": {
+    "skill": 7,
+    "enemy_template": 1005,
+    "die_set": "DEX+CHA+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22395,
+  "fields": {
+    "skill": 8,
+    "enemy_template": 1005,
+    "die_set": "INT+CHA+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22396,
+  "fields": {
+    "skill": 22,
+    "enemy_template": 1005,
+    "die_set": "POW+CHA+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 78119,
+  "fields": {
+    "skill": 37,
+    "enemy_template": 1005,
+    "die_set": "INT+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22397,
+  "fields": {
+    "skill": 4,
+    "enemy_template": 1005,
+    "die_set": "CON+CON+50+35",
+    "include": true
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 80690,
+  "fields": {
+    "skill": 38,
+    "enemy_template": 1005,
+    "die_set": "INT+INT",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22398,
+  "fields": {
+    "skill": 9,
+    "enemy_template": 1005,
+    "die_set": "DEX+DEX+50+35",
+    "include": true
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22399,
+  "fields": {
+    "skill": 21,
+    "enemy_template": 1005,
+    "die_set": "INT+CHA+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22400,
+  "fields": {
+    "skill": 10,
+    "enemy_template": 1005,
+    "die_set": "DEX+INT+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22401,
+  "fields": {
+    "skill": 20,
+    "enemy_template": 1005,
+    "die_set": "POW+CHA+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 83261,
+  "fields": {
+    "skill": 39,
+    "enemy_template": 1005,
+    "die_set": "INT+POW",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 85832,
+  "fields": {
+    "skill": 40,
+    "enemy_template": 1005,
+    "die_set": "INT+POW",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22402,
+  "fields": {
+    "skill": 11,
+    "enemy_template": 1005,
+    "die_set": "CHA+CHA+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22403,
+  "fields": {
+    "skill": 12,
+    "enemy_template": 1005,
+    "die_set": "INT+POW+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22404,
+  "fields": {
+    "skill": 23,
+    "enemy_template": 1005,
+    "die_set": "INT+CHA+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22405,
+  "fields": {
+    "skill": 13,
+    "enemy_template": 1005,
+    "die_set": "INT+INT+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 88403,
+  "fields": {
+    "skill": 41,
+    "enemy_template": 1005,
+    "die_set": "DEX+DEX",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 90974,
+  "fields": {
+    "skill": 42,
+    "enemy_template": 1005,
+    "die_set": "DEX+INT",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22406,
+  "fields": {
+    "skill": 29,
+    "enemy_template": 1005,
+    "die_set": "INT+CON+4D10+50+35",
+    "include": true
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22407,
+  "fields": {
+    "skill": 30,
+    "enemy_template": 1005,
+    "die_set": "POW+CON+4D10+50+35",
+    "include": true
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 93545,
+  "fields": {
+    "skill": 43,
+    "enemy_template": 1005,
+    "die_set": "INT+POW",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 96116,
+  "fields": {
+    "skill": 44,
+    "enemy_template": 1005,
+    "die_set": "POW+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22408,
+  "fields": {
+    "skill": 14,
+    "enemy_template": 1005,
+    "die_set": "INT+POW+50+35",
+    "include": true
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22409,
+  "fields": {
+    "skill": 15,
+    "enemy_template": 1005,
+    "die_set": "DEX+POW+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 98687,
+  "fields": {
+    "skill": 45,
+    "enemy_template": 1005,
+    "die_set": "INT+CON",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 101258,
+  "fields": {
+    "skill": 46,
+    "enemy_template": 1005,
+    "die_set": "INT+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22410,
+  "fields": {
+    "skill": 24,
+    "enemy_template": 1005,
+    "die_set": "INT+POW+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22411,
+  "fields": {
+    "skill": 16,
+    "enemy_template": 1005,
+    "die_set": "CHA+POW+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 103829,
+  "fields": {
+    "skill": 47,
+    "enemy_template": 1005,
+    "die_set": "DEX+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22412,
+  "fields": {
+    "skill": 17,
+    "enemy_template": 1005,
+    "die_set": "DEX+INT+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 106400,
+  "fields": {
+    "skill": 48,
+    "enemy_template": 1005,
+    "die_set": "POW+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 108971,
+  "fields": {
+    "skill": 49,
+    "enemy_template": 1005,
+    "die_set": "CON+POW",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22413,
+  "fields": {
+    "skill": 18,
+    "enemy_template": 1005,
+    "die_set": "STR+CON+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 111542,
+  "fields": {
+    "skill": 50,
+    "enemy_template": 1005,
+    "die_set": "INT+CHA",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 114113,
+  "fields": {
+    "skill": 51,
+    "enemy_template": 1005,
+    "die_set": "INT+CON",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22414,
+  "fields": {
+    "skill": 28,
+    "enemy_template": 1005,
+    "die_set": "POW+CON+50+35",
+    "include": false
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22415,
+  "fields": {
+    "skill": 19,
+    "enemy_template": 1005,
+    "die_set": "STR+DEX+50+35",
+    "include": true
+  }
+},
+{
+  "model": "enemygen.enemyskill",
+  "pk": 22416,
+  "fields": {
+    "skill": 5,
+    "enemy_template": 1005,
+    "die_set": "POW+POW+50+35",
+    "include": true
+  }
+},
+{
+  "model": "enemygen.enemyspell",
+  "pk": 7926,
+  "fields": {
+    "spell": 195,
+    "enemy_template": 1005,
+    "probability": 1,
+    "detail": ""
+  }
+},
+{
+  "model": "enemygen.enemyspell",
+  "pk": 7927,
+  "fields": {
+    "spell": 201,
+    "enemy_template": 1005,
+    "probability": 1,
+    "detail": ""
+  }
+},
+{
+  "model": "enemygen.enemyspell",
+  "pk": 7928,
+  "fields": {
+    "spell": 198,
+    "enemy_template": 1005,
+    "probability": 1,
+    "detail": ""
+  }
+},
+{
+  "model": "enemygen.enemyspell",
+  "pk": 7929,
+  "fields": {
+    "spell": 209,
+    "enemy_template": 1005,
+    "probability": 10,
+    "detail": ""
+  }
+},
+{
+  "model": "enemygen.enemyspell",
+  "pk": 7930,
+  "fields": {
+    "spell": 230,
+    "enemy_template": 1005,
+    "probability": 10,
+    "detail": ""
+  }
+},
+{
+  "model": "enemygen.enemyspell",
+  "pk": 7931,
+  "fields": {
+    "spell": 231,
+    "enemy_template": 1005,
+    "probability": 10,
+    "detail": ""
+  }
+},
+{
+  "model": "enemygen.enemyspell",
+  "pk": 7932,
+  "fields": {
+    "spell": 236,
+    "enemy_template": 1005,
+    "probability": 10,
+    "detail": ""
+  }
+},
+{
+  "model": "enemygen.enemyspell",
+  "pk": 7933,
+  "fields": {
+    "spell": 211,
+    "enemy_template": 1005,
+    "probability": 10,
+    "detail": ""
+  }
+},
+{
+  "model": "enemygen.enemyspell",
+  "pk": 7934,
+  "fields": {
+    "spell": 220,
+    "enemy_template": 1005,
+    "probability": 10,
+    "detail": ""
+  }
+},
+{
+  "model": "enemygen.enemyspell",
+  "pk": 7935,
+  "fields": {
+    "spell": 227,
+    "enemy_template": 1005,
+    "probability": 10,
+    "detail": ""
+  }
+},
+{
+  "model": "enemygen.enemyhitlocation",
+  "pk": 5772,
+  "fields": {
+    "hit_location": 1,
+    "enemy_template": 1005,
+    "armor": "0"
+  }
+},
+{
+  "model": "enemygen.enemyhitlocation",
+  "pk": 5773,
+  "fields": {
+    "hit_location": 2,
+    "enemy_template": 1005,
+    "armor": "0"
+  }
+},
+{
+  "model": "enemygen.enemyhitlocation",
+  "pk": 5774,
+  "fields": {
+    "hit_location": 3,
+    "enemy_template": 1005,
+    "armor": "0"
+  }
+},
+{
+  "model": "enemygen.enemyhitlocation",
+  "pk": 5775,
+  "fields": {
+    "hit_location": 4,
+    "enemy_template": 1005,
+    "armor": "0"
+  }
+},
+{
+  "model": "enemygen.enemyhitlocation",
+  "pk": 5776,
+  "fields": {
+    "hit_location": 5,
+    "enemy_template": 1005,
+    "armor": "0"
+  }
+},
+{
+  "model": "enemygen.enemyhitlocation",
+  "pk": 5777,
+  "fields": {
+    "hit_location": 6,
+    "enemy_template": 1005,
+    "armor": "0"
+  }
+},
+{
+  "model": "enemygen.enemyhitlocation",
+  "pk": 5778,
+  "fields": {
+    "hit_location": 7,
+    "enemy_template": 1005,
+    "armor": "0"
+  }
+},
+{
+  "model": "enemygen.combatstyle",
+  "pk": 858,
+  "fields": {
+    "name": "Way of the Staff",
+    "die_set": "STR+DEX+50+35",
+    "enemy_template": 1005,
+    "one_h_amount": "0",
+    "two_h_amount": "1",
+    "ranged_amount": "0",
+    "shield_amount": "0"
+  }
+},
+{
+  "model": "enemygen.enemyweapon",
+  "pk": 3039,
+  "fields": {
+    "combat_style": 858,
+    "weapon": 58,
+    "probability": 1
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1640,
+  "fields": {
+    "name": "Abelo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1641,
+  "fields": {
+    "name": "Amukelani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1642,
+  "fields": {
+    "name": "Andile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1644,
+  "fields": {
+    "name": "Anele",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1645,
+  "fields": {
+    "name": "Anelisa",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1646,
+  "fields": {
+    "name": "Avela",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1647,
+  "fields": {
+    "name": "Ayanda",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1648,
+  "fields": {
+    "name": "Ayize",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1649,
+  "fields": {
+    "name": "Azisa",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1650,
+  "fields": {
+    "name": "Bafana",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1651,
+  "fields": {
+    "name": "Bandile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1652,
+  "fields": {
+    "name": "Bangizwe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1653,
+  "fields": {
+    "name": "Bheka",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1654,
+  "fields": {
+    "name": "Bhekabantu",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1655,
+  "fields": {
+    "name": "Bhekifa",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1657,
+  "fields": {
+    "name": "Bhekimuzi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1658,
+  "fields": {
+    "name": "Bhekinkosi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1659,
+  "fields": {
+    "name": "Bhekisisa",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1660,
+  "fields": {
+    "name": "Bhekithemba",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1661,
+  "fields": {
+    "name": "Bhekizifundiswa",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1662,
+  "fields": {
+    "name": "Bhekizizwe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1663,
+  "fields": {
+    "name": "Bhekumuzi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1665,
+  "fields": {
+    "name": "Bongani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1666,
+  "fields": {
+    "name": "Bonginkosi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1667,
+  "fields": {
+    "name": "Busiso",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1668,
+  "fields": {
+    "name": "Buyisiwe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1669,
+  "fields": {
+    "name": "Cakaza",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1670,
+  "fields": {
+    "name": "Cebo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1671,
+  "fields": {
+    "name": "Cela",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1672,
+  "fields": {
+    "name": "Celankobe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1673,
+  "fields": {
+    "name": "Celokwakhe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1674,
+  "fields": {
+    "name": "Celumusa",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1675,
+  "fields": {
+    "name": "Cetshwayo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1676,
+  "fields": {
+    "name": "Chacha",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1677,
+  "fields": {
+    "name": "Chaka",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1678,
+  "fields": {
+    "name": "Chakijane",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1679,
+  "fields": {
+    "name": "Chipo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1680,
+  "fields": {
+    "name": "Chotho",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1681,
+  "fields": {
+    "name": "Chweba",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1682,
+  "fields": {
+    "name": "Ciko",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1683,
+  "fields": {
+    "name": "Cilonga",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1684,
+  "fields": {
+    "name": "Cothoza",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1685,
+  "fields": {
+    "name": "Cwatha",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1686,
+  "fields": {
+    "name": "Dabu",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1687,
+  "fields": {
+    "name": "Dabuka",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1688,
+  "fields": {
+    "name": "Dabulamanzi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1689,
+  "fields": {
+    "name": "Dalingcebo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1691,
+  "fields": {
+    "name": "Daza",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1692,
+  "fields": {
+    "name": "Delani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1693,
+  "fields": {
+    "name": "Dida",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1694,
+  "fields": {
+    "name": "Dinfa",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1695,
+  "fields": {
+    "name": "Dingane",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1696,
+  "fields": {
+    "name": "Dinizulu",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1697,
+  "fields": {
+    "name": "Donya",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1698,
+  "fields": {
+    "name": "Duma",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1699,
+  "fields": {
+    "name": "Dumezulu",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1700,
+  "fields": {
+    "name": "Dumile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1701,
+  "fields": {
+    "name": "Dumisane",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1702,
+  "fields": {
+    "name": "Dumisani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1703,
+  "fields": {
+    "name": "Dumisile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1704,
+  "fields": {
+    "name": "Dumo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1705,
+  "fields": {
+    "name": "Dundu",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1706,
+  "fields": {
+    "name": "Eethaba",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1707,
+  "fields": {
+    "name": "Elethu",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1708,
+  "fields": {
+    "name": "Falakhe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1709,
+  "fields": {
+    "name": "Fananaye",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1710,
+  "fields": {
+    "name": "Fanyana",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1711,
+  "fields": {
+    "name": "Felokwakhe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1712,
+  "fields": {
+    "name": "Fikile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1713,
+  "fields": {
+    "name": "Finyelela",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1714,
+  "fields": {
+    "name": "Fobela",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1715,
+  "fields": {
+    "name": "Fokazi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1716,
+  "fields": {
+    "name": "Fowabo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1717,
+  "fields": {
+    "name": "Fowenu",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1718,
+  "fields": {
+    "name": "Fundani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1719,
+  "fields": {
+    "name": "Fundisa",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1720,
+  "fields": {
+    "name": "Fuza",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1721,
+  "fields": {
+    "name": "Fuzo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1722,
+  "fields": {
+    "name": "Gabadeli",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1723,
+  "fields": {
+    "name": "Gabadi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1724,
+  "fields": {
+    "name": "Gabangaye",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1725,
+  "fields": {
+    "name": "Gamalakhe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1726,
+  "fields": {
+    "name": "Gangi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1727,
+  "fields": {
+    "name": "Gania",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1728,
+  "fields": {
+    "name": "Ganiah",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1729,
+  "fields": {
+    "name": "Ganya",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1730,
+  "fields": {
+    "name": "Ganyah",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1731,
+  "fields": {
+    "name": "Gatsha",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1732,
+  "fields": {
+    "name": "Gazi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1733,
+  "fields": {
+    "name": "Gcinumuzi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1734,
+  "fields": {
+    "name": "Geza",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1735,
+  "fields": {
+    "name": "Gibeli",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1736,
+  "fields": {
+    "name": "Gijimani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1737,
+  "fields": {
+    "name": "Gijimi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1739,
+  "fields": {
+    "name": "Guduza",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1740,
+  "fields": {
+    "name": "Gwazi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1741,
+  "fields": {
+    "name": "Gwebi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1742,
+  "fields": {
+    "name": "Gwedi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1743,
+  "fields": {
+    "name": "Gwili",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1744,
+  "fields": {
+    "name": "Hluphizwe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1745,
+  "fields": {
+    "name": "Impela",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1746,
+  "fields": {
+    "name": "Jabu",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1747,
+  "fields": {
+    "name": "Jabulani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1748,
+  "fields": {
+    "name": "Jama",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1749,
+  "fields": {
+    "name": "Jama",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1750,
+  "fields": {
+    "name": "Jwayelani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1751,
+  "fields": {
+    "name": "Kgomotso",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1752,
+  "fields": {
+    "name": "Khayalethu",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1753,
+  "fields": {
+    "name": "Khethukuthula",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1754,
+  "fields": {
+    "name": "Khewzi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1755,
+  "fields": {
+    "name": "Khulani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1756,
+  "fields": {
+    "name": "Khulekani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1757,
+  "fields": {
+    "name": "Khwezi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1758,
+  "fields": {
+    "name": "Kosan",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1759,
+  "fields": {
+    "name": "Kufika",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1760,
+  "fields": {
+    "name": "Kuhlekonke",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1761,
+  "fields": {
+    "name": "Kuhlesbonge",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1762,
+  "fields": {
+    "name": "Kwanele",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1763,
+  "fields": {
+    "name": "Langalibalele",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1764,
+  "fields": {
+    "name": "Lethu",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1765,
+  "fields": {
+    "name": "Lindani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1766,
+  "fields": {
+    "name": "Lindelani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1767,
+  "fields": {
+    "name": "Lindile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1768,
+  "fields": {
+    "name": "Litha",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1769,
+  "fields": {
+    "name": "Lizwi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1770,
+  "fields": {
+    "name": "Londisizwe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1771,
+  "fields": {
+    "name": "Lunga",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1772,
+  "fields": {
+    "name": "Lungelo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1773,
+  "fields": {
+    "name": "Lungile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1774,
+  "fields": {
+    "name": "Luvo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1775,
+  "fields": {
+    "name": "Luyanda",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1776,
+  "fields": {
+    "name": "Lwandile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1777,
+  "fields": {
+    "name": "Lwazi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1778,
+  "fields": {
+    "name": "Makhaya",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1779,
+  "fields": {
+    "name": "Malibongwe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1780,
+  "fields": {
+    "name": "Malusi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1781,
+  "fields": {
+    "name": "Malusi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1782,
+  "fields": {
+    "name": "Mandla",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1783,
+  "fields": {
+    "name": "Mandlakhe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1784,
+  "fields": {
+    "name": "Mandlenkosi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1785,
+  "fields": {
+    "name": "Manelesi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1786,
+  "fields": {
+    "name": "Manqoba",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1787,
+  "fields": {
+    "name": "Maphikelela",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1788,
+  "fields": {
+    "name": "Matshana",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1789,
+  "fields": {
+    "name": "Mbongiseni",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1791,
+  "fields": {
+    "name": "Mcebo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1792,
+  "fields": {
+    "name": "Mduduzi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1794,
+  "fields": {
+    "name": "Menzi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1795,
+  "fields": {
+    "name": "Menzi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1796,
+  "fields": {
+    "name": "Mfanafuthi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1797,
+  "fields": {
+    "name": "Mfundo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1798,
+  "fields": {
+    "name": "Mgwazeni",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1799,
+  "fields": {
+    "name": "Mhambi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1800,
+  "fields": {
+    "name": "Minenhle",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1801,
+  "fields": {
+    "name": "Mkhumbuleni",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1802,
+  "fields": {
+    "name": "Mlungisi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1803,
+  "fields": {
+    "name": "Mlungisi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1804,
+  "fields": {
+    "name": "Mmeli",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1805,
+  "fields": {
+    "name": "Mncedisi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1806,
+  "fields": {
+    "name": "Mndeni",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1808,
+  "fields": {
+    "name": "Mnotho",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1809,
+  "fields": {
+    "name": "Mnqobi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1811,
+  "fields": {
+    "name": "Mondli",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1812,
+  "fields": {
+    "name": "Mpendulo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1813,
+  "fields": {
+    "name": "Mphikeleli",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1814,
+  "fields": {
+    "name": "Mpilo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1815,
+  "fields": {
+    "name": "Mpinkulu",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1816,
+  "fields": {
+    "name": "Mpucuko",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1817,
+  "fields": {
+    "name": "Mpumelelo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1818,
+  "fields": {
+    "name": "Mqondisi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1819,
+  "fields": {
+    "name": "Mqondisi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1820,
+  "fields": {
+    "name": "Msizi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1821,
+  "fields": {
+    "name": "Mthandeni",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1822,
+  "fields": {
+    "name": "Mthobisi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1823,
+  "fields": {
+    "name": "Mthokozisi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1824,
+  "fields": {
+    "name": "Mtholephi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1825,
+  "fields": {
+    "name": "Mthunzi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1826,
+  "fields": {
+    "name": "Musa",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1827,
+  "fields": {
+    "name": "MusaweNkosi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1828,
+  "fields": {
+    "name": "Muzikayise",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1829,
+  "fields": {
+    "name": "Mvuseselo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1830,
+  "fields": {
+    "name": "Mzamo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1831,
+  "fields": {
+    "name": "Mzikayise",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1832,
+  "fields": {
+    "name": "Mzwakhe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1833,
+  "fields": {
+    "name": "Mzwamandla",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1834,
+  "fields": {
+    "name": "Mzwandile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1835,
+  "fields": {
+    "name": "Mzwenhlanhla",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1836,
+  "fields": {
+    "name": "Nathi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1837,
+  "fields": {
+    "name": "Ncelebana",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1838,
+  "fields": {
+    "name": "Ndleleni",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1839,
+  "fields": {
+    "name": "Ndonsa",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1840,
+  "fields": {
+    "name": "Ndonsa",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1841,
+  "fields": {
+    "name": "Nduduzo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1842,
+  "fields": {
+    "name": "Ndumiso",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1843,
+  "fields": {
+    "name": "Ngenzokwami",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1844,
+  "fields": {
+    "name": "Nhlakanipho",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1845,
+  "fields": {
+    "name": "Nhlanhla",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1846,
+  "fields": {
+    "name": "Nikhil",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1847,
+  "fields": {
+    "name": "Njabulo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1848,
+  "fields": {
+    "name": "Nkanyezi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1849,
+  "fields": {
+    "name": "Nkanyiso",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1851,
+  "fields": {
+    "name": "Nkosenye",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1852,
+  "fields": {
+    "name": "Nkosi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1853,
+  "fields": {
+    "name": "Nkosinathi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1854,
+  "fields": {
+    "name": "Nkosingiphile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1855,
+  "fields": {
+    "name": "Nkosinhle",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1856,
+  "fields": {
+    "name": "Nkosiphendule",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1857,
+  "fields": {
+    "name": "Nkululeko",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1858,
+  "fields": {
+    "name": "Nqobani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1860,
+  "fields": {
+    "name": "Nqobizitha",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1861,
+  "fields": {
+    "name": "Nsizwa",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1862,
+  "fields": {
+    "name": "Ntuthuko",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1863,
+  "fields": {
+    "name": "Olothando",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1864,
+  "fields": {
+    "name": "Owethu",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1865,
+  "fields": {
+    "name": "Phakama",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1866,
+  "fields": {
+    "name": "Phazamisa",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1867,
+  "fields": {
+    "name": "Phesheya",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1868,
+  "fields": {
+    "name": "Phila",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1869,
+  "fields": {
+    "name": "Philani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1870,
+  "fields": {
+    "name": "Phindile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1871,
+  "fields": {
+    "name": "Phiwayinkosi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1872,
+  "fields": {
+    "name": "Phiwokwakhe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1873,
+  "fields": {
+    "name": "Phumelela",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1874,
+  "fields": {
+    "name": "Phumulani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1876,
+  "fields": {
+    "name": "Qaphelani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1877,
+  "fields": {
+    "name": "Qedusizi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1878,
+  "fields": {
+    "name": "Qhude",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1879,
+  "fields": {
+    "name": "Qiniso",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1880,
+  "fields": {
+    "name": "S'bonele",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1881,
+  "fields": {
+    "name": "S'kulekile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1882,
+  "fields": {
+    "name": "Sakhile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1883,
+  "fields": {
+    "name": "Sandile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1884,
+  "fields": {
+    "name": "Sanele",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1885,
+  "fields": {
+    "name": "Sbu",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1886,
+  "fields": {
+    "name": "Sduduzo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1887,
+  "fields": {
+    "name": "Senzo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1888,
+  "fields": {
+    "name": "Sfiso",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1889,
+  "fields": {
+    "name": "Shaka",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1890,
+  "fields": {
+    "name": "Shakah",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1891,
+  "fields": {
+    "name": "Sibongile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1892,
+  "fields": {
+    "name": "Sibongiseni",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1893,
+  "fields": {
+    "name": "Sibusiso",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1894,
+  "fields": {
+    "name": "Sifiso",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1895,
+  "fields": {
+    "name": "Sihle",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1896,
+  "fields": {
+    "name": "Sikhosiphi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1897,
+  "fields": {
+    "name": "Simphiwe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1898,
+  "fields": {
+    "name": "Sinenhlanhla",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1899,
+  "fields": {
+    "name": "Sinoxolo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1900,
+  "fields": {
+    "name": "Siphelele",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1901,
+  "fields": {
+    "name": "Siphesihle",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1902,
+  "fields": {
+    "name": "Siphiwe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1903,
+  "fields": {
+    "name": "Siphiwe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1904,
+  "fields": {
+    "name": "Sipho",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1905,
+  "fields": {
+    "name": "Sithembiso",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1906,
+  "fields": {
+    "name": "Siyabonga",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1907,
+  "fields": {
+    "name": "Sizani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1908,
+  "fields": {
+    "name": "Sizwe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1909,
+  "fields": {
+    "name": "Slindile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1910,
+  "fields": {
+    "name": "Spamandla",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1911,
+  "fields": {
+    "name": "Sqalesihle",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1912,
+  "fields": {
+    "name": "Sthembiso",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1913,
+  "fields": {
+    "name": "Thabo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1914,
+  "fields": {
+    "name": "Thalente",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1915,
+  "fields": {
+    "name": "Thamsanqa",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1916,
+  "fields": {
+    "name": "Thandabantu",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1917,
+  "fields": {
+    "name": "Thandanani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1918,
+  "fields": {
+    "name": "Thando",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1919,
+  "fields": {
+    "name": "Thandoluhle",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1920,
+  "fields": {
+    "name": "Themba",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1921,
+  "fields": {
+    "name": "Thembelani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1922,
+  "fields": {
+    "name": "Thembinkosi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1923,
+  "fields": {
+    "name": "Thembisile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1924,
+  "fields": {
+    "name": "Thembisile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1925,
+  "fields": {
+    "name": "Thulani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1926,
+  "fields": {
+    "name": "Thulasizwe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1927,
+  "fields": {
+    "name": "Thuthuka",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1928,
+  "fields": {
+    "name": "Ulwazi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1929,
+  "fields": {
+    "name": "Unathi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1930,
+  "fields": {
+    "name": "Velabahleke",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1931,
+  "fields": {
+    "name": "Velaphi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1932,
+  "fields": {
+    "name": "Vukani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1933,
+  "fields": {
+    "name": "Vusi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1934,
+  "fields": {
+    "name": "Vusumuzi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1935,
+  "fields": {
+    "name": "Vuyo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1936,
+  "fields": {
+    "name": "Wandile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1937,
+  "fields": {
+    "name": "Wenzile",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1938,
+  "fields": {
+    "name": "Xhegu",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1939,
+  "fields": {
+    "name": "Xhibeni",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1941,
+  "fields": {
+    "name": "Xolani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1942,
+  "fields": {
+    "name": "Yengwayo",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1943,
+  "fields": {
+    "name": "Zama",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1944,
+  "fields": {
+    "name": "Zamani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1945,
+  "fields": {
+    "name": "Zenzele",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1946,
+  "fields": {
+    "name": "Zibonele",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1947,
+  "fields": {
+    "name": "Zithembe",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1948,
+  "fields": {
+    "name": "Zithulele",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1949,
+  "fields": {
+    "name": "Zuzumuzi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1950,
+  "fields": {
+    "name": "Zwelibani",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1951,
+  "fields": {
+    "name": "Zwelibanzi",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.additionalfeatureitem",
+  "pk": 1952,
+  "fields": {
+    "name": "Zwelikude",
+    "feature_list": 57
+  }
+},
+{
+  "model": "enemygen.racestat",
+  "pk": 1,
+  "fields": {
+    "stat": 1,
+    "race": 1,
+    "default_value": "3d6"
+  }
+},
+{
+  "model": "enemygen.racestat",
+  "pk": 2,
+  "fields": {
+    "stat": 2,
+    "race": 1,
+    "default_value": "3d6"
+  }
+},
+{
+  "model": "enemygen.racestat",
+  "pk": 3,
+  "fields": {
+    "stat": 3,
+    "race": 1,
+    "default_value": "2d6+6"
+  }
+},
+{
+  "model": "enemygen.racestat",
+  "pk": 4,
+  "fields": {
+    "stat": 4,
+    "race": 1,
+    "default_value": "3d6"
+  }
+},
+{
+  "model": "enemygen.racestat",
+  "pk": 5,
+  "fields": {
+    "stat": 7,
+    "race": 1,
+    "default_value": "2d6+6"
+  }
+},
+{
+  "model": "enemygen.racestat",
+  "pk": 6,
+  "fields": {
+    "stat": 5,
+    "race": 1,
+    "default_value": "3d6"
+  }
+},
+{
+  "model": "enemygen.racestat",
+  "pk": 7,
+  "fields": {
+    "stat": 6,
+    "race": 1,
+    "default_value": "3d6"
+  }
+}
+]
