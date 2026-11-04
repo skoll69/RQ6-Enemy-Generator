@@ -27,4 +27,19 @@
         </tr>
     {% endfor %}
 </table>
+<div class="pagination">
+    <span class="step-links">
+        {% if templates.has_previous %}
+            <a href="?page={{ templates.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ templates.number }} of {{ templates.paginator.num_pages }}.
+        </span>
+
+        {% if templates.has_next %}
+            <a href="?page={{ templates.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">next</a>
+        {% endif %}
+    </span>
+</div>
 </div>

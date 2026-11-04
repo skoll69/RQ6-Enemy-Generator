@@ -79,15 +79,19 @@ def get_party_context(party):
     return context
 
 
-def get_enemy_templates(filtr, user):
+def get_enemy_templates(filtr, user, search_string=None):
     """ Returns the list of EnemyTemplates based on the filter and user.
         Consolidated into a single query to avoid N+1 problems.
     """
     if filtr == "Starred":
         return EnemyTemplate.get_starred(user)
 
-    # Start with a base queryset excluding Cults, joining Race and Owner, and prefetching Tags
-    templates = EnemyTemplate.objects.exclude(race__name='Cult').select_related('race', 'owner').prefetch_related('tags')
+    # Start with a base queryset
+    if search_string:
+        templates = EnemyTemplate.search(search_string, user)
+    else:
+        templates = EnemyTemplate.objects.exclude(race__name='Cult')
+    templates = templates.select_related('race', 'owner').prefetch_related('tags')
 
     # Apply publication and ownership filters
     if user.is_authenticated:

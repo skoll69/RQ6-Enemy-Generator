@@ -625,11 +625,10 @@ class CombatStyleModelTest(TestCase):
         self.assertEqual(self.combat_style.die_set, 'STR+DEX+10')
 
     def test_custom_weapons_property(self):
-        """Test custom_weapons property returns queryset."""
+        """Test custom_weapons property returns list."""
         weapons = self.combat_style.custom_weapons
         self.assertIsNotNone(weapons)
-        from django.db.models import QuerySet
-        self.assertIsInstance(weapons, QuerySet)
+        self.assertIsInstance(weapons, list)
 
     def test_one_h_options(self):
         """Test one_h_options property returns list of dicts."""
@@ -862,7 +861,7 @@ class FeatureListModelTest(TestCase):
     def test_additional_feature_list_items(self):
         """Test feature list items property."""
         items = self.feature_list.items
-        self.assertEqual(items.count(), 2)
+        self.assertEqual(len(items), 2)
 
     def test_get_random_item(self):
         """Test getting random item from feature list."""
@@ -1001,15 +1000,15 @@ class TestDice(TestCase):
         self.assertEqual(_die_to_tuple('-2D6'), (-6, -1, 2))
         
     def test_2_dissect(self):
-        self.assertEqual(Dice('D6')._dissect(), [(1, 6, 1), ])
-        self.assertEqual(Dice('d6')._dissect(), [(1, 6, 1), ])
-        self.assertEqual(Dice('d6+1')._dissect(), [(1, 6, 1), 1])
-        self.assertEqual(Dice('d6-1')._dissect(), [(1, 6, 1), -1])
-        self.assertEqual(Dice('50+d6-1')._dissect(), [50, (1, 6, 1), -1])
-        self.assertEqual(Dice('50-d6')._dissect(), [50, (-6, -1, 1)])
-        self.assertEqual(Dice('2D6-D4')._dissect(), [(1, 6, 2), (-4, -1, 1)])
-        self.assertEqual(Dice('2D6-D4+5')._dissect(), [(1, 6, 2), (-4, -1, 1), 5])
-        self.assertEqual(Dice('2D6-D4-5')._dissect(), [(1, 6, 2), (-4, -1, 1), -5])
+        self.assertEqual(list(Dice('D6').components), [(1, 6, 1), ])
+        self.assertEqual(list(Dice('d6').components), [(1, 6, 1), ])
+        self.assertEqual(list(Dice('d6+1').components), [(1, 6, 1), 1])
+        self.assertEqual(list(Dice('d6-1').components), [(1, 6, 1), -1])
+        self.assertEqual(list(Dice('50+d6-1').components), [50, (1, 6, 1), -1])
+        self.assertEqual(list(Dice('50-d6').components), [50, (-6, -1, 1)])
+        self.assertEqual(list(Dice('2D6-D4').components), [(1, 6, 2), (-4, -1, 1)])
+        self.assertEqual(list(Dice('2D6-D4+5').components), [(1, 6, 2), (-4, -1, 1), 5])
+        self.assertEqual(list(Dice('2D6-D4-5').components), [(1, 6, 2), (-4, -1, 1), -5])
         
     def test_3_dice(self):
         self.assertTrue(1 <= Dice('D6').roll() <= 6)
