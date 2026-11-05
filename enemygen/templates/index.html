@@ -13,7 +13,9 @@
     </form>
 </div>
 
-Search: <input id="searchinput" /> |<form style="display: inline;" action="{% url 'generate_enemies' %}" method="post" target="_blank">
+Search: <form action="{% url 'index' %}" method="get" style="display: inline;">
+    <input id="searchinput" name="q" value="{{ request.GET.q }}" />
+</form> |<form style="display: inline;" action="{% url 'generate_enemies' %}" method="post" target="_blank">
      <input id="generate_button" type="submit" disabled class="disabled" name="generate" value="Generate"> | <input type="submit" name="lucky" value="Do you feel lucky?">
     {% csrf_token %}
     <div id="selected_enemy_template_list_container" style="display:none;">

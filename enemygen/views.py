@@ -20,7 +20,17 @@ import json
 def index(request):
     context = get_context(request)
 
-    context['templates'] = get_enemy_templates(get_filter(request), request.user)
+    q = request.GET.get('q', '').strip()
+    templates = get_enemy_templates(get_filter(request), request.user, search_string=q if q else None)
+    paginator = Paginator(templates, 100)
+    page = request.GET.get('page')
+    try:
+        context['templates'] = paginator.page(page)
+    except PageNotAnInteger:
+        context['templates'] = paginator.page(1)
+    except EmptyPage:
+        context['templates'] = paginator.page(paginator.num_pages)
+
     return render(request, 'index.html', context)
 
 

@@ -14,3 +14,5 @@ local_data_only.sql
 data_only.sql
 db.sqlite3
 *.sqlite3
+skills/
+PR-*.md
